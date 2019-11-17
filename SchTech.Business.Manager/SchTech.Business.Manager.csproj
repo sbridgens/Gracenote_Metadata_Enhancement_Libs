@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0868AA0F-32F8-43C2-AF12-5348D854100B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SchTech.Business.Manager</RootNamespace>
+    <AssemblyName>SchTech.Business.Manager</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore, Version=2.2.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.4.4.1\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Abstract\EnrichmentWorkflow\IEnrichmentWorkflowService.cs" />
+    <Compile Include="Abstract\EntityFramework\IAdiEnrichmentService.cs" />
+    <Compile Include="Abstract\EntityFramework\IGnImageLookupService.cs" />
+    <Compile Include="Abstract\EntityFramework\IGnMappingDataService.cs" />
+    <Compile Include="Concrete\CustomerBusinessLogic\VirginMedia\EnrichmentWorkflowManager.cs" />
+    <Compile Include="Concrete\CustomerBusinessLogic\VirginMedia\ProdisAdiContentManager.cs" />
+    <Compile Include="Concrete\EntityFramework\AdiEnrichmentManager.cs" />
+    <Compile Include="Concrete\EntityFramework\GnImageLookupManager.cs" />
+    <Compile Include="Concrete\EntityFramework\GnMappingDataManager.cs" />
+    <Compile Include="Concrete\ImageLogic\ImageSelectionLogic.cs" />
+    <Compile Include="Concrete\Validation\EnhancementDataValidator.cs" />
+    <Compile Include="Concrete\Validation\AdiXmlValidator.cs" />
+    <Compile Include="Concrete\Validation\GnMappingValidator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SchTech.Api.Manager\SchTech.Api.Manager.csproj">
+      <Project>{6A566258-03D3-4030-B238-9E9112840837}</Project>
+      <Name>SchTech.Api.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Configuration.Manager\SchTech.Configuration.Manager.csproj">
+      <Project>{326210A7-92B9-43DC-A87D-6E6ACEB164FE}</Project>
+      <Name>SchTech.Configuration.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Core\SchTech.Core.csproj">
+      <Project>{45D7D10A-D8B6-4381-995B-44F8E2E3D500}</Project>
+      <Name>SchTech.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.DataAccess\SchTech.DataAccess.csproj">
+      <Project>{E41294F8-869A-48BF-B95C-BDF3216E8E07}</Project>
+      <Name>SchTech.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Entities\SchTech.Entities.csproj">
+      <Project>{FBEC6C57-4653-415B-86C0-31545F92E285}</Project>
+      <Name>SchTech.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.File.Manager\SchTech.File.Manager.csproj">
+      <Project>{F39AE7F9-3F7D-4942-BB7E-F6DB58255042}</Project>
+      <Name>SchTech.File.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Queue.Manager\SchTech.Queue.Manager.csproj">
+      <Project>{B486D741-AE9E-4745-B6A1-09365FEB22AB}</Project>
+      <Name>SchTech.Queue.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Web.Manager\SchTech.Web.Manager.csproj">
+      <Project>{53CB7D04-F7BE-4280-B431-C41298B89299}</Project>
+      <Name>SchTech.Web.Manager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
