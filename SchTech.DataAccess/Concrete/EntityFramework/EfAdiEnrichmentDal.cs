@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
@@ -22,20 +21,15 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             try
             {
-                if (!ExpiryProcessing)
-                {
-                    Task.Run(action: ClearExpiredAssets);
-                }
+                if (!ExpiryProcessing) Task.Run(ClearExpiredAssets);
 
                 return true;
             }
-            catch (System.Data.SqlClient.SqlException sqlEx)
+            catch (SqlException sqlEx)
             {
                 EfStaticMethods.Log.Error($"SQL Exception during database connection: {sqlEx.Message}");
                 if (sqlEx.InnerException != null)
-                {
                     EfStaticMethods.Log.Error($"Inner Exception: {sqlEx.InnerException.Message}");
-                }
 
                 return false;
             }
@@ -43,9 +37,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 EfStaticMethods.Log.Error($"General Exception during database connection: {CAWND_EX.Message}");
                 if (CAWND_EX.InnerException != null)
-                {
                     EfStaticMethods.Log.Error($"Inner Exception: {CAWND_EX.InnerException.Message}");
-                }
 
                 return false;
             }
@@ -61,7 +53,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 EfStaticMethods.Log.Info("Checking for expired data in the adi db");
 
                 var expiredRows = CurrentContext.Adi_Data
-                    .Where(item => (Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now));
+                    .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now);
 
                 var mapData = new List<GN_Mapping_Data>();
 
@@ -82,13 +74,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
 
                 if (expiryCount == 0)
-                {
                     EfStaticMethods.Log.Info("No expired data present.");
-                }
                 else
-                {
                     EfStaticMethods.Log.Info($"Number of expired assets removed from database = {expiryCount}");
-                }
             }
 
             CheckAndClearOrphanedData();
@@ -102,7 +90,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 try
                 {
-                    EfStaticMethods.Log.Info("Checking for orphaned db data, this may take time dependant on db size; please be patient");
+                    EfStaticMethods.Log.Info(
+                        "Checking for orphaned db data, this may take time dependant on db size; please be patient");
 
                     var stopWatch = new Stopwatch();
                     stopWatch.Start();
@@ -137,7 +126,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                             logcount++;
                         }
 
-                        EfStaticMethods.Log.Warn($"Adi_Data table entry with id: {item.Id} and PAID: {item.TitlPaid} found that does not exist in GNMapping table, removing row data.");
+                        EfStaticMethods.Log.Warn(
+                            $"Adi_Data table entry with id: {item.Id} and PAID: {item.TitlPaid} found that does not exist in GNMapping table, removing row data.");
 
                         CurrentContext.Adi_Data.Remove(adidata);
                     }
@@ -179,7 +169,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                             logcount++;
                         }
 
-                        EfStaticMethods.Log.Warn($"Mapping table entry with id: {item.Id} and PAID: {item.GN_Paid} found that does not exist in adi data table, removing row data.");
+                        EfStaticMethods.Log.Warn(
+                            $"Mapping table entry with id: {item.Id} and PAID: {item.GN_Paid} found that does not exist in adi data table, removing row data.");
 
                         CurrentContext.GN_Mapping_Data.Remove(mapdata);
                     }
@@ -189,21 +180,17 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                     EfStaticMethods.Log.Info($"Orphan cleanup completed in: {stopWatch.Elapsed.Duration()}");
                 }
-                catch (System.Data.SqlClient.SqlException sqlEx)
+                catch (SqlException sqlEx)
                 {
                     EfStaticMethods.Log.Error($"SQL Exception during database connection: {sqlEx.Message}");
                     if (sqlEx.InnerException != null)
-                    {
                         EfStaticMethods.Log.Error($"Inner Exception: {sqlEx.InnerException.Message}");
-                    }
                 }
                 catch (Exception CAPO_EX)
                 {
                     EfStaticMethods.Log.Error($"General Exception during database connection: {CAPO_EX.Message}");
                     if (CAPO_EX.InnerException != null)
-                    {
                         EfStaticMethods.Log.Error($"Inner Exception: {CAPO_EX.InnerException.Message}");
-                    }
                 }
             }
         }

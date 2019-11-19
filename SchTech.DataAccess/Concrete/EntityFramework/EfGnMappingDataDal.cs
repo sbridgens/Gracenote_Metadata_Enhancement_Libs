@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
@@ -35,13 +34,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                     return true;
                 }
-                catch (System.Data.SqlClient.SqlException sqlEx)
+                catch (SqlException sqlEx)
                 {
                     EfStaticMethods.Log.Error($"SQL Exception during database connection: {sqlEx.Message}");
                     if (sqlEx.InnerException != null)
-                    {
                         EfStaticMethods.Log.Error($"Inner Exception: {sqlEx.InnerException.Message}");
-                    }
 
                     return false;
                 }
@@ -49,16 +46,15 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 {
                     EfStaticMethods.Log.Error($"General Exception during database connection: {CMDWND_EX.Message}");
                     if (CMDWND_EX.InnerException != null)
-                    {
                         EfStaticMethods.Log.Error($"Inner Exception: {CMDWND_EX.InnerException.Message}");
-                    }
 
                     return false;
                 }
             }
         }
 
-        public bool AddGraceNoteProgramData(string paid, string seriesTitle, string episodeTitle, GnApiProgramsSchema.programsProgram programData)
+        public bool AddGraceNoteProgramData(string paid, string seriesTitle, string episodeTitle,
+            GnApiProgramsSchema.programsProgram programData)
         {
             EfStaticMethods.Log.Info("Updating Gracenote database Mapping table with Program Data");
 
@@ -77,7 +73,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 gnMappingData.GN_SeriesTitle = seriesTitle;
 
                 var row = programContext.SaveChanges();
-                EfStaticMethods.Log.Info($"GN Mapping database number of records updated: {row}, where Paid: {paid} & Row ID: {gnMappingData.Id}");
+                EfStaticMethods.Log.Info(
+                    $"GN Mapping database number of records updated: {row}, where Paid: {paid} & Row ID: {gnMappingData.Id}");
             }
 
             return true;
@@ -86,7 +83,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         public Dictionary<string, string> ReturnDbImagesForAsset(string paidValue, int rowId)
         {
             var dbImages = new Dictionary<string, string>();
-            
+
             EfStaticMethods.Log.Debug($"Retrieving image data from the db where GNPAID = {paidValue}");
             try
             {
@@ -102,18 +99,15 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     if (imgList == null)
                         return dbImages;
 
-                    foreach (var kv in imgList.Where(kv => !dbImages.ContainsKey(kv[0])))
-                    {
-                        dbImages.Add(kv[0], kv[1]);
-                    }
+                    foreach (var kv in imgList.Where(kv => !dbImages.ContainsKey(kv[0]))) dbImages.Add(kv[0], kv[1]);
                 }
 
                 return dbImages;
-
             }
             catch (Exception GDBI_EX)
             {
-                EfStaticMethods.Log.Error($"Error obtaining DB Images for GN PAID: {paidValue}, ERROR = {GDBI_EX.Message}");
+                EfStaticMethods.Log.Error(
+                    $"Error obtaining DB Images for GN PAID: {paidValue}, ERROR = {GDBI_EX.Message}");
                 if (GDBI_EX.InnerException != null)
                     EfStaticMethods.Log.Error($"Inner Exception: {GDBI_EX.InnerException.Message}");
                 EfStaticMethods.Log.Info("Continuing with workflow!");
@@ -135,6 +129,5 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     i => i.GN_Paid.Contains(gnPaid));
             }
         }
-
     }
 }

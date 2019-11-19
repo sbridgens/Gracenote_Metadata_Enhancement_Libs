@@ -18,6 +18,7 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
     {
         [XmlAttribute(AttributeName = "providers")]
         public static string Providers { get; set; }
+
         [XmlAttribute(AttributeName = "BlockPlatformValue")]
         public static string BlockPlatformValue { get; set; }
     }
@@ -27,50 +28,68 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
     {
         [XmlElement(ElementName = "InputDirectory")]
         public static string InputDirectory { get; set; }
+
         [XmlElement(ElementName = "PollIntervalInSeconds")]
         public static string PollIntervalInSeconds { get; set; }
+
         [XmlElement(ElementName = "ExpiredAssetCleanupIntervalHours")]
         public static string ExpiredAssetCleanupIntervalHours { get; set; }
+
         [XmlElement(ElementName = "AllowSDContentIngest")]
         public static string AllowSDContentIngest { get; set; }
+
         [XmlElement(ElementName = "UnrequiredSDContentDirectory")]
         public static string UnrequiredSDContentDirectory { get; set; }
+
         [XmlElement(ElementName = "TempWorkingDirectory")]
         public static string TempWorkingDirectory { get; set; }
+
         [XmlElement(ElementName = "FailedDirectory")]
         public static string FailedDirectory { get; set; }
+
         [XmlElement(ElementName = "IngestDirectory")]
         public static string IngestDirectory { get; set; }
+
         [XmlElement(ElementName = "UpdatesFailedDirectory")]
         public static string UpdatesFailedDirectory { get; set; }
+
         [XmlElement(ElementName = "MoveNonMappedDirectory")]
         public static string MoveNonMappedDirectory { get; set; }
+
         [XmlElement(ElementName = "RepollNonMappedIntervalHours")]
         public static string RepollNonMappedIntervalHours { get; set; }
+
         [XmlElement(ElementName = "FailedToMap_Max_Retry_Days")]
         public static string FailedToMap_Max_Retry_Days { get; set; }
+
         [XmlElement(ElementName = "TVOD_Delivery_Directory")]
         public static string TVOD_Delivery_Directory { get; set; }
-        [XmlElement(ElementName = "OnApi")]
-        public static string OnApi { get; set; }
-        [XmlElement(ElementName = "ApiKey")]
-        public static string ApiKey { get; set; }
+
+        [XmlElement(ElementName = "OnApi")] public static string OnApi { get; set; }
+
+        [XmlElement(ElementName = "ApiKey")] public static string ApiKey { get; set; }
+
         [XmlElement(ElementName = "MediaCloud")]
         public static string MediaCloud { get; set; }
+
         [XmlElement(ElementName = "Database_Host")]
         public static string Database_Host { get; set; }
+
         [XmlElement(ElementName = "Database_Name")]
         public static string Database_Name { get; set; }
+
         [XmlElement(ElementName = "Integrated_Security")]
         public static string Integrated_Security { get; set; }
+
         //[XmlElement(ElementName = "ExtraDataConfig")]
         //public static ExtraDataConfig ExtraDataConfig { get; set; }
         [XmlElement(ElementName = "Block_Platform")]
         public static Block_Platform Block_Platform { get; set; }
+
         [XmlElement(ElementName = "Prefix_Show_ID_Value")]
         public static string Prefix_Show_ID_Value { get; set; }
+
         [XmlElement(ElementName = "Prefix_Series_ID_Value")]
         public static string Prefix_Series_ID_Value { get; set; }
-
     }
 }

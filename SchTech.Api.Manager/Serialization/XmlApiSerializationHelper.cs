@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace SchTech.Api.Manager.Serialization
@@ -23,8 +19,9 @@ namespace SchTech.Api.Manager.Serialization
             using (TextReader textReader = new StringReader(fileContent))
             {
                 var deserializer = new XmlSerializer(ApiType);
-                result = (T)deserializer.Deserialize(textReader);
+                result = (T) deserializer.Deserialize(textReader);
             }
+
             return result;
         }
     }

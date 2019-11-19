@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 
 namespace SchTech.Entities.ConcreteTypes
 {
     public class EnrichmentDataLists
     {
-
         /// <summary>
-        /// Initialize Log4net
+        ///     Initialize Log4net
         /// </summary>
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(EnrichmentDataLists));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentDataLists));
 
         public List<GnApiProgramsSchema.assetType> ProgramAssets { get; private set; }
 
@@ -35,10 +32,7 @@ namespace SchTech.Entities.ConcreteTypes
                     ProgramAssets = new List<GnApiProgramsSchema.assetType>();
 
                 Log.Debug($"Number of Assets at {apiLevel} Level: {programsList.Count()}");
-                foreach (var item in programsList)
-                {
-                    ProgramAssets.Add(item);
-                }
+                foreach (var item in programsList) ProgramAssets.Add(item);
             }
             else
             {
@@ -55,10 +49,7 @@ namespace SchTech.Entities.ConcreteTypes
                     CastMembers = new List<GnApiProgramsSchema.castTypeMember>();
 
                 Log.Debug($"Number of Cast Members at {apiLevel} Level: {castList.Count()}");
-                foreach (var cast in castList)
-                {
-                    CastMembers.Add(cast);
-                }
+                foreach (var cast in castList) CastMembers.Add(cast);
             }
             else
             {
@@ -76,11 +67,7 @@ namespace SchTech.Entities.ConcreteTypes
 
                 Log.Debug($"Number of Crew Members at {apiLevel} Level: {crewList.Count()}");
 
-                foreach (var crew in crewList)
-                {
-                    CrewMembers.Add(crew);
-                }
-
+                foreach (var crew in crewList) CrewMembers.Add(crew);
             }
             else
             {
@@ -98,10 +85,7 @@ namespace SchTech.Entities.ConcreteTypes
 
                 Log.Debug($"Number of Program Titles at {apiLevel} Level: {programTitles.title.Count()}");
 
-                foreach (var title in programTitles.title.ToList())
-                {
-                    ProgramTitles.Add(title);
-                }
+                foreach (var title in programTitles.title.ToList()) ProgramTitles.Add(title);
             }
             else
             {
@@ -112,7 +96,6 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void AddGenresToList(IEnumerable<GnApiProgramsSchema.programsProgramGenre> genres, string apiLevel)
         {
-            
             if (genres != null && genres.Count() > 0)
             {
                 if (GenresList == null)
@@ -120,10 +103,7 @@ namespace SchTech.Entities.ConcreteTypes
 
                 Log.Debug($"Number of Genres at {apiLevel} Level: {genres.Count()}");
 
-                foreach (var genre in genres)
-                {
-                    GenresList.Add(genre);
-                }
+                foreach (var genre in genres) GenresList.Add(genre);
             }
             else
             {
@@ -141,10 +121,7 @@ namespace SchTech.Entities.ConcreteTypes
                 if (ExternalLinks == null)
                     ExternalLinks = new List<GnApiProgramsSchema.externalLinksTypeExternalLink>();
 
-                foreach (var link in externalLinks)
-                {
-                    ExternalLinks.Add(link);
-                }
+                foreach (var link in externalLinks) ExternalLinks.Add(link);
             }
             else
             {

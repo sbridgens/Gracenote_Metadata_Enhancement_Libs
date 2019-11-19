@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 

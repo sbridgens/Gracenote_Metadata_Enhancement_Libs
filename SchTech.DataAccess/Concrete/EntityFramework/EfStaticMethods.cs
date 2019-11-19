@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using SchTech.DataAccess.Abstract;
+﻿using System.Linq;
+using log4net;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
@@ -13,20 +7,19 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
     public class EfStaticMethods
     {
         /// <summary>
-        /// Initialize Log4net
+        ///     Initialize Log4net
         /// </summary>
-        public static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(EfStaticMethods));
+        public static readonly ILog Log = LogManager.GetLogger(typeof(EfStaticMethods));
 
         public static string GetPaidLastValue(string paidvalue)
         {
             return paidvalue.Replace("TITL", "")
-                            .Replace("i", "")
-                            .TrimStart('0');
+                .Replace("i", "")
+                .TrimStart('0');
         }
 
         public static string GetEnrichedAdiFile(string paidvalue)
         {
-
             using (var adiContext = new ADI_EnrichmentContext())
             {
                 return adiContext.Adi_Data.FirstOrDefault(p => p.TitlPaid == paidvalue)
@@ -38,7 +31,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var adiContext = new ADI_EnrichmentContext())
             {
-                var dbPaid = adiContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid.Contains(GetPaidLastValue(p.GN_Paid)));
+                var dbPaid =
+                    adiContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid.Contains(GetPaidLastValue(p.GN_Paid)));
 
                 if (dbPaid != null && dbPaid.GN_TMSID != currentTmsId)
                 {

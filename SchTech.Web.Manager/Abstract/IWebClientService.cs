@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SchTech.Web.Manager.Abstract
 {
@@ -27,7 +22,7 @@ namespace SchTech.Web.Manager.Abstract
         bool IsDisposed { get; set; }
         void Dispose();
 
-        string HttpGetRequest(string url, bool followRedirect=true);
+        string HttpGetRequest(string url, bool followRedirect = true);
 
         bool DownloadWebBasedFile(string fileUrl, bool useOriginalFileName = true, string newFileName = null,
             string localSaveDirectory = null);
@@ -36,6 +31,5 @@ namespace SchTech.Web.Manager.Abstract
         string HttpPostRequest(string url, string post, bool followRedirect = true, string refer = "");
 
         void DebugHtml(string html);
-
     }
 }

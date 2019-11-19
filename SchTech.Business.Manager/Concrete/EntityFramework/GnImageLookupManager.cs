@@ -5,13 +5,11 @@ using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.Core.DataAccess;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete;
-using SchTech.Entities.ConcreteTypes;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {
     public class GnImageLookupManager : IGnImageLookupService
     {
-
         private readonly IGnImageLookupDal _gnImageLookupDal;
 
         public GnImageLookupManager(IGnImageLookupDal gnImageLookupDal)

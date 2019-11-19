@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using SchTech.Business.Manager.Concrete.EntityFramework;
-using SchTech.DataAccess.Concrete.EntityFramework;
-using SchTech.Entities.ConcreteTypes;
-
-namespace SchTech.Business.Manager.Concrete.Validation
+﻿namespace SchTech.Business.Manager.Concrete.Validation
 {
     public class GnMappingValidator
     {
@@ -21,6 +15,5 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
         //    return isUpdate && hasEntry;
         //}
-
     }
 }

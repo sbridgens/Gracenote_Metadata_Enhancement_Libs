@@ -1,17 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using log4net;
 
 namespace SchTech.File.Manager.Concrete.FileSystem
 {
     public sealed class HardwareInformationManager : IDisposable
     {
+        private const double BytesInMb = 1048576;
+        private const double BytesInGb = 1073741824;
+
+        /// <summary>
+        ///     Initialize Log4net
+        /// </summary>
+        private readonly ILog log = LogManager.GetLogger(typeof(HardwareInformationManager));
 
         // Flag: Has Dispose already been called?
-        bool _disposed = false;
+        private bool _disposed;
 
         // Public implementation of Dispose pattern callable by consumers.
         public void Dispose()
@@ -42,13 +46,6 @@ namespace SchTech.File.Manager.Concrete.FileSystem
             Dispose(false);
         }
 
-        /// <summary>
-        /// Initialize Log4net
-        /// </summary>
-        private readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(HardwareInformationManager));
-        private const double BytesInMb = 1048576;
-        private const double BytesInGb = 1073741824;
-
         public bool GetDriveSpace()
         {
             try
@@ -62,21 +59,21 @@ namespace SchTech.File.Manager.Concrete.FileSystem
                         continue;
 
                     var usedSpace = Convert.ToInt32((drive.TotalSize - drive.TotalFreeSpace) / BytesInGb);
-                    var freespace = Convert.ToInt32((drive.TotalFreeSpace) / BytesInGb);
+                    var freespace = Convert.ToInt32(drive.TotalFreeSpace / BytesInGb);
                     var totalsize = Convert.ToInt32(drive.TotalSize / BytesInGb);
 
                     log.Info($"\nDrive: {drive.Name} ({drive.DriveType}, {drive.DriveFormat})\n" +
                              $"  Used space:\t{(drive.TotalSize - drive.TotalFreeSpace) / BytesInMb} " +
                              $"MB\t{usedSpace} GB\n" +
-                             $"  Free space:\t{(drive.TotalFreeSpace) / BytesInMb} MB\t{freespace} GB\n" +
+                             $"  Free space:\t{drive.TotalFreeSpace / BytesInMb} MB\t{freespace} GB\n" +
                              $"  Total size:\t{drive.TotalSize / BytesInMb} MB\t{totalsize} GB\n\n");
 
 
                     if (drive.Name.ToLower() == "d:\\" && freespace < 50)
-                    {
-                        throw new Exception($"Drive Space on {drive.VolumeLabel} is less that 50GB, this service will stop running!");
-                    }
+                        throw new Exception(
+                            $"Drive Space on {drive.VolumeLabel} is less that 50GB, this service will stop running!");
                 }
+
                 return true;
             }
             catch (Exception gdsEx)
@@ -84,8 +81,6 @@ namespace SchTech.File.Manager.Concrete.FileSystem
                 log.Error($"[GetDriveSpace]\t{gdsEx.Message}");
                 return false;
             }
-
         }
-
     }
 }

@@ -1,17 +1,38 @@
-﻿namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema
+﻿using System;
+using System.CodeDom.Compiler;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Xml.Serialization;
+
+namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema
 {
     public class GnOnApiProgramMappingSchema
     {
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-        public partial class on
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [XmlType(AnonymousType = true)]
+        public enum onProgramMappingsProgramMappingStatus
         {
+            /// <remarks />
+            ToBeMapped,
 
+            /// <remarks />
+            Mapped,
+
+            /// <remarks />
+            Unmappable
+        }
+
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        [XmlRoot(Namespace = "", IsNullable = false)]
+        public class on
+        {
             private header headerField;
 
             private onProgramMappings programMappingsField;
@@ -20,823 +41,531 @@
 
             public on()
             {
-                this.schemaVersionField = ((decimal)(3.0m));
+                schemaVersionField = 3.0m;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public header header
             {
-                get
-                {
-                    return this.headerField;
-                }
-                set
-                {
-                    this.headerField = value;
-                }
+                get => headerField;
+                set => headerField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public onProgramMappings programMappings
             {
-                get
-                {
-                    return this.programMappingsField;
-                }
-                set
-                {
-                    this.programMappingsField = value;
-                }
+                get => programMappingsField;
+                set => programMappingsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            [System.ComponentModel.DefaultValueAttribute(typeof(decimal), "3.0")]
+            /// <remarks />
+            [XmlAttribute]
+            [DefaultValue(typeof(decimal), "3.0")]
             public decimal schemaVersion
             {
-                get
-                {
-                    return this.schemaVersionField;
-                }
-                set
-                {
-                    this.schemaVersionField = value;
-                }
+                get => schemaVersionField;
+                set => schemaVersionField = value;
             }
         }
 
-        ///Version 3.0
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-        public partial class header
+        /// Version 3.0
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        [XmlRoot(Namespace = "", IsNullable = false)]
+        public class header
         {
-
             private string contentField;
 
-            private System.DateTime createdField;
-
             private string copyrightField;
+
+            private DateTime createdField;
 
             private headerRequestParameter[] requestParametersField;
 
             private headerStreamData streamDataField;
 
-            /// <remarks/>
+            /// <remarks />
             public string content
             {
-                get
-                {
-                    return this.contentField;
-                }
-                set
-                {
-                    this.contentField = value;
-                }
+                get => contentField;
+                set => contentField = value;
             }
 
-            /// <remarks/>
-            public System.DateTime created
+            /// <remarks />
+            public DateTime created
             {
-                get
-                {
-                    return this.createdField;
-                }
-                set
-                {
-                    this.createdField = value;
-                }
+                get => createdField;
+                set => createdField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string copyright
             {
-                get
-                {
-                    return this.copyrightField;
-                }
-                set
-                {
-                    this.copyrightField = value;
-                }
+                get => copyrightField;
+                set => copyrightField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("requestParameter", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("requestParameter", IsNullable = false)]
             public headerRequestParameter[] requestParameters
             {
-                get
-                {
-                    return this.requestParametersField;
-                }
-                set
-                {
-                    this.requestParametersField = value;
-                }
+                get => requestParametersField;
+                set => requestParametersField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public headerStreamData streamData
             {
-                get
-                {
-                    return this.streamDataField;
-                }
-                set
-                {
-                    this.streamDataField = value;
-                }
+                get => streamDataField;
+                set => streamDataField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class headerRequestParameter
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class headerRequestParameter
         {
-
             private string nameField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string name
             {
-                get
-                {
-                    return this.nameField;
-                }
-                set
-                {
-                    this.nameField = value;
-                }
+                get => nameField;
+                set => nameField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute()]
+            /// <remarks />
+            [XmlText]
             public string Value
             {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class headerStreamData
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class headerStreamData
         {
+            private long maxUpdateIdField;
+
+            private bool maxUpdateIdFieldSpecified;
 
             private long nextUpdateIdField;
 
             private bool nextUpdateIdFieldSpecified;
 
-            private long maxUpdateIdField;
-
-            private bool maxUpdateIdFieldSpecified;
-
-            /// <remarks/>
+            /// <remarks />
             public long nextUpdateId
             {
-                get
-                {
-                    return this.nextUpdateIdField;
-                }
-                set
-                {
-                    this.nextUpdateIdField = value;
-                }
+                get => nextUpdateIdField;
+                set => nextUpdateIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool nextUpdateIdSpecified
             {
-                get
-                {
-                    return this.nextUpdateIdFieldSpecified;
-                }
-                set
-                {
-                    this.nextUpdateIdFieldSpecified = value;
-                }
+                get => nextUpdateIdFieldSpecified;
+                set => nextUpdateIdFieldSpecified = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public long maxUpdateId
             {
-                get
-                {
-                    return this.maxUpdateIdField;
-                }
-                set
-                {
-                    this.maxUpdateIdField = value;
-                }
+                get => maxUpdateIdField;
+                set => maxUpdateIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool maxUpdateIdSpecified
             {
-                get
-                {
-                    return this.maxUpdateIdFieldSpecified;
-                }
-                set
-                {
-                    this.maxUpdateIdFieldSpecified = value;
-                }
+                get => maxUpdateIdFieldSpecified;
+                set => maxUpdateIdFieldSpecified = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-        public partial class requestParameters
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        [XmlRoot(Namespace = "", IsNullable = false)]
+        public class requestParameters
         {
-
             private requestParametersRequestParameter[] requestParameterField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("requestParameter")]
+            /// <remarks />
+            [XmlElement("requestParameter")]
             public requestParametersRequestParameter[] requestParameter
             {
-                get
-                {
-                    return this.requestParameterField;
-                }
-                set
-                {
-                    this.requestParameterField = value;
-                }
+                get => requestParameterField;
+                set => requestParameterField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class requestParametersRequestParameter
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class requestParametersRequestParameter
         {
-
             private string nameField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string name
             {
-                get
-                {
-                    return this.nameField;
-                }
-                set
-                {
-                    this.nameField = value;
-                }
+                get => nameField;
+                set => nameField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute()]
+            /// <remarks />
+            [XmlText]
             public string Value
             {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class onProgramMappings
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class onProgramMappings
         {
-
             private onProgramMappingsProgramMapping[] programMappingField;
 
             private string typeField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("programMapping")]
+            /// <remarks />
+            [XmlElement("programMapping")]
             public onProgramMappingsProgramMapping[] programMapping
             {
-                get
-                {
-                    return this.programMappingField;
-                }
-                set
-                {
-                    this.programMappingField = value;
-                }
+                get => programMappingField;
+                set => programMappingField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string type
             {
-                get
-                {
-                    return this.typeField;
-                }
-                set
-                {
-                    this.typeField = value;
-                }
+                get => typeField;
+                set => typeField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class onProgramMappingsProgramMapping
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class onProgramMappingsProgramMapping
         {
+            private onProgramMappingsProgramMappingAvailability availabilityField;
 
-            private string initialMappingDateField;
+            private string catalogNameField;
 
             private string creationDateField;
 
             private bool creationDateFieldSpecified;
 
-            private onProgramMappingsProgramMappingStatus statusField;
-
-            private bool statusFieldSpecified;
-
-            private onProgramMappingsProgramMappingID[] idField;
-
-            private onProgramMappingsProgramMappingLink[] linkField;
-
-            private onProgramMappingsProgramMappingAvailability availabilityField;
-
-            private onProgramMappingsProgramMappingMessage messageField;
-
-            private string catalogNameField;
-
-            private string programMappingIdField;
-
-            private string updateIdField;
-
-            private System.DateTime updateDateField;
-
             private bool deletedField;
 
             private bool deletedFieldSpecified;
 
-            /// <remarks/>
+            private onProgramMappingsProgramMappingID[] idField;
+
+            private string initialMappingDateField;
+
+            private onProgramMappingsProgramMappingLink[] linkField;
+
+            private onProgramMappingsProgramMappingMessage messageField;
+
+            private string programMappingIdField;
+
+            private onProgramMappingsProgramMappingStatus statusField;
+
+            private bool statusFieldSpecified;
+
+            private DateTime updateDateField;
+
+            private string updateIdField;
+
+            /// <remarks />
             public string initialMappingDate
             {
-                get
-                {
-                    return this.initialMappingDateField;
-                }
-                set
-                {
-                    this.initialMappingDateField = value;
-                }
+                get => initialMappingDateField;
+                set => initialMappingDateField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string creationDate
             {
-                get
-                {
-                    return this.creationDateField;
-                }
-                set
-                {
-                    this.creationDateField = value;
-                }
+                get => creationDateField;
+                set => creationDateField = value;
             }
 
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool creationDateSpecified
             {
-                get
-                {
-                    return this.creationDateFieldSpecified;
-                }
-                set
-                {
-                    this.creationDateFieldSpecified = value;
-                }
+                get => creationDateFieldSpecified;
+                set => creationDateFieldSpecified = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public onProgramMappingsProgramMappingStatus status
             {
-                get
-                {
-                    return this.statusField;
-                }
-                set
-                {
-                    this.statusField = value;
-                }
+                get => statusField;
+                set => statusField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool statusSpecified
             {
-                get
-                {
-                    return this.statusFieldSpecified;
-                }
-                set
-                {
-                    this.statusFieldSpecified = value;
-                }
+                get => statusFieldSpecified;
+                set => statusFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("id")]
+            /// <remarks />
+            [XmlElement("id")]
             public onProgramMappingsProgramMappingID[] id
             {
-                get
-                {
-                    return this.idField;
-                }
-                set
-                {
-                    this.idField = value;
-                }
+                get => idField;
+                set => idField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("link")]
+            /// <remarks />
+            [XmlElement("link")]
             public onProgramMappingsProgramMappingLink[] link
             {
-                get
-                {
-                    return this.linkField;
-                }
-                set
-                {
-                    this.linkField = value;
-                }
+                get => linkField;
+                set => linkField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public onProgramMappingsProgramMappingAvailability availability
             {
-                get
-                {
-                    return this.availabilityField;
-                }
-                set
-                {
-                    this.availabilityField = value;
-                }
+                get => availabilityField;
+                set => availabilityField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public onProgramMappingsProgramMappingMessage message
             {
-                get
-                {
-                    return this.messageField;
-                }
-                set
-                {
-                    this.messageField = value;
-                }
+                get => messageField;
+                set => messageField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string catalogName
             {
-                get
-                {
-                    return this.catalogNameField;
-                }
-                set
-                {
-                    this.catalogNameField = value;
-                }
+                get => catalogNameField;
+                set => catalogNameField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string programMappingId
             {
-                get
-                {
-                    return this.programMappingIdField;
-                }
-                set
-                {
-                    this.programMappingIdField = value;
-                }
+                get => programMappingIdField;
+                set => programMappingIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "nonNegativeInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "nonNegativeInteger")]
             public string updateId
             {
-                get
-                {
-                    return this.updateIdField;
-                }
-                set
-                {
-                    this.updateIdField = value;
-                }
+                get => updateIdField;
+                set => updateIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public System.DateTime updateDate
+            /// <remarks />
+            [XmlAttribute]
+            public DateTime updateDate
             {
-                get
-                {
-                    return this.updateDateField;
-                }
-                set
-                {
-                    this.updateDateField = value;
-                }
+                get => updateDateField;
+                set => updateDateField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool deleted
             {
-                get
-                {
-                    return this.deletedField;
-                }
-                set
-                {
-                    this.deletedField = value;
-                }
+                get => deletedField;
+                set => deletedField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool deletedSpecified
             {
-                get
-                {
-                    return this.deletedFieldSpecified;
-                }
-                set
-                {
-                    this.deletedFieldSpecified = value;
-                }
+                get => deletedFieldSpecified;
+                set => deletedFieldSpecified = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public enum onProgramMappingsProgramMappingStatus
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class onProgramMappingsProgramMappingID
         {
-
-            /// <remarks/>
-            ToBeMapped,
-
-            /// <remarks/>
-            Mapped,
-
-            /// <remarks/>
-            Unmappable,
-        }
-
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class onProgramMappingsProgramMappingID
-        {
-
             private string typeField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get
-                {
-                    return this.typeField;
-                }
-                set
-                {
-                    this.typeField = value;
-                }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class onProgramMappingsProgramMappingLink
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class onProgramMappingsProgramMappingLink
         {
-
             private string idTypeField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string idType
             {
-                get
-                {
-                    return this.idTypeField;
-                }
-                set
-                {
-                    this.idTypeField = value;
-                }
+                get => idTypeField;
+                set => idTypeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute()]
+            /// <remarks />
+            [XmlText]
             public string Value
             {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class onProgramMappingsProgramMappingAvailability
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class onProgramMappingsProgramMappingAvailability
         {
-
-            private System.DateTime startField;
-
-            private bool startFieldSpecified;
-
-            private System.DateTime endField;
+            private DateTime endField;
 
             private bool endFieldSpecified;
 
-            /// <remarks/>
-            public System.DateTime start
+            private DateTime startField;
+
+            private bool startFieldSpecified;
+
+            /// <remarks />
+            public DateTime start
             {
-                get
-                {
-                    return this.startField;
-                }
-                set
-                {
-                    this.startField = value;
-                }
+                get => startField;
+                set => startField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool startSpecified
             {
-                get
-                {
-                    return this.startFieldSpecified;
-                }
-                set
-                {
-                    this.startFieldSpecified = value;
-                }
+                get => startFieldSpecified;
+                set => startFieldSpecified = value;
             }
 
-            /// <remarks/>
-            public System.DateTime end
+            /// <remarks />
+            public DateTime end
             {
-                get
-                {
-                    return this.endField;
-                }
-                set
-                {
-                    this.endField = value;
-                }
+                get => endField;
+                set => endField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool endSpecified
             {
-                get
-                {
-                    return this.endFieldSpecified;
-                }
-                set
-                {
-                    this.endFieldSpecified = value;
-                }
+                get => endFieldSpecified;
+                set => endFieldSpecified = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class onProgramMappingsProgramMappingMessage
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [Serializable]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class onProgramMappingsProgramMappingMessage
         {
-
             private string[] detailField;
 
             private string reasonField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("detail", DataType = "token")]
+            /// <remarks />
+            [XmlElement("detail", DataType = "token")]
             public string[] detail
             {
-                get
-                {
-                    return this.detailField;
-                }
-                set
-                {
-                    this.detailField = value;
-                }
+                get => detailField;
+                set => detailField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string reason
             {
-                get
-                {
-                    return this.reasonField;
-                }
-                set
-                {
-                    this.reasonField = value;
-                }
+                get => reasonField;
+                set => reasonField = value;
             }
         }
     }

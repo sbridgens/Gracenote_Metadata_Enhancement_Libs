@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Abstract.EntityFramework;
-using SchTech.Core.DataAccess;
 using SchTech.DataAccess.Abstract;
 using SchTech.Entities.ConcreteTypes;
 
@@ -48,7 +47,8 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _gnMappingDataDal.CleanMappingDataWithNoAdi();
         }
 
-        public bool AddGraceNoteProgramData(string paid, string seriesTitle, string episodeTitle, GnApiProgramsSchema.programsProgram programDatas)
+        public bool AddGraceNoteProgramData(string paid, string seriesTitle, string episodeTitle,
+            GnApiProgramsSchema.programsProgram programDatas)
         {
             return _gnMappingDataDal.AddGraceNoteProgramData(paid, seriesTitle, episodeTitle, programDatas);
         }
@@ -62,6 +62,5 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
         {
             return _gnMappingDataDal.ReturnMapData(paid);
         }
-
     }
 }

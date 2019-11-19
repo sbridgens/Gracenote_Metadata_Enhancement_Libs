@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using log4net;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 
 namespace ADIWFE_TestClient
@@ -10,9 +11,14 @@ namespace ADIWFE_TestClient
     public class AdiWfManager
     {
         /// <summary>
-        /// Initialize Log4net
+        ///     Initialize Log4net
         /// </summary>
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(AdiWfManager));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AdiWfManager));
+
+        public AdiWfManager()
+        {
+            AdiWfOperations = new AdiWfOperations();
+        }
 
         private AdiWfOperations AdiWfOperations { get; }
 
@@ -20,7 +26,7 @@ namespace ADIWFE_TestClient
 
 
         /// <summary>
-        /// Function to resolve application assemblies that are contained in sub directories.
+        ///     Function to resolve application assemblies that are contained in sub directories.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
@@ -32,7 +38,7 @@ namespace ADIWFE_TestClient
                 return null;
 
             // check for assemblies already loaded
-            Assembly assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
             if (assembly != null)
                 return assembly;
 
@@ -51,11 +57,6 @@ namespace ADIWFE_TestClient
             }
         }
 
-        public AdiWfManager()
-        {
-            AdiWfOperations = new AdiWfOperations();
-        }
-
 
         public void Workflow_Start(object objdata)
         {
@@ -67,7 +68,6 @@ namespace ADIWFE_TestClient
 
             if (IsRunning)
             {
-
                 Log.Info("Service Started Successfully");
 
                 AdiWfOperations.InitialiseWorkflowOperations();
@@ -82,22 +82,17 @@ namespace ADIWFE_TestClient
         private void StartEnhancementEngine()
         {
             while (IsRunning)
-            {
                 try
                 {
-                    if (AdiWfOperations.IsInCleanup == false)
-                    {
-                        AdiWfOperations.StartProcessing();
-                    }
+                    if (AdiWfOperations.IsInCleanup == false) AdiWfOperations.StartProcessing();
                     Thread.Sleep(Convert.ToInt32(ADIWF_Config.PollIntervalInSeconds) * 1000);
                 }
                 catch (Exception saeEx)
                 {
                     AdiWfOperations.LogError("StartEnhancementEngine",
-                        $"Error Encountered During Poll Workflow Operations",
-                        ex: saeEx);
+                        "Error Encountered During Poll Workflow Operations",
+                        saeEx);
                 }
-            }
         }
     }
 }

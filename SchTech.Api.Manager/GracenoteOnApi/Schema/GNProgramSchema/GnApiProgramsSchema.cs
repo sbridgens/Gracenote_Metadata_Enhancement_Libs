@@ -1,8 +1,9 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Xml.Serialization;
 
 namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
 {
@@ -13,16 +14,15 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
         // 
 
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-        public partial class on
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        [XmlRoot(Namespace = "", IsNullable = false)]
+        public class on
         {
-
             private header headerField;
 
             private List<programsProgram> programsField;
@@ -31,199 +31,167 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
 
             public on()
             {
-                this.schemaVersionField = ((decimal)(3.2m));
+                schemaVersionField = 3.2m;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public header header
             {
-                get { return this.headerField; }
-                set { this.headerField = value; }
+                get => headerField;
+                set => headerField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("program", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("program", IsNullable = false)]
             public List<programsProgram> programs
             {
-                get { return this.programsField; }
-                set { this.programsField = value; }
+                get => programsField;
+                set => programsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            [System.ComponentModel.DefaultValueAttribute(typeof(decimal), "3.2")]
+            /// <remarks />
+            [XmlAttribute]
+            [DefaultValue(typeof(decimal), "3.2")]
             public decimal schemaVersion
             {
-                get { return this.schemaVersionField; }
-                set { this.schemaVersionField = value; }
+                get => schemaVersionField;
+                set => schemaVersionField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-        public partial class header
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        [XmlRoot(Namespace = "", IsNullable = false)]
+        public class header
         {
-
             private string contentField;
 
-            private System.DateTime createdField;
-
             private string copyrightField;
+
+            private DateTime createdField;
 
             private List<headerRequestParameter> requestParametersField;
 
             private headerStreamData streamDataField;
 
-            /// <remarks/>
+            /// <remarks />
             public string content
             {
-                get { return this.contentField; }
-                set { this.contentField = value; }
+                get => contentField;
+                set => contentField = value;
             }
 
-            /// <remarks/>
-            public System.DateTime created
+            /// <remarks />
+            public DateTime created
             {
-                get { return this.createdField; }
-                set { this.createdField = value; }
+                get => createdField;
+                set => createdField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string copyright
             {
-                get { return this.copyrightField; }
-                set { this.copyrightField = value; }
+                get => copyrightField;
+                set => copyrightField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("requestParameter", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("requestParameter", IsNullable = false)]
             public List<headerRequestParameter> requestParameters
             {
-                get { return this.requestParametersField; }
-                set { this.requestParametersField = value; }
+                get => requestParametersField;
+                set => requestParametersField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public headerStreamData streamData
             {
-                get { return this.streamDataField; }
-                set { this.streamDataField = value; }
+                get => streamDataField;
+                set => streamDataField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class headerRequestParameter
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class headerRequestParameter
         {
-
             private string nameField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string name
             {
-                get { return this.nameField; }
-                set { this.nameField = value; }
+                get => nameField;
+                set => nameField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute()]
+            /// <remarks />
+            [XmlText]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        public partial class identifierType
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        public class identifierType
         {
-
             private List<string> idField;
 
             private string typeField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("id", DataType = "token")]
+            /// <remarks />
+            [XmlElement("id", DataType = "token")]
             public List<string> id
             {
-                get { return this.idField; }
-                set { this.idField = value; }
+                get => idField;
+                set => idField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        public partial class assetType
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        public class assetType
         {
-
-            private List<identifierType> identifiersField;
-
-            private string uRIField;
+            private string assetIdField;
 
             private List<assetTypeCaption> captionField;
 
-            private string providerField;
-
-            private string assetIdField;
-
-            private string updateIdField;
+            private string categoryField;
 
             private bool deletedField;
 
             private bool deletedFieldSpecified;
 
-            private System.DateTime lastModifiedField;
-
-            private bool lastModifiedFieldSpecified;
-
-            private System.DateTime expiredDateField;
+            private DateTime expiredDateField;
 
             private bool expiredDateFieldSpecified;
-
-            private string typeField;
-
-            private string widthField;
-
-            private string heightField;
-
-            private bool primaryField;
-
-            private bool primaryFieldSpecified;
-
-            private string categoryField;
-
-            private string ratioField;
-
-            private string tierField;
-
-            private string seasonIdField;
 
             private string familyIdField;
 
@@ -231,316 +199,338 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
 
             private bool familyMasterFieldSpecified;
 
+            private string heightField;
+
+            private List<identifierType> identifiersField;
+
+            private DateTime lastModifiedField;
+
+            private bool lastModifiedFieldSpecified;
+
+            private bool primaryField;
+
+            private bool primaryFieldSpecified;
+
             private string provider1Field;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("identifier", IsNullable = false)]
+            private string providerField;
+
+            private string ratioField;
+
+            private string seasonIdField;
+
+            private string tierField;
+
+            private string typeField;
+
+            private string updateIdField;
+
+            private string uRIField;
+
+            private string widthField;
+
+            /// <remarks />
+            [XmlArrayItem("identifier", IsNullable = false)]
             public List<identifierType> identifiers
             {
-                get { return this.identifiersField; }
-                set { this.identifiersField = value; }
+                get => identifiersField;
+                set => identifiersField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string URI
             {
-                get { return this.uRIField; }
-                set { this.uRIField = value; }
+                get => uRIField;
+                set => uRIField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("caption")]
+            /// <remarks />
+            [XmlElement("caption")]
             public List<assetTypeCaption> caption
             {
-                get { return this.captionField; }
-                set { this.captionField = value; }
+                get => captionField;
+                set => captionField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string provider
             {
-                get { return this.providerField; }
-                set { this.providerField = value; }
+                get => providerField;
+                set => providerField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string assetId
             {
-                get { return this.assetIdField; }
-                set { this.assetIdField = value; }
+                get => assetIdField;
+                set => assetIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "nonNegativeInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "nonNegativeInteger")]
             public string updateId
             {
-                get { return this.updateIdField; }
-                set { this.updateIdField = value; }
+                get => updateIdField;
+                set => updateIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool deleted
             {
-                get { return this.deletedField; }
-                set { this.deletedField = value; }
+                get => deletedField;
+                set => deletedField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool deletedSpecified
             {
-                get { return this.deletedFieldSpecified; }
-                set { this.deletedFieldSpecified = value; }
+                get => deletedFieldSpecified;
+                set => deletedFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public System.DateTime lastModified
+            /// <remarks />
+            [XmlAttribute]
+            public DateTime lastModified
             {
-                get { return this.lastModifiedField; }
-                set { this.lastModifiedField = value; }
+                get => lastModifiedField;
+                set => lastModifiedField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool lastModifiedSpecified
             {
-                get { return this.lastModifiedFieldSpecified; }
-                set { this.lastModifiedFieldSpecified = value; }
+                get => lastModifiedFieldSpecified;
+                set => lastModifiedFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public System.DateTime expiredDate
+            /// <remarks />
+            [XmlAttribute]
+            public DateTime expiredDate
             {
-                get { return this.expiredDateField; }
-                set { this.expiredDateField = value; }
+                get => expiredDateField;
+                set => expiredDateField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool expiredDateSpecified
             {
-                get { return this.expiredDateFieldSpecified; }
-                set { this.expiredDateFieldSpecified = value; }
+                get => expiredDateFieldSpecified;
+                set => expiredDateFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string width
             {
-                get { return this.widthField; }
-                set { this.widthField = value; }
+                get => widthField;
+                set => widthField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string height
             {
-                get { return this.heightField; }
-                set { this.heightField = value; }
+                get => heightField;
+                set => heightField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool primary
             {
-                get { return this.primaryField; }
-                set { this.primaryField = value; }
+                get => primaryField;
+                set => primaryField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool primarySpecified
             {
-                get { return this.primaryFieldSpecified; }
-                set { this.primaryFieldSpecified = value; }
+                get => primaryFieldSpecified;
+                set => primaryFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string category
             {
-                get { return this.categoryField; }
-                set { this.categoryField = value; }
+                get => categoryField;
+                set => categoryField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string ratio
             {
-                get { return this.ratioField; }
-                set { this.ratioField = value; }
+                get => ratioField;
+                set => ratioField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string tier
             {
-                get { return this.tierField; }
-                set { this.tierField = value; }
+                get => tierField;
+                set => tierField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string seasonId
             {
-                get { return this.seasonIdField; }
-                set { this.seasonIdField = value; }
+                get => seasonIdField;
+                set => seasonIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string familyId
             {
-                get { return this.familyIdField; }
-                set { this.familyIdField = value; }
+                get => familyIdField;
+                set => familyIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool familyMaster
             {
-                get { return this.familyMasterField; }
-                set { this.familyMasterField = value; }
+                get => familyMasterField;
+                set => familyMasterField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool familyMasterSpecified
             {
-                get { return this.familyMasterFieldSpecified; }
-                set { this.familyMasterFieldSpecified = value; }
+                get => familyMasterFieldSpecified;
+                set => familyMasterFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute("provider", DataType = "token")]
+            /// <remarks />
+            [XmlAttribute("provider", DataType = "token")]
             public string provider1
             {
-                get { return this.provider1Field; }
-                set { this.provider1Field = value; }
+                get => provider1Field;
+                set => provider1Field = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class assetTypeCaption
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class assetTypeCaption
         {
-
             private string langField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "language")]
+            /// <remarks />
+            [XmlAttribute(DataType = "language")]
             public string lang
             {
-                get { return this.langField; }
-                set { this.langField = value; }
+                get => langField;
+                set => langField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute()]
+            /// <remarks />
+            [XmlText]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        public partial class ratingType
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        public class ratingType
         {
-
             private List<ratingTypeAdvisory> advisoriesField;
-
-            private List<ratingTypeRating> ratingField;
 
             private ratingTypeQualityRating qualityRatingField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("advisory", IsNullable = false)]
+            private List<ratingTypeRating> ratingField;
+
+            /// <remarks />
+            [XmlArrayItem("advisory", IsNullable = false)]
             public List<ratingTypeAdvisory> advisories
             {
-                get { return this.advisoriesField; }
-                set { this.advisoriesField = value; }
+                get => advisoriesField;
+                set => advisoriesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("rating")]
+            /// <remarks />
+            [XmlElement("rating")]
             public List<ratingTypeRating> rating
             {
-                get { return this.ratingField; }
-                set { this.ratingField = value; }
+                get => ratingField;
+                set => ratingField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public ratingTypeQualityRating qualityRating
             {
-                get { return this.qualityRatingField; }
-                set { this.qualityRatingField = value; }
+                get => qualityRatingField;
+                set => qualityRatingField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class ratingTypeAdvisory
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class ratingTypeAdvisory
         {
-
             private string ratingsBodyField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string ratingsBody
             {
-                get { return this.ratingsBodyField; }
-                set { this.ratingsBodyField = value; }
+                get => ratingsBodyField;
+                set => ratingsBodyField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class ratingTypeRating
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class ratingTypeRating
         {
-
-            private string warningField;
-
             private string areaField;
 
             private string codeField;
@@ -549,100 +539,98 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
 
             private string ratingsBodyField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            private string warningField;
+
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string warning
             {
-                get { return this.warningField; }
-                set { this.warningField = value; }
+                get => warningField;
+                set => warningField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string area
             {
-                get { return this.areaField; }
-                set { this.areaField = value; }
+                get => areaField;
+                set => areaField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string code
             {
-                get { return this.codeField; }
-                set { this.codeField = value; }
+                get => codeField;
+                set => codeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string description
             {
-                get { return this.descriptionField; }
-                set { this.descriptionField = value; }
+                get => descriptionField;
+                set => descriptionField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string ratingsBody
             {
-                get { return this.ratingsBodyField; }
-                set { this.ratingsBodyField = value; }
+                get => ratingsBodyField;
+                set => ratingsBodyField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class ratingTypeQualityRating
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class ratingTypeQualityRating
         {
+            private string numVotesField;
 
             private string ratingsBodyField;
 
             private float valueField;
 
-            private string numVotesField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string ratingsBody
             {
-                get { return this.ratingsBodyField; }
-                set { this.ratingsBodyField = value; }
+                get => ratingsBodyField;
+                set => ratingsBodyField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public float value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string numVotes
             {
-                get { return this.numVotesField; }
-                set { this.numVotesField = value; }
+                get => numVotesField;
+                set => numVotesField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        public partial class awardType
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        public class awardType
         {
-
-            private awardTypeName nameField;
-
             private awardTypeCategory categoryField;
 
-            private string yearField;
+            private awardTypeName nameField;
 
             private awardTypeRecipient recipientField;
 
@@ -650,1336 +638,1320 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
 
             private bool wonFieldSpecified;
 
-            /// <remarks/>
+            private string yearField;
+
+            /// <remarks />
             public awardTypeName name
             {
-                get { return this.nameField; }
-                set { this.nameField = value; }
+                get => nameField;
+                set => nameField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public awardTypeCategory category
             {
-                get { return this.categoryField; }
-                set { this.categoryField = value; }
+                get => categoryField;
+                set => categoryField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "gYear")]
+            /// <remarks />
+            [XmlElement(DataType = "gYear")]
             public string year
             {
-                get { return this.yearField; }
-                set { this.yearField = value; }
+                get => yearField;
+                set => yearField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public awardTypeRecipient recipient
             {
-                get { return this.recipientField; }
-                set { this.recipientField = value; }
+                get => recipientField;
+                set => recipientField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool won
             {
-                get { return this.wonField; }
-                set { this.wonField = value; }
+                get => wonField;
+                set => wonField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool wonSpecified
             {
-                get { return this.wonFieldSpecified; }
-                set { this.wonFieldSpecified = value; }
+                get => wonFieldSpecified;
+                set => wonFieldSpecified = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class awardTypeName
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class awardTypeName
         {
-
             private string awardIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string awardId
             {
-                get { return this.awardIdField; }
-                set { this.awardIdField = value; }
+                get => awardIdField;
+                set => awardIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class awardTypeCategory
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class awardTypeCategory
         {
-
             private string awardCatIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string awardCatId
             {
-                get { return this.awardCatIdField; }
-                set { this.awardCatIdField = value; }
+                get => awardCatIdField;
+                set => awardCatIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class awardTypeRecipient
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class awardTypeRecipient
         {
-
             private string nameIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string nameId
             {
-                get { return this.nameIdField; }
-                set { this.nameIdField = value; }
+                get => nameIdField;
+                set => nameIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        public partial class pNameType
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        public class pNameType
         {
-
-            private string prefixField;
-
             private string firstField;
-
-            private string middleField;
 
             private string lastField;
 
+            private string middleField;
+
+            private string prefixField;
+
             private string suffixField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string prefix
             {
-                get { return this.prefixField; }
-                set { this.prefixField = value; }
+                get => prefixField;
+                set => prefixField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string first
             {
-                get { return this.firstField; }
-                set { this.firstField = value; }
+                get => firstField;
+                set => firstField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string middle
             {
-                get { return this.middleField; }
-                set { this.middleField = value; }
+                get => middleField;
+                set => middleField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string last
             {
-                get { return this.lastField; }
-                set { this.lastField = value; }
+                get => lastField;
+                set => lastField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string suffix
             {
-                get { return this.suffixField; }
-                set { this.suffixField = value; }
+                get => suffixField;
+                set => suffixField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        public partial class titleDescType
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        public class titleDescType
         {
+            private string langField;
 
             private string sizeField;
 
-            private string typeField;
-
             private string subTypeField;
 
-            private string langField;
+            private string typeField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string size
             {
-                get { return this.sizeField; }
-                set { this.sizeField = value; }
+                get => sizeField;
+                set => sizeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string subType
             {
-                get { return this.subTypeField; }
-                set { this.subTypeField = value; }
+                get => subTypeField;
+                set => subTypeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "language")]
+            /// <remarks />
+            [XmlAttribute(DataType = "language")]
             public string lang
             {
-                get { return this.langField; }
-                set { this.langField = value; }
+                get => langField;
+                set => langField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute()]
+            /// <remarks />
+            [XmlText]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class headerStreamData
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class headerStreamData
         {
+            private long maxUpdateIdField;
+
+            private bool maxUpdateIdFieldSpecified;
 
             private long nextUpdateIdField;
 
             private bool nextUpdateIdFieldSpecified;
 
-            private long maxUpdateIdField;
-
-            private bool maxUpdateIdFieldSpecified;
-
-            /// <remarks/>
+            /// <remarks />
             public long nextUpdateId
             {
-                get { return this.nextUpdateIdField; }
-                set { this.nextUpdateIdField = value; }
+                get => nextUpdateIdField;
+                set => nextUpdateIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool nextUpdateIdSpecified
             {
-                get { return this.nextUpdateIdFieldSpecified; }
-                set { this.nextUpdateIdFieldSpecified = value; }
+                get => nextUpdateIdFieldSpecified;
+                set => nextUpdateIdFieldSpecified = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public long maxUpdateId
             {
-                get { return this.maxUpdateIdField; }
-                set { this.maxUpdateIdField = value; }
+                get => maxUpdateIdField;
+                set => maxUpdateIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool maxUpdateIdSpecified
             {
-                get { return this.maxUpdateIdFieldSpecified; }
-                set { this.maxUpdateIdFieldSpecified = value; }
+                get => maxUpdateIdFieldSpecified;
+                set => maxUpdateIdFieldSpecified = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgram
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgram
         {
-
-            private programsProgramTitles titlesField;
-
-            private programsProgramDescriptions descriptionsField;
-
-            private List<castTypeMember> castField;
-
-            private List<crewTypeMember> crewField;
-
-            private string runTimeField;
-
-            private string progTypeField;
-
-            private string subTypeField;
-
-            private programsProgramHoliday holidayField;
-
-            private List<string> countriesField;
-
-            private List<awardType> awardsField;
-
-            private List<programsProgramGenre> genresField;
-
-            private ratingType ratingsField;
-
-            private System.DateTime origAirDateField;
-
-            private bool origAirDateFieldSpecified;
-
-            private string colorCodeField;
-
-            private string versionLabelField;
-
-            private programsProgramMovieInfo movieInfoField;
-
-            private programsProgramEpisodeInfo episodeInfoField;
-
-            private programsProgramSportsInfo sportsInfoField;
+            private string animationField;
 
             private List<assetType> assetsField;
 
-            private List<programsProgramRelease> releasesField;
+            private List<awardType> awardsField;
 
-            private string animationField;
+            private List<castTypeMember> castField;
 
-            private string origAudioLangField;
-
-            private string sourceTypeField;
-
-            private programsProgramOriginalNetwork originalNetworkField;
-
-            private programsProgramLastOriginalNetwork lastOriginalNetworkField;
-
-            private System.DateTime seriesPremiereField;
-
-            private bool seriesPremiereFieldSpecified;
-
-            private System.DateTime seriesFinaleField;
-
-            private bool seriesFinaleFieldSpecified;
-
-            private List<programsProgramSeason> seasonsField;
-
-            private List<keywordsTypeKeyword> keywordsField;
-
-            private List<relationsTypeRelation> relationsField;
-
-            private List<relationshipsTypeRelationship> relationshipsField;
-
-            private bool showcardField;
-
-            private bool showcardFieldSpecified;
-
-            private List<string> officialURLField;
-
-            private string partNumberField;
-
-            private string totalPartsField;
-
-            private string durationField;
-
-            private List<externalLinksTypeExternalLink> externalLinksField;
-
-            private List<videoDescriptorsTypeVideoDescriptor> videoDescriptorsField;
-
-            private string tMSIdField;
-
-            private string rootIdField;
-
-            private string versionIdField;
+            private string colorCodeField;
 
             private string connectorIdField;
 
-            private string seasonIdField;
+            private List<string> countriesField;
 
-            private string seriesIdField;
-
-            private string updateIdField;
-
-            private System.DateTime updateDateField;
-
-            private bool inactiveField;
-
-            private bool inactiveFieldSpecified;
+            private List<crewTypeMember> crewField;
 
             private bool deletedField;
 
             private bool deletedFieldSpecified;
 
-            /// <remarks/>
+            private programsProgramDescriptions descriptionsField;
+
+            private string durationField;
+
+            private programsProgramEpisodeInfo episodeInfoField;
+
+            private List<externalLinksTypeExternalLink> externalLinksField;
+
+            private List<programsProgramGenre> genresField;
+
+            private programsProgramHoliday holidayField;
+
+            private bool inactiveField;
+
+            private bool inactiveFieldSpecified;
+
+            private List<keywordsTypeKeyword> keywordsField;
+
+            private programsProgramLastOriginalNetwork lastOriginalNetworkField;
+
+            private programsProgramMovieInfo movieInfoField;
+
+            private List<string> officialURLField;
+
+            private DateTime origAirDateField;
+
+            private bool origAirDateFieldSpecified;
+
+            private string origAudioLangField;
+
+            private programsProgramOriginalNetwork originalNetworkField;
+
+            private string partNumberField;
+
+            private string progTypeField;
+
+            private ratingType ratingsField;
+
+            private List<relationsTypeRelation> relationsField;
+
+            private List<relationshipsTypeRelationship> relationshipsField;
+
+            private List<programsProgramRelease> releasesField;
+
+            private string rootIdField;
+
+            private string runTimeField;
+
+            private string seasonIdField;
+
+            private List<programsProgramSeason> seasonsField;
+
+            private DateTime seriesFinaleField;
+
+            private bool seriesFinaleFieldSpecified;
+
+            private string seriesIdField;
+
+            private DateTime seriesPremiereField;
+
+            private bool seriesPremiereFieldSpecified;
+
+            private bool showcardField;
+
+            private bool showcardFieldSpecified;
+
+            private string sourceTypeField;
+
+            private programsProgramSportsInfo sportsInfoField;
+
+            private string subTypeField;
+
+            private programsProgramTitles titlesField;
+
+            private string tMSIdField;
+
+            private string totalPartsField;
+
+            private DateTime updateDateField;
+
+            private string updateIdField;
+
+            private string versionIdField;
+
+            private string versionLabelField;
+
+            private List<videoDescriptorsTypeVideoDescriptor> videoDescriptorsField;
+
+            /// <remarks />
             public programsProgramTitles titles
             {
-                get { return this.titlesField; }
-                set { this.titlesField = value; }
+                get => titlesField;
+                set => titlesField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramDescriptions descriptions
             {
-                get { return this.descriptionsField; }
-                set { this.descriptionsField = value; }
+                get => descriptionsField;
+                set => descriptionsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("member", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("member", IsNullable = false)]
             public List<castTypeMember> cast
             {
-                get { return this.castField; }
-                set { this.castField = value; }
+                get => castField;
+                set => castField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("member", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("member", IsNullable = false)]
             public List<crewTypeMember> crew
             {
-                get { return this.crewField; }
-                set { this.crewField = value; }
+                get => crewField;
+                set => crewField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "duration")]
+            /// <remarks />
+            [XmlElement(DataType = "duration")]
             public string runTime
             {
-                get { return this.runTimeField; }
-                set { this.runTimeField = value; }
+                get => runTimeField;
+                set => runTimeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string progType
             {
-                get { return this.progTypeField; }
-                set { this.progTypeField = value; }
+                get => progTypeField;
+                set => progTypeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string subType
             {
-                get { return this.subTypeField; }
-                set { this.subTypeField = value; }
+                get => subTypeField;
+                set => subTypeField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramHoliday holiday
             {
-                get { return this.holidayField; }
-                set { this.holidayField = value; }
+                get => holidayField;
+                set => holidayField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("country", DataType = "token", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("country", DataType = "token", IsNullable = false)]
             public List<string> countries
             {
-                get { return this.countriesField; }
-                set { this.countriesField = value; }
+                get => countriesField;
+                set => countriesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("award", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("award", IsNullable = false)]
             public List<awardType> awards
             {
-                get { return this.awardsField; }
-                set { this.awardsField = value; }
+                get => awardsField;
+                set => awardsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("genre", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("genre", IsNullable = false)]
             public List<programsProgramGenre> genres
             {
-                get { return this.genresField; }
-                set { this.genresField = value; }
+                get => genresField;
+                set => genresField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public ratingType ratings
             {
-                get { return this.ratingsField; }
-                set { this.ratingsField = value; }
+                get => ratingsField;
+                set => ratingsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-            public System.DateTime origAirDate
+            /// <remarks />
+            [XmlElement(DataType = "date")]
+            public DateTime origAirDate
             {
-                get { return this.origAirDateField; }
-                set { this.origAirDateField = value; }
+                get => origAirDateField;
+                set => origAirDateField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool origAirDateSpecified
             {
-                get { return this.origAirDateFieldSpecified; }
-                set { this.origAirDateFieldSpecified = value; }
+                get => origAirDateFieldSpecified;
+                set => origAirDateFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string colorCode
             {
-                get { return this.colorCodeField; }
-                set { this.colorCodeField = value; }
+                get => colorCodeField;
+                set => colorCodeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string versionLabel
             {
-                get { return this.versionLabelField; }
-                set { this.versionLabelField = value; }
+                get => versionLabelField;
+                set => versionLabelField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramMovieInfo movieInfo
             {
-                get { return this.movieInfoField; }
-                set { this.movieInfoField = value; }
+                get => movieInfoField;
+                set => movieInfoField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramEpisodeInfo episodeInfo
             {
-                get { return this.episodeInfoField; }
-                set { this.episodeInfoField = value; }
+                get => episodeInfoField;
+                set => episodeInfoField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramSportsInfo sportsInfo
             {
-                get { return this.sportsInfoField; }
-                set { this.sportsInfoField = value; }
+                get => sportsInfoField;
+                set => sportsInfoField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("asset", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("asset", IsNullable = false)]
             public List<assetType> assets
             {
-                get { return this.assetsField; }
-                set { this.assetsField = value; }
+                get => assetsField;
+                set => assetsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("release", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("release", IsNullable = false)]
             public List<programsProgramRelease> releases
             {
-                get { return this.releasesField; }
-                set { this.releasesField = value; }
+                get => releasesField;
+                set => releasesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string animation
             {
-                get { return this.animationField; }
-                set { this.animationField = value; }
+                get => animationField;
+                set => animationField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "language")]
+            /// <remarks />
+            [XmlElement(DataType = "language")]
             public string origAudioLang
             {
-                get { return this.origAudioLangField; }
-                set { this.origAudioLangField = value; }
+                get => origAudioLangField;
+                set => origAudioLangField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string sourceType
             {
-                get { return this.sourceTypeField; }
-                set { this.sourceTypeField = value; }
+                get => sourceTypeField;
+                set => sourceTypeField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramOriginalNetwork originalNetwork
             {
-                get { return this.originalNetworkField; }
-                set { this.originalNetworkField = value; }
+                get => originalNetworkField;
+                set => originalNetworkField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramLastOriginalNetwork lastOriginalNetwork
             {
-                get { return this.lastOriginalNetworkField; }
-                set { this.lastOriginalNetworkField = value; }
+                get => lastOriginalNetworkField;
+                set => lastOriginalNetworkField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-            public System.DateTime seriesPremiere
+            /// <remarks />
+            [XmlElement(DataType = "date")]
+            public DateTime seriesPremiere
             {
-                get { return this.seriesPremiereField; }
-                set { this.seriesPremiereField = value; }
+                get => seriesPremiereField;
+                set => seriesPremiereField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool seriesPremiereSpecified
             {
-                get { return this.seriesPremiereFieldSpecified; }
-                set { this.seriesPremiereFieldSpecified = value; }
+                get => seriesPremiereFieldSpecified;
+                set => seriesPremiereFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-            public System.DateTime seriesFinale
+            /// <remarks />
+            [XmlElement(DataType = "date")]
+            public DateTime seriesFinale
             {
-                get { return this.seriesFinaleField; }
-                set { this.seriesFinaleField = value; }
+                get => seriesFinaleField;
+                set => seriesFinaleField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool seriesFinaleSpecified
             {
-                get { return this.seriesFinaleFieldSpecified; }
-                set { this.seriesFinaleFieldSpecified = value; }
+                get => seriesFinaleFieldSpecified;
+                set => seriesFinaleFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("season", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("season", IsNullable = false)]
             public List<programsProgramSeason> seasons
             {
-                get { return this.seasonsField; }
-                set { this.seasonsField = value; }
+                get => seasonsField;
+                set => seasonsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("keyword", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("keyword", IsNullable = false)]
             public List<keywordsTypeKeyword> keywords
             {
-                get { return this.keywordsField; }
-                set { this.keywordsField = value; }
+                get => keywordsField;
+                set => keywordsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("relation", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("relation", IsNullable = false)]
             public List<relationsTypeRelation> relations
             {
-                get { return this.relationsField; }
-                set { this.relationsField = value; }
-
+                get => relationsField;
+                set => relationsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("relationship", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("relationship", IsNullable = false)]
             public List<relationshipsTypeRelationship> relationships
             {
-                get { return this.relationshipsField; }
-                set { this.relationshipsField = value; }
+                get => relationshipsField;
+                set => relationshipsField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public bool showcard
             {
-                get { return this.showcardField; }
-                set { this.showcardField = value; }
+                get => showcardField;
+                set => showcardField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool showcardSpecified
             {
-                get { return this.showcardFieldSpecified; }
-                set { this.showcardFieldSpecified = value; }
+                get => showcardFieldSpecified;
+                set => showcardFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("officialURL", DataType = "token")]
+            /// <remarks />
+            [XmlElement("officialURL", DataType = "token")]
             public List<string> officialURL
             {
-                get { return this.officialURLField; }
-                set { this.officialURLField = value; }
+                get => officialURLField;
+                set => officialURLField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlElement(DataType = "positiveInteger")]
             public string partNumber
             {
-                get { return this.partNumberField; }
-                set { this.partNumberField = value; }
+                get => partNumberField;
+                set => partNumberField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlElement(DataType = "positiveInteger")]
             public string totalParts
             {
-                get { return this.totalPartsField; }
-                set { this.totalPartsField = value; }
+                get => totalPartsField;
+                set => totalPartsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlElement(DataType = "positiveInteger")]
             public string duration
             {
-                get { return this.durationField; }
-                set { this.durationField = value; }
+                get => durationField;
+                set => durationField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("externalLink", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("externalLink", IsNullable = false)]
             public List<externalLinksTypeExternalLink> externalLinks
             {
-                get { return this.externalLinksField; }
-                set { this.externalLinksField = value; }
+                get => externalLinksField;
+                set => externalLinksField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("videoDescriptor", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("videoDescriptor", IsNullable = false)]
             public List<videoDescriptorsTypeVideoDescriptor> videoDescriptors
             {
-                get { return this.videoDescriptorsField; }
-                set { this.videoDescriptorsField = value; }
+                get => videoDescriptorsField;
+                set => videoDescriptorsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string TMSId
             {
-                get { return this.tMSIdField; }
-                set { this.tMSIdField = value; }
+                get => tMSIdField;
+                set => tMSIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string rootId
             {
-                get { return this.rootIdField; }
-                set { this.rootIdField = value; }
+                get => rootIdField;
+                set => rootIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string versionId
             {
-                get { return this.versionIdField; }
-                set { this.versionIdField = value; }
+                get => versionIdField;
+                set => versionIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string connectorId
             {
-                get { return this.connectorIdField; }
-                set { this.connectorIdField = value; }
+                get => connectorIdField;
+                set => connectorIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string seasonId
             {
-                get { return this.seasonIdField; }
-                set { this.seasonIdField = value; }
+                get => seasonIdField;
+                set => seasonIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string seriesId
             {
-                get { return this.seriesIdField; }
-                set { this.seriesIdField = value; }
+                get => seriesIdField;
+                set => seriesIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "nonNegativeInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "nonNegativeInteger")]
             public string updateId
             {
-                get { return this.updateIdField; }
-                set { this.updateIdField = value; }
+                get => updateIdField;
+                set => updateIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public System.DateTime updateDate
+            /// <remarks />
+            [XmlAttribute]
+            public DateTime updateDate
             {
-                get { return this.updateDateField; }
-                set { this.updateDateField = value; }
+                get => updateDateField;
+                set => updateDateField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool inactive
             {
-                get { return this.inactiveField; }
-                set { this.inactiveField = value; }
+                get => inactiveField;
+                set => inactiveField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool inactiveSpecified
             {
-                get { return this.inactiveFieldSpecified; }
-                set { this.inactiveFieldSpecified = value; }
+                get => inactiveFieldSpecified;
+                set => inactiveFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool deleted
             {
-                get { return this.deletedField; }
-                set { this.deletedField = value; }
+                get => deletedField;
+                set => deletedField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool deletedSpecified
             {
-                get { return this.deletedFieldSpecified; }
-                set { this.deletedFieldSpecified = value; }
+                get => deletedFieldSpecified;
+                set => deletedFieldSpecified = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramTitles
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramTitles
         {
+            private string langField;
 
             private List<titleDescType> titleField;
 
-            private string langField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("title")]
+            /// <remarks />
+            [XmlElement("title")]
             public List<titleDescType> title
             {
-                get { return this.titleField; }
-                set { this.titleField = value; }
+                get => titleField;
+                set => titleField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "language")]
+            /// <remarks />
+            [XmlAttribute(DataType = "language")]
             public string lang
             {
-                get { return this.langField; }
-                set { this.langField = value; }
+                get => langField;
+                set => langField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramDescriptions
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramDescriptions
         {
-
             private List<titleDescType> descField;
 
             private string langField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("desc")]
+            /// <remarks />
+            [XmlElement("desc")]
             public List<titleDescType> desc
             {
-                get { return this.descField; }
-                set { this.descField = value; }
+                get => descField;
+                set => descField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "language")]
+            /// <remarks />
+            [XmlAttribute(DataType = "language")]
             public string lang
             {
-                get { return this.langField; }
-                set { this.langField = value; }
+                get => langField;
+                set => langField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class castTypeMember
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class castTypeMember
         {
-
             private string characterNameField;
-
-            private string roleField;
-
-            private castTypeMemberName nameField;
 
             private bool departedField;
 
             private bool departedFieldSpecified;
 
-            private string personIdField;
+            private castTypeMemberName nameField;
 
             private string ordField;
 
-            /// <remarks/>
-            public string characterName
-            {
-                get { return this.characterNameField; }
-                set { this.characterNameField = value; }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
-            public string role
-            {
-                get { return this.roleField; }
-                set { this.roleField = value; }
-            }
-
-            /// <remarks/>
-            public castTypeMemberName name
-            {
-                get { return this.nameField; }
-                set { this.nameField = value; }
-            }
-
-            /// <remarks/>
-            public bool departed
-            {
-                get { return this.departedField; }
-                set { this.departedField = value; }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
-            public bool departedSpecified
-            {
-                get { return this.departedFieldSpecified; }
-                set { this.departedFieldSpecified = value; }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
-            public string personId
-            {
-                get { return this.personIdField; }
-                set { this.personIdField = value; }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
-            public string ord
-            {
-                get { return this.ordField; }
-                set { this.ordField = value; }
-            }
-        }
-
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class castTypeMemberName : pNameType
-        {
-
-            private string nameIdField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
-            public string nameId
-            {
-                get { return this.nameIdField; }
-                set { this.nameIdField = value; }
-            }
-        }
-
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class crewTypeMember
-        {
+            private string personIdField;
 
             private string roleField;
 
-            private crewTypeMemberName nameField;
+            /// <remarks />
+            public string characterName
+            {
+                get => characterNameField;
+                set => characterNameField = value;
+            }
 
-            private string personIdField;
+            /// <remarks />
+            [XmlElement(DataType = "token")]
+            public string role
+            {
+                get => roleField;
+                set => roleField = value;
+            }
+
+            /// <remarks />
+            public castTypeMemberName name
+            {
+                get => nameField;
+                set => nameField = value;
+            }
+
+            /// <remarks />
+            public bool departed
+            {
+                get => departedField;
+                set => departedField = value;
+            }
+
+            /// <remarks />
+            [XmlIgnore]
+            public bool departedSpecified
+            {
+                get => departedFieldSpecified;
+                set => departedFieldSpecified = value;
+            }
+
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
+            public string personId
+            {
+                get => personIdField;
+                set => personIdField = value;
+            }
+
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
+            public string ord
+            {
+                get => ordField;
+                set => ordField = value;
+            }
+        }
+
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class castTypeMemberName : pNameType
+        {
+            private string nameIdField;
+
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
+            public string nameId
+            {
+                get => nameIdField;
+                set => nameIdField = value;
+            }
+        }
+
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class crewTypeMember
+        {
+            private crewTypeMemberName nameField;
 
             private string ordField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            private string personIdField;
+
+            private string roleField;
+
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string role
             {
-                get { return this.roleField; }
-                set { this.roleField = value; }
+                get => roleField;
+                set => roleField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public crewTypeMemberName name
             {
-                get { return this.nameField; }
-                set { this.nameField = value; }
+                get => nameField;
+                set => nameField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string personId
             {
-                get { return this.personIdField; }
-                set { this.personIdField = value; }
+                get => personIdField;
+                set => personIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string ord
             {
-                get { return this.ordField; }
-                set { this.ordField = value; }
+                get => ordField;
+                set => ordField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class crewTypeMemberName : pNameType
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class crewTypeMemberName : pNameType
         {
-
             private string nameIdField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string nameId
             {
-                get { return this.nameIdField; }
-                set { this.nameIdField = value; }
+                get => nameIdField;
+                set => nameIdField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramHoliday
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramHoliday
         {
-
             private string holidayIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string holidayId
             {
-                get { return this.holidayIdField; }
-                set { this.holidayIdField = value; }
+                get => holidayIdField;
+                set => holidayIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramGenre
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramGenre
         {
-
             private string genreIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string genreId
             {
-                get { return this.genreIdField; }
-                set { this.genreIdField = value; }
+                get => genreIdField;
+                set => genreIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramMovieInfo
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramMovieInfo
         {
-
-            private List<string> soundMixesField;
-
             private List<string> pictureFormatsField;
 
             private List<string> productionCompaniesField;
+
+            private List<string> soundMixesField;
 
             private List<programsProgramMovieInfoTrailer> trailersField;
 
             private string yearOfReleaseField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("soundMix", DataType = "token", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("soundMix", DataType = "token", IsNullable = false)]
             public List<string> soundMixes
             {
-                get { return this.soundMixesField; }
-                set { this.soundMixesField = value; }
+                get => soundMixesField;
+                set => soundMixesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("pictureFormat", DataType = "token", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("pictureFormat", DataType = "token", IsNullable = false)]
             public List<string> pictureFormats
             {
-                get { return this.pictureFormatsField; }
-                set { this.pictureFormatsField = value; }
+                get => pictureFormatsField;
+                set => pictureFormatsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("name", DataType = "token", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("name", DataType = "token", IsNullable = false)]
             public List<string> productionCompanies
             {
-                get { return this.productionCompaniesField; }
-                set { this.productionCompaniesField = value; }
+                get => productionCompaniesField;
+                set => productionCompaniesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("trailer", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("trailer", IsNullable = false)]
             public List<programsProgramMovieInfoTrailer> trailers
             {
-                get { return this.trailersField; }
-                set { this.trailersField = value; }
+                get => trailersField;
+                set => trailersField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string yearOfRelease
             {
-                get { return this.yearOfReleaseField; }
-                set { this.yearOfReleaseField = value; }
+                get => yearOfReleaseField;
+                set => yearOfReleaseField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramMovieInfoTrailer
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramMovieInfoTrailer
         {
-
             private string formatField;
 
             private string uRLField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string format
             {
-                get { return this.formatField; }
-                set { this.formatField = value; }
+                get => formatField;
+                set => formatField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string URL
             {
-                get { return this.uRLField; }
-                set { this.uRLField = value; }
+                get => uRLField;
+                set => uRLField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramEpisodeInfo
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramEpisodeInfo
         {
-
-            private titleDescType titleField;
-
-            private string synNumField;
-
             private List<programsProgramEpisodeInfoAlternate> alternateField;
 
             private string altSynNumField;
 
-            private string seasonField;
+            private string episodesField;
 
             private string numberField;
 
-            private string episodesField;
-
             private string numInSeriesField;
+
+            private string seasonField;
 
             private string seasonYearField;
 
-            /// <remarks/>
+            private string synNumField;
+
+            private titleDescType titleField;
+
+            /// <remarks />
             public titleDescType title
             {
-                get { return this.titleField; }
-                set { this.titleField = value; }
+                get => titleField;
+                set => titleField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string synNum
             {
-                get { return this.synNumField; }
-                set { this.synNumField = value; }
+                get => synNumField;
+                set => synNumField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("alternate")]
+            /// <remarks />
+            [XmlElement("alternate")]
             public List<programsProgramEpisodeInfoAlternate> alternate
             {
-                get { return this.alternateField; }
-                set { this.alternateField = value; }
+                get => alternateField;
+                set => alternateField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string altSynNum
             {
-                get { return this.altSynNumField; }
-                set { this.altSynNumField = value; }
+                get => altSynNumField;
+                set => altSynNumField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string season
             {
-                get { return this.seasonField; }
-                set { this.seasonField = value; }
+                get => seasonField;
+                set => seasonField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string number
             {
-                get { return this.numberField; }
-                set { this.numberField = value; }
+                get => numberField;
+                set => numberField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string episodes
             {
-                get { return this.episodesField; }
-                set { this.episodesField = value; }
+                get => episodesField;
+                set => episodesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string numInSeries
             {
-                get { return this.numInSeriesField; }
-                set { this.numInSeriesField = value; }
+                get => numInSeriesField;
+                set => numInSeriesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string seasonYear
             {
-                get { return this.seasonYearField; }
-                set { this.seasonYearField = value; }
+                get => seasonYearField;
+                set => seasonYearField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramEpisodeInfoAlternate
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramEpisodeInfoAlternate
         {
-
             private string countryField;
 
             private bool countrywideField;
 
             private bool countrywideFieldSpecified;
+
+            private string episodeField;
 
             private long prgSvcIdField;
 
@@ -1989,531 +1961,535 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
 
             private bool seasonFieldSpecified;
 
-            private string episodeField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string country
             {
-                get { return this.countryField; }
-                set { this.countryField = value; }
+                get => countryField;
+                set => countryField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool countrywide
             {
-                get { return this.countrywideField; }
-                set { this.countrywideField = value; }
+                get => countrywideField;
+                set => countrywideField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool countrywideSpecified
             {
-                get { return this.countrywideFieldSpecified; }
-                set { this.countrywideFieldSpecified = value; }
+                get => countrywideFieldSpecified;
+                set => countrywideFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public long prgSvcId
             {
-                get { return this.prgSvcIdField; }
-                set { this.prgSvcIdField = value; }
+                get => prgSvcIdField;
+                set => prgSvcIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool prgSvcIdSpecified
             {
-                get { return this.prgSvcIdFieldSpecified; }
-                set { this.prgSvcIdFieldSpecified = value; }
+                get => prgSvcIdFieldSpecified;
+                set => prgSvcIdFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public long season
             {
-                get { return this.seasonField; }
-                set { this.seasonField = value; }
+                get => seasonField;
+                set => seasonField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool seasonSpecified
             {
-                get { return this.seasonFieldSpecified; }
-                set { this.seasonFieldSpecified = value; }
+                get => seasonFieldSpecified;
+                set => seasonFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string episode
             {
-                get { return this.episodeField; }
-                set { this.episodeField = value; }
+                get => episodeField;
+                set => episodeField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSportsInfo
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSportsInfo
         {
-
-            private System.DateTime gameDateField;
+            private DateTime gameDateField;
 
             private bool gameDateFieldSpecified;
 
-            private System.DateTime gameTimeField;
+            private DateTime gameTimeField;
 
             private bool gameTimeFieldSpecified;
 
             private string gameTimeZoneField;
 
-            private programsProgramSportsInfoVenue venueField;
-
-            private List<programsProgramSportsInfoTeam> teamField;
+            private programsProgramSportsInfoPlayoffRound playoffRoundField;
 
             private programsProgramSportsInfoSeason seasonField;
 
-            private programsProgramSportsInfoPlayoffRound playoffRoundField;
+            private List<programsProgramSportsInfoTeam> teamField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-            public System.DateTime gameDate
+            private programsProgramSportsInfoVenue venueField;
+
+            /// <remarks />
+            [XmlElement(DataType = "date")]
+            public DateTime gameDate
             {
-                get { return this.gameDateField; }
-                set { this.gameDateField = value; }
+                get => gameDateField;
+                set => gameDateField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool gameDateSpecified
             {
-                get { return this.gameDateFieldSpecified; }
-                set { this.gameDateFieldSpecified = value; }
+                get => gameDateFieldSpecified;
+                set => gameDateFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "time")]
-            public System.DateTime gameTime
+            /// <remarks />
+            [XmlElement(DataType = "time")]
+            public DateTime gameTime
             {
-                get { return this.gameTimeField; }
-                set { this.gameTimeField = value; }
+                get => gameTimeField;
+                set => gameTimeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool gameTimeSpecified
             {
-                get { return this.gameTimeFieldSpecified; }
-                set { this.gameTimeFieldSpecified = value; }
+                get => gameTimeFieldSpecified;
+                set => gameTimeFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string gameTimeZone
             {
-                get { return this.gameTimeZoneField; }
-                set { this.gameTimeZoneField = value; }
+                get => gameTimeZoneField;
+                set => gameTimeZoneField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramSportsInfoVenue venue
             {
-                get { return this.venueField; }
-                set { this.venueField = value; }
+                get => venueField;
+                set => venueField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("team")]
+            /// <remarks />
+            [XmlElement("team")]
             public List<programsProgramSportsInfoTeam> team
             {
-                get { return this.teamField; }
-                set { this.teamField = value; }
+                get => teamField;
+                set => teamField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramSportsInfoSeason season
             {
-                get { return this.seasonField; }
-                set { this.seasonField = value; }
+                get => seasonField;
+                set => seasonField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramSportsInfoPlayoffRound playoffRound
             {
-                get { return this.playoffRoundField; }
-                set { this.playoffRoundField = value; }
+                get => playoffRoundField;
+                set => playoffRoundField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSportsInfoVenue
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSportsInfoVenue
         {
+            private string valueField;
 
             private string venueBrandIdField;
 
-            private string valueField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string venueBrandId
             {
-                get { return this.venueBrandIdField; }
-                set { this.venueBrandIdField = value; }
+                get => venueBrandIdField;
+                set => venueBrandIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSportsInfoTeam
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSportsInfoTeam
         {
-
-            private string teamBrandIdField;
-
             private bool isHomeField;
 
             private bool isHomeFieldSpecified;
 
+            private string teamBrandIdField;
+
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string teamBrandId
             {
-                get { return this.teamBrandIdField; }
-                set { this.teamBrandIdField = value; }
+                get => teamBrandIdField;
+                set => teamBrandIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public bool isHome
             {
-                get { return this.isHomeField; }
-                set { this.isHomeField = value; }
+                get => isHomeField;
+                set => isHomeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool isHomeSpecified
             {
-                get { return this.isHomeFieldSpecified; }
-                set { this.isHomeFieldSpecified = value; }
+                get => isHomeFieldSpecified;
+                set => isHomeFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSportsInfoSeason
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSportsInfoSeason
         {
-
             private string typeField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSportsInfoPlayoffRound
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSportsInfoPlayoffRound
         {
-
             private string gameNumberField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string gameNumber
             {
-                get { return this.gameNumberField; }
-                set { this.gameNumberField = value; }
+                get => gameNumberField;
+                set => gameNumberField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramRelease
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramRelease
         {
-
-            private string editNotesField;
-
-            private List<string> distributorsField;
+            private List<programsProgramReleaseAttribute> attributesField;
 
             private string countryField;
 
-            private string typeField;
-
-            private List<programsProgramReleaseAttribute> attributesField;
-
             private string dateField;
+
+            private List<string> distributorsField;
+
+            private string editNotesField;
 
             private string mediumField;
 
             private string prgSvcIdField;
 
-            private string seasonYearField;
-
             private string seasonNameField;
 
-            /// <remarks/>
+            private string seasonYearField;
+
+            private string typeField;
+
+            /// <remarks />
             public string editNotes
             {
-                get { return this.editNotesField; }
-                set { this.editNotesField = value; }
+                get => editNotesField;
+                set => editNotesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("name", DataType = "token", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("name", DataType = "token", IsNullable = false)]
             public List<string> distributors
             {
-                get { return this.distributorsField; }
-                set { this.distributorsField = value; }
+                get => distributorsField;
+                set => distributorsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string country
             {
-                get { return this.countryField; }
-                set { this.countryField = value; }
+                get => countryField;
+                set => countryField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("attribute", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("attribute", IsNullable = false)]
             public List<programsProgramReleaseAttribute> attributes
             {
-                get { return this.attributesField; }
-                set { this.attributesField = value; }
+                get => attributesField;
+                set => attributesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string date
             {
-                get { return this.dateField; }
-                set { this.dateField = value; }
+                get => dateField;
+                set => dateField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string medium
             {
-                get { return this.mediumField; }
-                set { this.mediumField = value; }
+                get => mediumField;
+                set => mediumField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlElement(DataType = "positiveInteger")]
             public string prgSvcId
             {
-                get { return this.prgSvcIdField; }
-                set { this.prgSvcIdField = value; }
+                get => prgSvcIdField;
+                set => prgSvcIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlElement(DataType = "positiveInteger")]
             public string seasonYear
             {
-                get { return this.seasonYearField; }
-                set { this.seasonYearField = value; }
+                get => seasonYearField;
+                set => seasonYearField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlElement(DataType = "token")]
             public string seasonName
             {
-                get { return this.seasonNameField; }
-                set { this.seasonNameField = value; }
+                get => seasonNameField;
+                set => seasonNameField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramReleaseAttribute
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramReleaseAttribute
         {
-
             private string typeField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramOriginalNetwork
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramOriginalNetwork
         {
-
             private string prgSvcIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string prgSvcId
             {
-                get { return this.prgSvcIdField; }
-                set { this.prgSvcIdField = value; }
+                get => prgSvcIdField;
+                set => prgSvcIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramLastOriginalNetwork
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramLastOriginalNetwork
         {
-
             private string prgSvcIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string prgSvcId
             {
-                get { return this.prgSvcIdField; }
-                set { this.prgSvcIdField = value; }
+                get => prgSvcIdField;
+                set => prgSvcIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSeason
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSeason
         {
+            private List<assetType> assetsField;
 
-            private System.DateTime seasonPremiereField;
+            private List<castTypeMember> castField;
 
-            private bool seasonPremiereFieldSpecified;
+            private List<crewTypeMember> crewField;
 
-            private System.DateTime seasonFinaleField;
+            private programsProgramSeasonDescriptions descriptionsField;
 
-            private bool seasonFinaleFieldSpecified;
+            private List<keywordsTypeKeyword> keywordsField;
+
+            private List<string> officialURLField;
 
             private programsProgramSeasonOriginalNetwork originalNetworkField;
 
-            private string totalSeasonEpisodesField;
+            private List<relationsTypeRelation> relationsField;
 
-            private List<string> officialURLField;
+            private DateTime seasonFinaleField;
+
+            private bool seasonFinaleFieldSpecified;
+
+            private string seasonIdField;
+
+            private string seasonNumberField;
+
+            private DateTime seasonPremiereField;
+
+            private bool seasonPremiereFieldSpecified;
+
+            private string seasonYearField;
 
             private bool showcardField;
 
@@ -2521,594 +2497,568 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
 
             private programsProgramSeasonTitles titlesField;
 
-            private programsProgramSeasonDescriptions descriptionsField;
+            private string totalSeasonEpisodesField;
 
-            private List<castTypeMember> castField;
-
-            private List<crewTypeMember> crewField;
-
-            private List<keywordsTypeKeyword> keywordsField;
-
-            private List<relationsTypeRelation> relationsField;
-
-            private List<assetType> assetsField;
-
-            private string seasonNumberField;
-
-            private string seasonIdField;
-
-            private string seasonYearField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-            public System.DateTime seasonPremiere
+            /// <remarks />
+            [XmlElement(DataType = "date")]
+            public DateTime seasonPremiere
             {
-                get { return this.seasonPremiereField; }
-                set { this.seasonPremiereField = value; }
+                get => seasonPremiereField;
+                set => seasonPremiereField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool seasonPremiereSpecified
             {
-                get { return this.seasonPremiereFieldSpecified; }
-                set { this.seasonPremiereFieldSpecified = value; }
+                get => seasonPremiereFieldSpecified;
+                set => seasonPremiereFieldSpecified = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "date")]
-            public System.DateTime seasonFinale
+            /// <remarks />
+            [XmlElement(DataType = "date")]
+            public DateTime seasonFinale
             {
-                get { return this.seasonFinaleField; }
-                set { this.seasonFinaleField = value; }
+                get => seasonFinaleField;
+                set => seasonFinaleField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool seasonFinaleSpecified
             {
-                get { return this.seasonFinaleFieldSpecified; }
-                set { this.seasonFinaleFieldSpecified = value; }
+                get => seasonFinaleFieldSpecified;
+                set => seasonFinaleFieldSpecified = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramSeasonOriginalNetwork originalNetwork
             {
-                get { return this.originalNetworkField; }
-                set { this.originalNetworkField = value; }
+                get => originalNetworkField;
+                set => originalNetworkField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlElement(DataType = "positiveInteger")]
             public string totalSeasonEpisodes
             {
-                get { return this.totalSeasonEpisodesField; }
-                set { this.totalSeasonEpisodesField = value; }
+                get => totalSeasonEpisodesField;
+                set => totalSeasonEpisodesField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("officialURL", DataType = "token")]
+            /// <remarks />
+            [XmlElement("officialURL", DataType = "token")]
             public List<string> officialURL
             {
-                get { return this.officialURLField; }
-                set { this.officialURLField = value; }
+                get => officialURLField;
+                set => officialURLField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public bool showcard
             {
-                get { return this.showcardField; }
-                set { this.showcardField = value; }
+                get => showcardField;
+                set => showcardField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            /// <remarks />
+            [XmlIgnore]
             public bool showcardSpecified
             {
-                get { return this.showcardFieldSpecified; }
-                set { this.showcardFieldSpecified = value; }
+                get => showcardFieldSpecified;
+                set => showcardFieldSpecified = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramSeasonTitles titles
             {
-                get { return this.titlesField; }
-                set { this.titlesField = value; }
+                get => titlesField;
+                set => titlesField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public programsProgramSeasonDescriptions descriptions
             {
-                get { return this.descriptionsField; }
-                set { this.descriptionsField = value; }
+                get => descriptionsField;
+                set => descriptionsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("member", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("member", IsNullable = false)]
             public List<castTypeMember> cast
             {
-                get { return this.castField; }
-                set { this.castField = value; }
+                get => castField;
+                set => castField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("member", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("member", IsNullable = false)]
             public List<crewTypeMember> crew
             {
-                get { return this.crewField; }
-                set { this.crewField = value; }
+                get => crewField;
+                set => crewField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("keyword", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("keyword", IsNullable = false)]
             public List<keywordsTypeKeyword> keywords
             {
-                get { return this.keywordsField; }
-                set { this.keywordsField = value; }
+                get => keywordsField;
+                set => keywordsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("relation", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("relation", IsNullable = false)]
             public List<relationsTypeRelation> relations
             {
-                get { return this.relationsField; }
-                set { this.relationsField = value; }
+                get => relationsField;
+                set => relationsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("asset", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("asset", IsNullable = false)]
             public List<assetType> assets
             {
-                get { return this.assetsField; }
-                set { this.assetsField = value; }
+                get => assetsField;
+                set => assetsField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string seasonNumber
             {
-                get { return this.seasonNumberField; }
-                set { this.seasonNumberField = value; }
+                get => seasonNumberField;
+                set => seasonNumberField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string seasonId
             {
-                get { return this.seasonIdField; }
-                set { this.seasonIdField = value; }
+                get => seasonIdField;
+                set => seasonIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "positiveInteger")]
+            /// <remarks />
+            [XmlAttribute(DataType = "positiveInteger")]
             public string seasonYear
             {
-                get { return this.seasonYearField; }
-                set { this.seasonYearField = value; }
+                get => seasonYearField;
+                set => seasonYearField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSeasonOriginalNetwork
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSeasonOriginalNetwork
         {
-
             private string prgSvcIdField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "integer")]
+            /// <remarks />
+            [XmlAttribute(DataType = "integer")]
             public string prgSvcId
             {
-                get { return this.prgSvcIdField; }
-                set { this.prgSvcIdField = value; }
+                get => prgSvcIdField;
+                set => prgSvcIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSeasonTitles
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSeasonTitles
         {
+            private string langField;
 
             private List<titleDescType> titleField;
 
-            private string langField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("title")]
+            /// <remarks />
+            [XmlElement("title")]
             public List<titleDescType> title
             {
-                get { return this.titleField; }
-                set { this.titleField = value; }
+                get => titleField;
+                set => titleField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "language")]
+            /// <remarks />
+            [XmlAttribute(DataType = "language")]
             public string lang
             {
-                get { return this.langField; }
-                set { this.langField = value; }
+                get => langField;
+                set => langField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class programsProgramSeasonDescriptions
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class programsProgramSeasonDescriptions
         {
-
             private List<titleDescType> descField;
 
             private string langField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("desc")]
+            /// <remarks />
+            [XmlElement("desc")]
             public List<titleDescType> desc
             {
-                get { return this.descField; }
-                set { this.descField = value; }
+                get => descField;
+                set => descField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "language")]
+            /// <remarks />
+            [XmlAttribute(DataType = "language")]
             public string lang
             {
-                get { return this.langField; }
-                set { this.langField = value; }
+                get => langField;
+                set => langField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class keywordsTypeKeyword
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class keywordsTypeKeyword
         {
-
             private string typeField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class relationsTypeRelation
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class relationsTypeRelation
         {
-
-            private string typeField;
-
             private string connectorTypeField;
 
+            private string typeField;
+
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string connectorType
             {
-                get { return this.connectorTypeField; }
-                set { this.connectorTypeField = value; }
+                get => connectorTypeField;
+                set => connectorTypeField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlText(DataType = "token")]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class relationshipsTypeRelationship
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class relationshipsTypeRelationship
         {
-
-            private string rootIdField;
-
-            private List<string> tmsIdsField;
-
-            private string personIdField;
-
-            private string personNameIdField;
+            private string associationField;
 
             private string firstNameField;
 
             private string lastNameField;
 
+            private string personIdField;
+
+            private string personNameIdField;
+
+            private string rootIdField;
+
+            private List<string> tmsIdsField;
+
             private string typeField;
 
-            private string associationField;
-
-            /// <remarks/>
+            /// <remarks />
             public string rootId
             {
-                get { return this.rootIdField; }
-                set { this.rootIdField = value; }
+                get => rootIdField;
+                set => rootIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("tmsId", IsNullable = false)]
+            /// <remarks />
+            [XmlArrayItem("tmsId", IsNullable = false)]
             public List<string> tmsIds
             {
-                get { return this.tmsIdsField; }
-                set { this.tmsIdsField = value; }
+                get => tmsIdsField;
+                set => tmsIdsField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string personId
             {
-                get { return this.personIdField; }
-                set { this.personIdField = value; }
+                get => personIdField;
+                set => personIdField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string personNameId
             {
-                get { return this.personNameIdField; }
-                set { this.personNameIdField = value; }
+                get => personNameIdField;
+                set => personNameIdField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string firstName
             {
-                get { return this.firstNameField; }
-                set { this.firstNameField = value; }
+                get => firstNameField;
+                set => firstNameField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string lastName
             {
-                get { return this.lastNameField; }
-                set { this.lastNameField = value; }
+                get => lastNameField;
+                set => lastNameField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
 
-            /// <remarks/>
+            /// <remarks />
             public string association
             {
-                get { return this.associationField; }
-                set { this.associationField = value; }
+                get => associationField;
+                set => associationField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class externalLinksTypeExternalLink
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class externalLinksTypeExternalLink
         {
+            private string idField;
+
+            private string scoreField;
+
+            private string urlField;
 
             private string vendorField;
 
             private string vendorIdField;
 
-            private string idField;
-
-            private string urlField;
-
-            private string scoreField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string vendor
             {
-                get { return this.vendorField; }
-                set { this.vendorField = value; }
+                get => vendorField;
+                set => vendorField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string vendorId
             {
-                get { return this.vendorIdField; }
-                set { this.vendorIdField = value; }
+                get => vendorIdField;
+                set => vendorIdField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string id
             {
-                get { return this.idField; }
-                set { this.idField = value; }
+                get => idField;
+                set => idField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string url
             {
-                get { return this.urlField; }
-                set { this.urlField = value; }
+                get => urlField;
+                set => urlField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string score
             {
-                get { return this.scoreField; }
-                set { this.scoreField = value; }
+                get => scoreField;
+                set => scoreField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class videoDescriptorsTypeVideoDescriptor
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class videoDescriptorsTypeVideoDescriptor
         {
-
             private string idField;
 
             private string ordField;
 
-            private string weightField;
-
             private string typeField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            private string weightField;
+
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string id
             {
-                get { return this.idField; }
-                set { this.idField = value; }
+                get => idField;
+                set => idField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string ord
             {
-                get { return this.ordField; }
-                set { this.ordField = value; }
+                get => ordField;
+                set => ordField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string weight
             {
-                get { return this.weightField; }
-                set { this.weightField = value; }
+                get => weightField;
+                set => weightField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(DataType = "token")]
+            /// <remarks />
+            [XmlAttribute(DataType = "token")]
             public string type
             {
-                get { return this.typeField; }
-                set { this.typeField = value; }
+                get => typeField;
+                set => typeField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-        public partial class programs
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        [XmlRoot(Namespace = "", IsNullable = false)]
+        public class programs
         {
-
             private List<programsProgram> programField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("program")]
+            /// <remarks />
+            [XmlElement("program")]
             public List<programsProgram> program
             {
-                get { return this.programField; }
-                set { this.programField = value; }
+                get => programField;
+                set => programField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-        public partial class requestParameters
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        [XmlRoot(Namespace = "", IsNullable = false)]
+        public class requestParameters
         {
             private List<requestParametersRequestParameter> requestParameterField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("requestParameter")]
+            /// <remarks />
+            [XmlElement("requestParameter")]
             public List<requestParametersRequestParameter> requestParameter
             {
-                get { return this.requestParameterField; }
-                set { this.requestParameterField = value; }
+                get => requestParameterField;
+                set => requestParameterField = value;
             }
         }
 
-        /// <remarks/>
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-        [System.SerializableAttribute()]
-        [System.Diagnostics.DebuggerStepThroughAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-        public partial class requestParametersRequestParameter
+        /// <remarks />
+        [GeneratedCode("xsd", "4.6.1590.0")]
+        [SerializableAttribute]
+        [DebuggerStepThrough]
+        [DesignerCategory("code")]
+        [XmlType(AnonymousType = true)]
+        public class requestParametersRequestParameter
         {
-
             private string nameField;
 
             private string valueField;
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
+            /// <remarks />
+            [XmlAttribute]
             public string name
             {
-                get { return this.nameField; }
-                set { this.nameField = value; }
+                get => nameField;
+                set => nameField = value;
             }
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlTextAttribute()]
+            /// <remarks />
+            [XmlText]
             public string Value
             {
-                get { return this.valueField; }
-                set { this.valueField = value; }
+                get => valueField;
+                set => valueField = value;
             }
         }
     }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia;
+﻿using SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia;
 
 namespace SchTech.Workflow.Director.Concrete
 {
@@ -15,7 +10,5 @@ namespace SchTech.Workflow.Director.Concrete
         {
             _workflowManager = new EnrichmentWorkflowManager();
         }
-
-
     }
 }

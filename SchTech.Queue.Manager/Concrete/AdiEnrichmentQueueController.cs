@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SchTech.Queue.Manager.Abstract;
 
 namespace SchTech.Queue.Manager.Concrete
@@ -13,31 +8,30 @@ namespace SchTech.Queue.Manager.Concrete
     {
         public FileInfo AdiPackage;
     }
+
     public class AdiEnrichmentQueueController : IQueueService
     {
-        public static ArrayList QueuedPackages { get; set; }
-
         public AdiEnrichmentQueueController()
         {
             QueuedPackages = new ArrayList();
         }
 
+        public static ArrayList QueuedPackages { get; set; }
+
         public void AddPackageToQueue(FileInfo packageFile)
         {
-            bool packageExists = false;
+            var packageExists = false;
 
             foreach (WorkQueueItem queItem in QueuedPackages)
-            {
                 if (queItem.AdiPackage.FullName == packageFile.FullName)
                 {
                     packageExists = true;
                     break;
                 }
-            }
 
             if (!packageExists)
             {
-                WorkQueueItem packageItem = new WorkQueueItem
+                var packageItem = new WorkQueueItem
                 {
                     AdiPackage = packageFile
                 };

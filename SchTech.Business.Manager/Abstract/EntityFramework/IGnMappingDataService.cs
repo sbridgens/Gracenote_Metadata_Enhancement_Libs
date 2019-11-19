@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using SchTech.DataAccess.Abstract;
-using SchTech.Entities.ConcreteTypes;
+﻿using SchTech.DataAccess.Abstract;
 
 namespace SchTech.Business.Manager.Abstract.EntityFramework
 {
     public interface IGnMappingDataService : IGnMappingDataDal
     {
-
     }
 }

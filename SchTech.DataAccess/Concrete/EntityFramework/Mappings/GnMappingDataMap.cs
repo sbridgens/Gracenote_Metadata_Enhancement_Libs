@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Data.Entity.ModelConfiguration;
 using SchTech.Entities.ConcreteTypes;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
@@ -12,7 +6,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
     public class GnMappingDataMap : EntityTypeConfiguration<GN_Mapping_Data>
     {
         public GnMappingDataMap()
-        { 
+        {
             //mapped to EntityTypeConfiguration Adi_data
             ToTable(@"GN_Mapping_Data", @"dbo");
             //Primary key is set here
@@ -40,7 +34,6 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             Property(x => x.GN_Status).HasColumnName("GN_Status");
             Property(x => x.GN_TMSID).HasColumnName("GN_TMSID");
             Property(x => x.GN_updateId).HasColumnName("GN_updateId");
-
         }
     }
 }

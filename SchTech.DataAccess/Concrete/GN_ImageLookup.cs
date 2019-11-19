@@ -18,8 +18,10 @@ namespace SchTech.DataAccess.Concrete
     {
         [XmlElement(ElementName = "Aspect_Width")]
         public string AspectWidth { get; set; }
+
         [XmlElement(ElementName = "Aspect_Height")]
         public string AspectHeight { get; set; }
+
         [XmlElement(ElementName = "Resize_Height")]
         public string ResizeHeight { get; set; }
     }
@@ -27,8 +29,7 @@ namespace SchTech.DataAccess.Concrete
     [XmlRoot(ElementName = "AllowedAspects")]
     public class AllowedAspects
     {
-        [XmlElement(ElementName = "Aspect")]
-        public List<Aspect> Aspect { get; set; }
+        [XmlElement(ElementName = "Aspect")] public List<Aspect> Aspect { get; set; }
     }
 
     [XmlRoot(ElementName = "Image_Category")]
@@ -36,10 +37,13 @@ namespace SchTech.DataAccess.Concrete
     {
         [XmlElement(ElementName = "Image_Tier")]
         public List<string> ImageTier { get; set; }
+
         [XmlElement(ElementName = "AllowedAspects")]
         public AllowedAspects AllowedAspects { get; set; }
+
         [XmlAttribute(AttributeName = "Category_Name")]
         public string CategoryName { get; set; }
+
         [XmlAttribute(AttributeName = "Priority_Order")]
         public string PriorityOrder { get; set; }
     }
@@ -47,10 +51,9 @@ namespace SchTech.DataAccess.Concrete
     [XmlRoot(ElementName = "Image_Identifier")]
     public class Image_Identifier
     {
-        [XmlAttribute(AttributeName = "type")]
-        public string Type { get; set; }
-        [XmlAttribute(AttributeName = "id")]
-        public string Id { get; set; }
+        [XmlAttribute(AttributeName = "type")] public string Type { get; set; }
+
+        [XmlAttribute(AttributeName = "id")] public string Id { get; set; }
     }
 
 
@@ -59,12 +62,16 @@ namespace SchTech.DataAccess.Concrete
     {
         [XmlElement(ElementName = "Image_Qualifier")]
         public string ImageQualifier { get; set; }
+
         [XmlElement(ElementName = "ProgramType")]
         public List<string> ProgramType { get; set; }
+
         [XmlElement(ElementName = "Image_Identifier")]
         public List<Image_Identifier> ImageIdentifier { get; set; }
+
         [XmlElement(ElementName = "Image_Category")]
         public List<Image_Category> ImageCategory { get; set; }
+
         [XmlElement(ElementName = "IsLandscape")]
         public string IsLandscape { get; set; }
     }

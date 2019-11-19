@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
@@ -24,28 +25,15 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
     public class EnrichmentWorkflowManager : IEnrichmentWorkflowService
     {
         /// <summary>
-        /// Initialize Log4net
+        ///     Initialize Log4net
         /// </summary>
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(EnrichmentWorkflowManager));
-        private EnrichmentWorkflowEntities WorkflowEntities { get; set; }
-        private ProdisAdiContentManager AdiContentManager { get; }
-        private GraceNoteApiManager ApiManager { get; set; }
-        private bool insertSuccess { get; set; }
-        private GN_Mapping_Data GnMappingData { get; set; }
-
-        private IGnImageLookupService _gnImageLookupService;
-
-        private IGnMappingDataService _gnMappingDataService;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentWorkflowManager));
 
         private IAdiEnrichmentService _adiDataService;
-        private string DeliveryPackage { get; set; }
-        public bool IsPackageAnUpdate { get; set; }
-        private ZipHandler ZipHandler { get; set; }
-        public FileInfo PrimaryAsset { get; set; }
-        public FileInfo PreviewAsset { get; set; }
-        public bool IsMoviePackage { get; set; }
-        public bool IsTvodPackage { get; set; }
-        private Adi_Data AdiData { get; set; }
+
+        private readonly IGnImageLookupService _gnImageLookupService;
+
+        private readonly IGnMappingDataService _gnMappingDataService;
 
         public EnrichmentWorkflowManager()
         {
@@ -57,14 +45,26 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             GnMappingData = new GN_Mapping_Data();
         }
 
+        private EnrichmentWorkflowEntities WorkflowEntities { get; }
+        private ProdisAdiContentManager AdiContentManager { get; }
+        private GraceNoteApiManager ApiManager { get; }
+        private bool InsertSuccess { get; set; }
+        private GN_Mapping_Data GnMappingData { get; set; }
+        private string DeliveryPackage { get; set; }
+        public bool IsPackageAnUpdate { get; set; }
+        private ZipHandler ZipHandler { get; set; }
+        public bool IsMoviePackage { get; set; }
+        public bool IsTvodPackage { get; set; }
+        private Adi_Data AdiData { get; set; }
+        public FileInfo PrimaryAsset { get; set; }
+        public FileInfo PreviewAsset { get; set; }
+
         public void LogError(string functionName, string message, Exception ex)
         {
             Log.Error($"[{functionName}] {message}: {ex.Message}");
             if (ex.InnerException != null)
-            {
                 Log.Error($"[{functionName}] Inner Exception:" +
                           $" {ex.InnerException.Message}");
-            }
         }
 
         public bool CheckAndCleanOrphanedData()
@@ -75,7 +75,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
                 return _adiDataService.CleanAdiDataWithNoMapping() &&
                        _gnMappingDataService.CleanMappingDataWithNoAdi();
-
             }
             catch (Exception e)
             {
@@ -94,8 +93,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         public void BuildWorkQueue()
         {
-            AdiEnrichmentPollController pollController = new AdiEnrichmentPollController();
-            
+            var pollController = new AdiEnrichmentPollController();
+
             pollController.StartPollingOperations(ADIWF_Config.InputDirectory, "*.zip");
             WorkflowEntities.HasPackagesToProcess = pollController.HasFilesToProcess;
         }
@@ -107,23 +106,18 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 ZipHandler = new ZipHandler();
                 WorkflowEntities.CurrentPackage = adiPackageInfo;
                 WorkflowEntities.SetCurrentWorkingDirectory();
-                if(Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
+                if (Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
                     FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
                 var adiValidation = new AdiXmlValidator();
 
                 if (!ZipHandler.ExtractItemFromArchive(
                     WorkflowEntities.CurrentPackage.FullName,
                     WorkflowEntities.CurrentWorkingDirectory, false, true))
-                {
                     return false;
-                }
 
 
                 Log.Info("Validating ADI XML is well formed");
-                if (!WorkflowEntities.SerializeAdiFile(false))
-                {
-                    return false;
-                }
+                if (!WorkflowEntities.SerializeAdiFile(false)) return false;
 
                 Log.Info("XML well formed, Retrieving PAID Value from ADI to use in Gracenote Mapping Lookup");
                 WorkflowEntities.TitlPaidValue =
@@ -138,9 +132,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 WorkflowEntities.CheckIfAssetContainsPreview();
 
                 return true;
-
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogError(
                     "ObtainAndParseAdiFile",
@@ -170,8 +163,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                             i => i.Value == WorkflowEntities.OnapiProviderid &&
                                  string.Equals
                                  (
-                                     p.status.ToString(), GnOnApiProgramMappingSchema
-                                         .onProgramMappingsProgramMappingStatus.Mapped.ToString(),
+                                     p.status.ToString(),
+                                     GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped
+                                         .ToString(),
                                      StringComparison.CurrentCultureIgnoreCase)
                         )
                     )
@@ -201,7 +195,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     .Select(r => r?.Value)
                     .FirstOrDefault();
 
-                Log.Info($"Mapping data with TmsID: {WorkflowEntities.GraceNoteTmsId} parsed successfully, continuing package processing.");
+                Log.Info(
+                    $"Mapping data with TmsID: {WorkflowEntities.GraceNoteTmsId} parsed successfully, continuing package processing.");
                 return true;
             }
             catch (Exception ex)
@@ -220,17 +215,16 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             if (IsPackageAnUpdate && adiMajor != null)
             {
                 if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor,
-                        IsTvodPackage))
+                    IsTvodPackage))
                     return false;
 
                 Log.Info("Package is confirmed as a valid Update Package");
                 return true;
+            }
 
-            }
             if (IsPackageAnUpdate && adiMajor == null)
-            {
-                Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
-            }
+                Log.Error(
+                    $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
             if (!IsPackageAnUpdate &&
                 adiMajor == null)
             {
@@ -239,12 +233,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 return true;
             }
+
             if (!IsPackageAnUpdate &&
                 adiMajor != null)
-            {
                 Log.Error($"Package for PAID: {WorkflowEntities.TitlPaidValue} already exists," +
-                          $" duplicate ingest detected! Failing Enhancement.");
-            }
+                          " duplicate ingest detected! Failing Enhancement.");
             return false;
         }
 
@@ -260,7 +253,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var data = new GN_Mapping_Data
                 {
                     GN_TMSID = WorkflowEntities.GraceNoteTmsId,
-                    GN_Paid =  mapData?.link.Where(i => i.idType.Equals("PAID"))
+                    GN_Paid = mapData?.link.Where(i => i.idType.Equals("PAID"))
                         .Select(r => r.Value)
                         .FirstOrDefault(),
 
@@ -296,7 +289,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     "Error Seeding Mapping data", ex);
                 return false;
             }
-            
         }
 
         public bool ExtractPackageMedia()
@@ -308,14 +300,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (!IsPackageAnUpdate)
                 {
                     //Extract remaining items from package
-                    ZipHandler.ExtractItemFromArchive(sourceArchive: WorkflowEntities.CurrentPackage.FullName,
-                                                       outputDirectory: WorkflowEntities.CurrentWorkingDirectory,
-                                                       true,
-                                                       false);
+                    ZipHandler.ExtractItemFromArchive(WorkflowEntities.CurrentPackage.FullName,
+                        WorkflowEntities.CurrentWorkingDirectory,
+                        true,
+                        false);
 
                     //Update content adi movie value with ts file name
                     AdiContentManager.SetAdiAssetContentField("movie",
-                        assetFileName: ZipHandler.ExtractedMovieAsset.Name);
+                        ZipHandler.ExtractedMovieAsset.Name);
 
                     PrimaryAsset = ZipHandler.ExtractedMovieAsset;
 
@@ -323,9 +315,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     {
                         //Update content adi preview value with ts file name
                         AdiContentManager.SetAdiAssetContentField("preview",
-                            assetFileName: ZipHandler.ExtractedPreview.Name);
+                            ZipHandler.ExtractedPreview.Name);
                         PreviewAsset = ZipHandler.ExtractedPreview;
                     }
+
                     //seed adi data
                     return SeedAdiData();
                 }
@@ -341,49 +334,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        /// <summary>
-        /// If update set the required vars for processing an update package.
-        /// </summary>
-        /// <returns></returns>
-        private bool SetInitialUpdateData()
-        {
-            try
-            {
-                //Get the correct stored adi data
-                AdiData = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue);
-                //Serialize previously enriched Adi File to obtain Asset data
-                WorkflowEntities.SerializeAdiFile(true, adiData: AdiData.EnrichedAdi);
-
-                //Get original asset data and modify new adi.
-                if (!AdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi())
-                    return false;
-
-                //Update all version major values to correct value.
-                if (AdiContentManager
-                    .UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
-                {
-                    //update the db with the new license window end date.
-                    var licEnd = AdiContentManager.GetLicenceEndData();
-                    AdiData.Licensing_Window_End = licEnd;
-                    _adiDataService.Update(AdiData);
-                    Log.Info($"Update Adi Data row id:{AdiData.Id} with new Licensing_Window_End value: {licEnd}");
-                    //nullify un-required data.
-                    EnrichmentWorkflowEntities.EnrichedAdi = null;
-
-                    return true;
-                }
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                LogError(
-                    "SetInitialUpdateData",
-                    "Error Setting initial update data", ex);
-                return false;
-            }
-        }
-
         public bool SeedAdiData()
         {
             try
@@ -394,8 +344,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     Log.Info("Seeding Adi Data to the database");
 
-                    WorkflowEntities.MovieFileSize = FileDirectoryManager.GetFileSize(ZipHandler.ExtractedMovieAsset.FullName);
-                    WorkflowEntities.MovieChecksum = FileDirectoryManager.GetFileHash(ZipHandler.ExtractedMovieAsset.FullName);
+                    WorkflowEntities.MovieFileSize =
+                        FileDirectoryManager.GetFileSize(ZipHandler.ExtractedMovieAsset.FullName);
+                    WorkflowEntities.MovieChecksum =
+                        FileDirectoryManager.GetFileHash(ZipHandler.ExtractedMovieAsset.FullName);
 
                     WorkflowEntities.PreviewFileSize = ZipHandler.HasPreviewAsset
                         ? FileDirectoryManager.GetFileSize(ZipHandler.ExtractedPreview.FullName)
@@ -433,11 +385,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (IsPackageAnUpdate)
                     return true;
 
-                Log.Error($"Cannot seed data as the package is not an update" +
+                Log.Error("Cannot seed data as the package is not an update" +
                           $" and data exists for paid: {WorkflowEntities.TitlPaidValue}" +
-                          $"Failing Ingest.");
+                          "Failing Ingest.");
                 return false;
-
             }
             catch (Exception ex)
             {
@@ -455,8 +406,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (!WorkflowEntities.GetGracenoteProgramData())
                     return false;
 
-                var serializeEpisodeMovieData = 
-                    new XmlApiSerializationHelper<GnApiProgramsSchema.on>();
+                var serializeEpisodeMovieData =
+                    new XmlApiSerializationHelper<GnApiProgramsSchema.@on>();
 
                 //Serialize GN Api Program data
                 ApiManager.CoreProgramData =
@@ -475,16 +426,18 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     Log.Info("Package is a Movie asset.");
                     IsMoviePackage = true;
                 }
-                if(ApiManager.MovieEpisodeProgramData?.holiday != null)
+
+                if (ApiManager.MovieEpisodeProgramData?.holiday != null)
                 {
                     Log.Info("Program is a Holiday Special of type: " +
-                        $"{ApiManager.MovieEpisodeProgramData.holiday.Value}" +
-                        $" and ID: {ApiManager.MovieEpisodeProgramData.holiday.holidayId}");
+                             $"{ApiManager.MovieEpisodeProgramData.holiday.Value}" +
+                             $" and ID: {ApiManager.MovieEpisodeProgramData.holiday.holidayId}");
                     WorkflowEntities.IsHolidaySpecial = true;
                 }
 
                 //set default vars for workflow
-                AdiContentManager.InitialiseAndSeedObjectLists(ApiManager.MovieEpisodeProgramData,ApiManager.GetSeasonId().ToString());
+                AdiContentManager.InitialiseAndSeedObjectLists(ApiManager.MovieEpisodeProgramData,
+                    ApiManager.GetSeasonId().ToString());
                 return true;
             }
             catch (Exception ex)
@@ -529,7 +482,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AdiContentManager.UpdateListData(ApiManager.ShowSeriesSeasonProgramData,
                     ApiManager.GetSeasonId().ToString());
 
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -541,10 +494,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        private bool HasMovieInfo()
-        {
-            return ApiManager.MovieEpisodeProgramData?.movieInfo != null;
-        }
         public bool SetAdiEpisodeMetadata()
         {
             try
@@ -552,38 +501,32 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AdiContentManager.RemoveDefaultAdiNodes();
 
                 if (!IsMoviePackage)
-                {
                     AdiContentManager.InsertEpisodeData(WorkflowEntities.GraceNoteTmsId,
                         ApiManager.GetEpisodeOrdinalValue(), ApiManager.GetEpisodeTitle());
-                }
 
-                return 
-                    
-                     _gnMappingDataService.AddGraceNoteProgramData(WorkflowEntities.TitlPaidValue,
+                return
+                    _gnMappingDataService.AddGraceNoteProgramData(WorkflowEntities.TitlPaidValue,
                         ApiManager.GetSeriesTitle(),
                         ApiManager.GetEpisodeTitle(),
-                        ApiManager.ShowSeriesSeasonProgramData) 
+                        ApiManager.ShowSeriesSeasonProgramData)
                     &&
-                    AdiContentManager.InsertProgramLayerData(tmsid: WorkflowEntities.GraceNoteTmsId,
-                        rootid: WorkflowEntities.GraceNoteRootId) 
+                    AdiContentManager.InsertProgramLayerData(WorkflowEntities.GraceNoteTmsId,
+                        WorkflowEntities.GraceNoteRootId)
                     &&
-                    AdiContentManager.InsertActorData() 
+                    AdiContentManager.InsertActorData()
                     &&
-                    AdiContentManager.InsertCrewData() 
-                    && 
-                    AdiContentManager.InsertTitleData() 
+                    AdiContentManager.InsertCrewData()
                     &&
-                    AdiContentManager.InsertDescriptionData(ApiManager.MovieEpisodeProgramData.descriptions) 
+                    AdiContentManager.InsertTitleData()
                     &&
-                    AdiContentManager.InsertYearData(airDate: ApiManager.MovieEpisodeProgramData.origAirDate,
-                            ApiManager.MovieEpisodeProgramData?.movieInfo) 
+                    AdiContentManager.InsertDescriptionData(ApiManager.MovieEpisodeProgramData.descriptions)
                     &&
-                    AdiContentManager.InsertGenreData() 
+                    AdiContentManager.InsertYearData(ApiManager.MovieEpisodeProgramData.origAirDate,
+                        ApiManager.MovieEpisodeProgramData?.movieInfo)
+                    &&
+                    AdiContentManager.InsertGenreData()
                     &&
                     AdiContentManager.InsertIdmbData(ApiManager.ExternalLinks(), HasMovieInfo());
-
-                
-
             }
             catch (Exception ex)
             {
@@ -601,20 +544,20 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 Log.Info("Setting ADI Content Metadata");
                 var paid = WorkflowEntities.TitlPaidValue.Replace("TITL", "ASST");
                 AdiContentManager.AddAssetMetadataApp_DataNode(
-                    assetId: paid,
+                    paid,
                     "Content_CheckSum",
                     WorkflowEntities.MovieChecksum
                 );
 
                 AdiContentManager.AddAssetMetadataApp_DataNode(
-                    assetId: paid,
+                    paid,
                     "Content_FileSize",
                     WorkflowEntities.MovieFileSize
                 );
 
                 AdiContentManager.SetAdiAssetContentField(
                     "movie",
-                    assetFileName: PrimaryAsset.Name);
+                    PrimaryAsset.Name);
 
                 if (WorkflowEntities.PackageHasPreviewAsset)
                 {
@@ -624,7 +567,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 if (IsPackageAnUpdate)
                 {
-                    WorkflowEntities.GetDbEnrichedAdi(EfStaticMethods.GetEnrichedAdiFile(WorkflowEntities.TitlPaidValue));
+                    WorkflowEntities.GetDbEnrichedAdi(
+                        EfStaticMethods.GetEnrichedAdiFile(WorkflowEntities.TitlPaidValue));
 
                     Log.Info("Cloning enriched asset data to ADI");
                     AdiContentManager.CloneEnrichedAssetDataToAdi(EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset);
@@ -653,21 +597,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     var paid = WorkflowEntities.TitlPaidValue.Replace("TITL", "PREV");
 
                     AdiContentManager.AddAssetMetadataApp_DataNode(
-                        assetId: paid,
+                        paid,
                         "Content_CheckSum",
                         FileDirectoryManager.GetFileHash(PreviewAsset.FullName)
                     );
 
                     AdiContentManager.AddAssetMetadataApp_DataNode(
-                        assetId: paid,
+                        paid,
                         "Content_FileSize",
                         FileDirectoryManager.GetFileSize(PreviewAsset.FullName)
                     );
                     AdiContentManager.SetAdiAssetContentField(
                         "preview",
-                        assetFileName: PreviewAsset.Name);
+                        PreviewAsset.Name);
                 }
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -690,15 +634,15 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 return AdiContentManager.InsertIdmbData(ApiManager.ExternalLinks(), HasMovieInfo()) &&
                        AdiContentManager.InsertSeriesLayerData(ApiManager.ShowSeriesSeasonProgramData.connectorId,
-                           seriesId: ApiManager.GetSeriesId()) &&
+                           ApiManager.GetSeriesId()) &&
                        AdiContentManager.InsertShowData(ApiManager.GetShowId(), ApiManager.GetShowName(),
                            ApiManager.GetNumberOfSeasons(),
                            ApiManager.ShowSeriesSeasonProgramData.descriptions) &&
                        AdiContentManager.InsertSeriesGenreData() &&
                        AdiContentManager.InsertSeriesData(
                            ApiManager.GetSeriesId(),
-                           seriesOrdinalValue: ApiManager.GetSeriesOrdinalValue(),
-                           seasonId: ApiManager.GetSeasonId(),
+                           ApiManager.GetSeriesOrdinalValue(),
+                           ApiManager.GetSeasonId(),
                            ApiManager.GetEpisodeSeason());
             }
             catch (Exception ex)
@@ -729,31 +673,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        private string GetImageName(string imageUri, string imageMapping)
-        {
-            var originalFileName = Path.GetFileNameWithoutExtension(imageUri);
-            if (originalFileName == null)
-                return string.Empty;
-
-            var newFileName = originalFileName.Replace(originalFileName, $"{imageMapping}_{originalFileName}{Path.GetExtension(imageUri)}");
-            return Path.Combine(WorkflowEntities.CurrentWorkingDirectory, newFileName);
-
-        }
-
-        private void UpdateDbImages(string dbImages)
-        {
-            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
-            gnMappingRow.GN_Images = dbImages;
-            var rowId = _gnMappingDataService.Update(gnMappingRow);
-            Log.Info($"GN Mapping table with row id: {rowId} updated with new image data");
-        }
         public bool ImageSelectionLogic()
         {
             var currentImage = "";
 
             var imageLookups = _gnImageLookupService.GetList().OrderBy(o => Convert.ToInt32(o.Image_AdiOrder));
             var serialization = new XmlSerializationManager<ImageMapping>();
-            
+
             foreach (var configLookup in imageLookups)
             {
                 var mappingData = serialization.Read(configLookup.Mapping_Config);
@@ -774,7 +700,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     ImageMapping = mappingData,
                     CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue),
-                    IsUpdate =  IsPackageAnUpdate,
+                    IsUpdate = IsPackageAnUpdate,
                     ConfigImageCategories = mappingData.ImageCategory,
                     ApiAssetList = AdiContentManager.ReturnAssetList()
                 };
@@ -785,7 +711,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     isl.CurrentMappingData.Id
                 );
 
-                var imageUri = isl.GetGracenoteImage(ImageTypeRequired: configLookup.Image_Lookup, currentProgramType,
+                var imageUri = isl.GetGracenoteImage(configLookup.Image_Lookup, currentProgramType,
                     WorkflowEntities.TitlPaidValue, WorkflowEntities.SeasonId);
 
                 if (string.IsNullOrEmpty(imageUri))
@@ -800,22 +726,23 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var localImage = GetImageName(imageUri, configLookup.Image_Mapping);
                 isl.DownloadImage(imageUri, localImage);
                 //download and insert image
-                insertSuccess = AdiContentManager.InsertImageData
+                InsertSuccess = AdiContentManager.InsertImageData
                 (
-                    titlPaid: WorkflowEntities.TitlPaidValue,
-                    imageName: imageUri.Replace("assets/",""),
-                    imageMapping:configLookup.Image_Mapping,
-                    contentCheckSum: FileDirectoryManager.GetFileHash(localImage),
-                    contentFileSize: FileDirectoryManager.GetFileSize(localImage),
-                    encodingType: Path.GetExtension(localImage),
-                    imageQualifier: isl.ImageQualifier,
-                    imageAspectRatio: isl.GetFileAspectRatio(localImage)
+                    WorkflowEntities.TitlPaidValue,
+                    imageUri.Replace("assets/", ""),
+                    configLookup.Image_Mapping,
+                    FileDirectoryManager.GetFileHash(localImage),
+                    FileDirectoryManager.GetFileSize(localImage),
+                    Path.GetExtension(localImage),
+                    isl.ImageQualifier,
+                    isl.GetFileAspectRatio(localImage)
                 );
 
-                if(insertSuccess)
+                if (InsertSuccess)
                     currentImage = configLookup.Image_Mapping;
             }
-            return insertSuccess;
+
+            return InsertSuccess;
         }
 
         public bool RemoveDerivedFromAsset()
@@ -824,15 +751,15 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 //<App_Data App="VOD" Name="DeriveFromAsset" Value="ASST0000000001506105" />
                 foreach (var asset in from asset in EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                                      let dfa = asset.Metadata.App_Data.FirstOrDefault(d => d.Name.ToLower() == "derivefromasset")
-                                      where dfa != null
-                                      select asset)
+                    let dfa = asset.Metadata.App_Data.FirstOrDefault(d => d.Name.ToLower() == "derivefromasset")
+                    where dfa != null
+                    select asset)
                 {
                     Log.Info("Removing DeriveFromAsset section from ADI.xml");
                     EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(asset);
                     break;
                 }
-                
+
 
                 return true;
             }
@@ -862,28 +789,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return true;
         }
 
-        public bool SaveAdiFile()
-        {
-            try
-            {
-                var outputAdi = Path.Combine(WorkflowEntities.CurrentWorkingDirectory, "ADI.xml");
-                WorkflowEntities.SaveAdiFile(outputAdi, EnrichmentWorkflowEntities.AdiFile);
-
-                AdiData.EnrichedAdi = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
-                AdiData.Enrichment_DateTime = DateTime.Now;
-                _adiDataService.Update(AdiData);
-
-                return true;
-            }
-            catch (Exception safex)
-            {
-                LogError(
-                    "SaveAdiFile",
-                    "Error Saving Enriched ADI", safex);
-                return false;
-            }
-        }
-
         public bool PackageEnrichedAsset()
         {
             try
@@ -909,21 +814,20 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         public bool DeliverEnrichedAsset()
         {
             try
-            { 
+            {
                 var fInfo = new FileInfo(DeliveryPackage);
                 var tmpPackage = Path.Combine(ADIWF_Config.IngestDirectory, $"{fInfo.Name}.tmp");
                 var finalPackage = Path.Combine(ADIWF_Config.IngestDirectory, fInfo.Name);
                 Log.Info($"Moving Temp Package to ingest: {DeliveryPackage} to {tmpPackage}");
-                System.IO.File.Move(DeliveryPackage,tmpPackage);
+                System.IO.File.Move(DeliveryPackage, tmpPackage);
                 if (System.IO.File.Exists(tmpPackage))
                 {
                     Log.Info("Temp package successfully moved");
                     Log.Info($"Moving Temp Package: {tmpPackage} to Ingest package {finalPackage}");
-                    System.IO.File.Move(tmpPackage,finalPackage);
+                    System.IO.File.Move(tmpPackage, finalPackage);
                     Log.Info("Ingest package Delivered successfully.");
                     return true;
                 }
-
             }
             catch (Exception ex)
             {
@@ -939,6 +843,95 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         public bool ProcessFailedPackage()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     If update set the required vars for processing an update package.
+        /// </summary>
+        /// <returns></returns>
+        private bool SetInitialUpdateData()
+        {
+            try
+            {
+                //Get the correct stored adi data
+                AdiData = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue);
+                //Serialize previously enriched Adi File to obtain Asset data
+                WorkflowEntities.SerializeAdiFile(true, AdiData.EnrichedAdi);
+
+                //Get original asset data and modify new adi.
+                if (!AdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi())
+                    return false;
+
+                //Update all version major values to correct value.
+                if (AdiContentManager
+                    .UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
+                {
+                    //update the db with the new license window end date.
+                    var licEnd = AdiContentManager.GetLicenceEndData();
+                    AdiData.Licensing_Window_End = licEnd;
+                    _adiDataService.Update(AdiData);
+                    Log.Info($"Update Adi Data row id:{AdiData.Id} with new Licensing_Window_End value: {licEnd}");
+                    //nullify un-required data.
+                    EnrichmentWorkflowEntities.EnrichedAdi = null;
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LogError(
+                    "SetInitialUpdateData",
+                    "Error Setting initial update data", ex);
+                return false;
+            }
+        }
+
+        private bool HasMovieInfo()
+        {
+            return ApiManager.MovieEpisodeProgramData?.movieInfo != null;
+        }
+
+        private string GetImageName(string imageUri, string imageMapping)
+        {
+            var originalFileName = Path.GetFileNameWithoutExtension(imageUri);
+            if (originalFileName == null)
+                return string.Empty;
+
+            var newFileName = originalFileName.Replace(originalFileName,
+                $"{imageMapping}_{originalFileName}{Path.GetExtension(imageUri)}");
+            return Path.Combine(WorkflowEntities.CurrentWorkingDirectory, newFileName);
+        }
+
+        private void UpdateDbImages(string dbImages)
+        {
+            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
+            gnMappingRow.GN_Images = dbImages;
+            var rowId = _gnMappingDataService.Update(gnMappingRow);
+            Log.Info($"GN Mapping table with row id: {rowId} updated with new image data");
+        }
+
+        public bool SaveAdiFile()
+        {
+            try
+            {
+                var outputAdi = Path.Combine(WorkflowEntities.CurrentWorkingDirectory, "ADI.xml");
+                WorkflowEntities.SaveAdiFile(outputAdi, EnrichmentWorkflowEntities.AdiFile);
+
+                AdiData.EnrichedAdi = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
+                AdiData.Enrichment_DateTime = DateTime.Now;
+                _adiDataService.Update(AdiData);
+
+                return true;
+            }
+            catch (Exception safex)
+            {
+                LogError(
+                    "SaveAdiFile",
+                    "Error Saving Enriched ADI", safex);
+                return false;
+            }
         }
     }
 }

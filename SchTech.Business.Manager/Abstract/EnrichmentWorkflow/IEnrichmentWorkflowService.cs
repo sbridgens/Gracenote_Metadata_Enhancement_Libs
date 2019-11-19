@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SchTech.File.Manager.Concrete.Serialization;
-using SchTech.Queue.Manager.Concrete;
 
 namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
 {

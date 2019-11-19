@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SchTech.Entities.ConcreteTypes;
+﻿using System.Data.Entity.ModelConfiguration;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
 {
@@ -18,7 +11,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             //Primary key is set here
             HasKey(x => x.Id);
 
-            
+
             //EntityTypeConfiguration properties are now mapped
             //to the db tables matching the property names.
             Property(x => x.Image_Lookup).HasColumnName("Image_Lookup");

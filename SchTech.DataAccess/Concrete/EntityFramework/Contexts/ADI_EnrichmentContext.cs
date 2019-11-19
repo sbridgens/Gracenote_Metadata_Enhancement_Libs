@@ -13,18 +13,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
     {
         private readonly AdiWfeProperties _adiWfeProperties;
         private DbModelBuilder modelBuilder;
+
         public ADI_EnrichmentContext()
         {
-            if (_adiWfeProperties == null)
-            {
-                _adiWfeProperties = new AdiWfeProperties();
-            }
+            if (_adiWfeProperties == null) _adiWfeProperties = new AdiWfeProperties();
         }
 
 
         public ADI_EnrichmentContext(DbContextOptions<ADI_EnrichmentContext> options)
             : base(options)
-        {   
+        {
         }
 
         public virtual Microsoft.EntityFrameworkCore.DbSet<Adi_Data> Adi_Data { get; set; }
@@ -38,7 +36,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
                 optionsBuilder.UseSqlServer($"Server={ADIWF_Config.Database_Host},1433;" +
                                             $"Database={ADIWF_Config.Database_Name};" +
                                             $"Trusted_Connection={ADIWF_Config.Integrated_Security};" +
-                                            $"MultipleActiveResultSets=True;");
+                                            "MultipleActiveResultSets=True;");
 
                 if (modelBuilder == null)
                 {
@@ -47,12 +45,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
                     modelBuilder.Configurations.Add(new GnImageLookupMap());
                     modelBuilder.Configurations.Add(new GnMappingDataMap());
                 }
-               
             }
         }
 
         /// <summary>
-        /// SCH Tech added to allow update of entity based on property name
+        ///     SCH Tech added to allow update of entity based on property name
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
@@ -60,8 +57,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
         /// <param name="propertyValue"></param>
         public void UpdateEntity<T>(int id, string propertyName, string propertyValue) where T : class
         {
-
-            var entity = this.Set<T>().Find(id);
+            var entity = Set<T>().Find(id);
             var prop = typeof(T).GetProperty(propertyName);
             if (prop != null)
             {
@@ -69,11 +65,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
                 prop.SetValue(entity, val);
             }
 
-            this.SaveChanges();
+            SaveChanges();
         }
 
         /// <summary>
-        /// SCH Tech added to allow return of data based on property name
+        ///     SCH Tech added to allow return of data based on property name
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
@@ -81,19 +77,12 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
         /// <returns></returns>
         public string GetEntity<T>(int id, string propertyName) where T : class
         {
-            var entity = this.Set<T>().Find(id);
+            var entity = Set<T>().Find(id);
             var prop = typeof(T).GetProperty(propertyName);
 
             if (prop != null)
                 return prop.GetValue(entity, null).ToString();
-            else
-            {
-                return string.Empty;
-            }
+            return string.Empty;
         }
-
-        
     }
-
-
 }

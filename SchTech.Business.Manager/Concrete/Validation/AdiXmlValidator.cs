@@ -1,15 +1,15 @@
 ﻿using System.Text.RegularExpressions;
+using log4net;
 using SchTech.Entities.ConcreteTypes;
-using SchTech.File.Manager.Concrete.Serialization;
 
 namespace SchTech.Business.Manager.Concrete.Validation
 {
-    public class AdiXmlValidator 
+    public class AdiXmlValidator
     {
         /// <summary>
-        /// Initialize Log4net
+        ///     Initialize Log4net
         /// </summary>
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(EnhancementDataValidator));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(EnhancementDataValidator));
 
         public string ValidatePaidValue(string TitlPaidValue)
         {

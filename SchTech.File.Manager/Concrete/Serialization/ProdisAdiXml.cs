@@ -1,111 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace SchTech.File.Manager.Concrete.Serialization
 {
     // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADI
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADI
     {
+        private ADIAsset assetField;
 
         private ADIMetadata metadataField;
 
-        private ADIAsset assetField;
-
-        /// <remarks/>
+        /// <remarks />
         public ADIMetadata Metadata
         {
-            get
-            {
-                return this.metadataField;
-            }
-            set
-            {
-                this.metadataField = value;
-            }
+            get => metadataField;
+            set => metadataField = value;
         }
 
-        /// <remarks/>
+        /// <remarks />
         public ADIAsset Asset
         {
-            get
-            {
-                return this.assetField;
-            }
-            set
-            {
-                this.assetField = value;
-            }
+            get => assetField;
+            set => assetField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIMetadata
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIMetadata
     {
-
         private ADIMetadataAMS aMSField;
 
         private List<ADIMetadataApp_Data> app_DataField;
 
-        /// <remarks/>
+        /// <remarks />
         public ADIMetadataAMS AMS
         {
-            get
-            {
-                return this.aMSField;
-            }
-            set
-            {
-                this.aMSField = value;
-            }
+            get => aMSField;
+            set => aMSField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("App_Data")]
+        /// <remarks />
+        [XmlElementAttribute("App_Data")]
         public List<ADIMetadataApp_Data> App_Data
         {
-            get
-            {
-                return this.app_DataField;
-            }
-            set
-            {
-                this.app_DataField = value;
-            }
+            get => app_DataField;
+            set => app_DataField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIMetadataAMS
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIMetadataAMS
     {
-
         private string asset_ClassField;
 
         private string asset_IDField;
 
         private string asset_NameField;
 
-        private System.DateTime creation_DateField;
+        private DateTime creation_DateField;
 
         private string descriptionField;
 
         private string productField;
 
-        private string providerField;
-
         private string provider_IDField;
+
+        private string providerField;
 
         private string verbField;
 
@@ -113,313 +82,201 @@ namespace SchTech.File.Manager.Concrete.Serialization
 
         private int version_MinorField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_Class
         {
-            get
-            {
-                return this.asset_ClassField;
-            }
-            set
-            {
-                this.asset_ClassField = value;
-            }
+            get => asset_ClassField;
+            set => asset_ClassField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_ID
         {
-            get
-            {
-                return this.asset_IDField;
-            }
-            set
-            {
-                this.asset_IDField = value;
-            }
+            get => asset_IDField;
+            set => asset_IDField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_Name
         {
-            get
-            {
-                return this.asset_NameField;
-            }
-            set
-            {
-                this.asset_NameField = value;
-            }
+            get => asset_NameField;
+            set => asset_NameField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "date")]
-        public System.DateTime Creation_Date
+        /// <remarks />
+        [XmlAttributeAttribute(DataType = "date")]
+        public DateTime Creation_Date
         {
-            get
-            {
-                return this.creation_DateField;
-            }
-            set
-            {
-                this.creation_DateField = value;
-            }
+            get => creation_DateField;
+            set => creation_DateField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Description
         {
-            get
-            {
-                return this.descriptionField;
-            }
-            set
-            {
-                this.descriptionField = value;
-            }
+            get => descriptionField;
+            set => descriptionField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Product
         {
-            get
-            {
-                return this.productField;
-            }
-            set
-            {
-                this.productField = value;
-            }
+            get => productField;
+            set => productField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Provider
         {
-            get
-            {
-                return this.providerField;
-            }
-            set
-            {
-                this.providerField = value;
-            }
+            get => providerField;
+            set => providerField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Provider_ID
         {
-            get
-            {
-                return this.provider_IDField;
-            }
-            set
-            {
-                this.provider_IDField = value;
-            }
+            get => provider_IDField;
+            set => provider_IDField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Verb
         {
-            get
-            {
-                return this.verbField;
-            }
-            set
-            {
-                this.verbField = value;
-            }
+            get => verbField;
+            set => verbField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public int Version_Major
         {
-            get
-            {
-                return this.version_MajorField;
-            }
-            set
-            {
-                this.version_MajorField = Convert.ToInt32(value);
-            }
+            get => version_MajorField;
+            set => version_MajorField = Convert.ToInt32(value);
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public int Version_Minor
         {
-            get
-            {
-                return this.version_MinorField;
-            }
-            set
-            {
-                this.version_MinorField = Convert.ToInt32(value);
-            }
+            get => version_MinorField;
+            set => version_MinorField = Convert.ToInt32(value);
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIMetadataApp_Data
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIMetadataApp_Data
     {
-
         private string appField;
 
         private string nameField;
 
         private string valueField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string App
         {
-            get
-            {
-                return this.appField;
-            }
-            set
-            {
-                this.appField = value;
-            }
+            get => appField;
+            set => appField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Name
         {
-            get
-            {
-                return this.nameField;
-            }
-            set
-            {
-                this.nameField = value;
-            }
+            get => nameField;
+            set => nameField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Value
         {
-            get
-            {
-                return this.valueField;
-            }
-            set
-            {
-                this.valueField = value;
-            }
+            get => valueField;
+            set => valueField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAsset
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAsset
     {
+        private List<ADIAssetAsset> assetField;
 
         private ADIAssetMetadata metadataField;
 
-        private List<ADIAssetAsset> assetField;
-
-        /// <remarks/>
+        /// <remarks />
         public ADIAssetMetadata Metadata
         {
-            get
-            {
-                return this.metadataField;
-            }
-            set
-            {
-                this.metadataField = value;
-            }
+            get => metadataField;
+            set => metadataField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Asset")]
+        /// <remarks />
+        [XmlElementAttribute("Asset")]
         public List<ADIAssetAsset> Asset
         {
-            get
-            {
-                return this.assetField;
-            }
-            set
-            {
-                this.assetField = value;
-            }
+            get => assetField;
+            set => assetField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetMetadata
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetMetadata
     {
-
         private ADIAssetMetadataAMS aMSField;
 
         private List<ADIAssetMetadataApp_Data> app_DataField;
 
-        /// <remarks/>
+        /// <remarks />
         public ADIAssetMetadataAMS AMS
         {
-            get
-            {
-                return this.aMSField;
-            }
-            set
-            {
-                this.aMSField = value;
-            }
+            get => aMSField;
+            set => aMSField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("App_Data")]
+        /// <remarks />
+        [XmlElementAttribute("App_Data")]
         public List<ADIAssetMetadataApp_Data> App_Data
         {
-            get
-            {
-                return this.app_DataField;
-            }
-            set
-            {
-                this.app_DataField = value;
-            }
+            get => app_DataField;
+            set => app_DataField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetMetadataAMS
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetMetadataAMS
     {
-
         private string asset_ClassField;
 
         private string asset_IDField;
 
         private string asset_NameField;
 
-        private System.DateTime creation_DateField;
+        private DateTime creation_DateField;
 
         private string descriptionField;
 
         private string productField;
 
-        private string providerField;
-
         private string provider_IDField;
+
+        private string providerField;
 
         private string verbField;
 
@@ -427,551 +284,345 @@ namespace SchTech.File.Manager.Concrete.Serialization
 
         private int version_MinorField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_Class
         {
-            get
-            {
-                return this.asset_ClassField;
-            }
-            set
-            {
-                this.asset_ClassField = value;
-            }
+            get => asset_ClassField;
+            set => asset_ClassField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_ID
         {
-            get
-            {
-                return this.asset_IDField;
-            }
-            set
-            {
-                this.asset_IDField = value;
-            }
+            get => asset_IDField;
+            set => asset_IDField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_Name
         {
-            get
-            {
-                return this.asset_NameField;
-            }
-            set
-            {
-                this.asset_NameField = value;
-            }
+            get => asset_NameField;
+            set => asset_NameField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "date")]
-        public System.DateTime Creation_Date
+        /// <remarks />
+        [XmlAttributeAttribute(DataType = "date")]
+        public DateTime Creation_Date
         {
-            get
-            {
-                return this.creation_DateField;
-            }
-            set
-            {
-                this.creation_DateField = value;
-            }
+            get => creation_DateField;
+            set => creation_DateField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Description
         {
-            get
-            {
-                return this.descriptionField;
-            }
-            set
-            {
-                this.descriptionField = value;
-            }
+            get => descriptionField;
+            set => descriptionField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Product
         {
-            get
-            {
-                return this.productField;
-            }
-            set
-            {
-                this.productField = value;
-            }
+            get => productField;
+            set => productField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Provider
         {
-            get
-            {
-                return this.providerField;
-            }
-            set
-            {
-                this.providerField = value;
-            }
+            get => providerField;
+            set => providerField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Provider_ID
         {
-            get
-            {
-                return this.provider_IDField;
-            }
-            set
-            {
-                this.provider_IDField = value;
-            }
+            get => provider_IDField;
+            set => provider_IDField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Verb
         {
-            get
-            {
-                return this.verbField;
-            }
-            set
-            {
-                this.verbField = value;
-            }
+            get => verbField;
+            set => verbField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public int Version_Major
         {
-            get
-            {
-                return this.version_MajorField;
-            }
-            set
-            {
-                this.version_MajorField = Convert.ToInt32(value);
-            }
+            get => version_MajorField;
+            set => version_MajorField = Convert.ToInt32(value);
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public int Version_Minor
         {
-            get
-            {
-                return this.version_MinorField;
-            }
-            set
-            {
-                this.version_MinorField = Convert.ToInt32(value);
-            }
+            get => version_MinorField;
+            set => version_MinorField = Convert.ToInt32(value);
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetMetadataApp_Data
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetMetadataApp_Data
     {
-
         private string appField;
 
         private string nameField;
 
         private string valueField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string App
         {
-            get
-            {
-                return this.appField;
-            }
-            set
-            {
-                this.appField = value;
-            }
+            get => appField;
+            set => appField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Name
         {
-            get
-            {
-                return this.nameField;
-            }
-            set
-            {
-                this.nameField = value;
-            }
+            get => nameField;
+            set => nameField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Value
         {
-            get
-            {
-                return this.valueField;
-            }
-            set
-            {
-                this.valueField = value;
-            }
+            get => valueField;
+            set => valueField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetAsset
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetAsset
     {
+        private ADIAssetAssetContent contentField;
 
         private ADIAssetAssetMetadata metadataField;
 
-        private ADIAssetAssetContent contentField;
-
-        /// <remarks/>
+        /// <remarks />
         public ADIAssetAssetMetadata Metadata
         {
-            get
-            {
-                return this.metadataField;
-            }
-            set
-            {
-                this.metadataField = value;
-            }
+            get => metadataField;
+            set => metadataField = value;
         }
 
-        /// <remarks/>
+        /// <remarks />
         public ADIAssetAssetContent Content
         {
-            get
-            {
-                return this.contentField;
-            }
-            set
-            {
-                this.contentField = value;
-            }
+            get => contentField;
+            set => contentField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetAssetMetadata
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetAssetMetadata
     {
-
         private ADIAssetAssetMetadataAMS aMSField;
 
         private List<ADIAssetAssetMetadataApp_Data> app_DataField;
 
-        /// <remarks/>
+        /// <remarks />
         public ADIAssetAssetMetadataAMS AMS
         {
-            get
-            {
-                return this.aMSField;
-            }
-            set
-            {
-                this.aMSField = value;
-            }
+            get => aMSField;
+            set => aMSField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("App_Data")]
+        /// <remarks />
+        [XmlElementAttribute("App_Data")]
         public List<ADIAssetAssetMetadataApp_Data> App_Data
         {
-            get
-            {
-                return this.app_DataField;
-            }
-            set
-            {
-                this.app_DataField = value;
-            }
+            get => app_DataField;
+            set => app_DataField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetAssetMetadataAMS
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetAssetMetadataAMS
     {
-
         private string asset_ClassField;
 
         private string asset_IDField;
 
         private string asset_NameField;
 
-        private int version_MinorField;
-
-        private int version_MajorField;
-
-        private System.DateTime creation_DateField;
+        private DateTime creation_DateField;
 
         private string descriptionField;
+
+        private string productField;
 
         private string provider_IDField;
 
         private string providerField;
 
-        private string productField;
-
         private string verbField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        private int version_MajorField;
+
+        private int version_MinorField;
+
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_Class
         {
-            get
-            {
-                return this.asset_ClassField;
-            }
-            set
-            {
-                this.asset_ClassField = value;
-            }
+            get => asset_ClassField;
+            set => asset_ClassField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_ID
         {
-            get
-            {
-                return this.asset_IDField;
-            }
-            set
-            {
-                this.asset_IDField = value;
-            }
+            get => asset_IDField;
+            set => asset_IDField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Asset_Name
         {
-            get
-            {
-                return this.asset_NameField;
-            }
-            set
-            {
-                this.asset_NameField = value;
-            }
+            get => asset_NameField;
+            set => asset_NameField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public int Version_Minor
         {
-            get
-            {
-                return this.version_MinorField;
-            }
-            set
-            {
-                this.version_MinorField = Convert.ToInt32(value);
-            }
+            get => version_MinorField;
+            set => version_MinorField = Convert.ToInt32(value);
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public int Version_Major
         {
-            get
-            {
-                return this.version_MajorField;
-            }
-            set
-            {
-                this.version_MajorField = Convert.ToInt32(value);
-            }
+            get => version_MajorField;
+            set => version_MajorField = Convert.ToInt32(value);
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "date")]
-        public System.DateTime Creation_Date
+        /// <remarks />
+        [XmlAttributeAttribute(DataType = "date")]
+        public DateTime Creation_Date
         {
-            get
-            {
-                return this.creation_DateField;
-            }
-            set
-            {
-                this.creation_DateField = value;
-            }
+            get => creation_DateField;
+            set => creation_DateField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Description
         {
-            get
-            {
-                return this.descriptionField;
-            }
-            set
-            {
-                this.descriptionField = value;
-            }
+            get => descriptionField;
+            set => descriptionField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Provider_ID
         {
-            get
-            {
-                return this.provider_IDField;
-            }
-            set
-            {
-                this.provider_IDField = value;
-            }
+            get => provider_IDField;
+            set => provider_IDField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Provider
         {
-            get
-            {
-                return this.providerField;
-            }
-            set
-            {
-                this.providerField = value;
-            }
+            get => providerField;
+            set => providerField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Product
         {
-            get
-            {
-                return this.productField;
-            }
-            set
-            {
-                this.productField = value;
-            }
+            get => productField;
+            set => productField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Verb
         {
-            get
-            {
-                return this.verbField;
-            }
-            set
-            {
-                this.verbField = value;
-            }
+            get => verbField;
+            set => verbField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetAssetMetadataApp_Data
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetAssetMetadataApp_Data
     {
-
         private string appField;
 
         private string nameField;
 
         private string valueField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string App
         {
-            get
-            {
-                return this.appField;
-            }
-            set
-            {
-                this.appField = value;
-            }
+            get => appField;
+            set => appField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Name
         {
-            get
-            {
-                return this.nameField;
-            }
-            set
-            {
-                this.nameField = value;
-            }
+            get => nameField;
+            set => nameField = value;
         }
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Value
         {
-            get
-            {
-                return this.valueField;
-            }
-            set
-            {
-                this.valueField = value;
-            }
+            get => valueField;
+            set => valueField = value;
         }
     }
 
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class ADIAssetAssetContent
+    /// <remarks />
+    [SerializableAttribute]
+    [DesignerCategory("code")]
+    public class ADIAssetAssetContent
     {
-
         private string valueField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        /// <remarks />
+        [XmlAttributeAttribute]
         public string Value
         {
-            get
-            {
-                return this.valueField;
-            }
-            set
-            {
-                this.valueField = value;
-            }
+            get => valueField;
+            set => valueField = value;
         }
     }
-
-
 }

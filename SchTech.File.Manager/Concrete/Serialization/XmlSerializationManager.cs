@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -24,11 +19,10 @@ namespace SchTech.File.Manager.Concrete.Serialization
         {
             using (TextWriter textWriter = new StreamWriter(path))
             {
-                XmlSerializer serializer = new XmlSerializer(_type);
+                var serializer = new XmlSerializer(_type);
                 serializer.Serialize(textWriter, obj);
                 textWriter.Close();
             }
-
         }
 
         public T Read(string fileContent)
@@ -36,13 +30,14 @@ namespace SchTech.File.Manager.Concrete.Serialization
             T result;
             using (TextReader textReader = new StringReader(fileContent))
             {
-                using (XmlTextReader reader = new XmlTextReader(textReader))
+                using (var reader = new XmlTextReader(textReader))
                 {
                     reader.Namespaces = false;
-                    XmlSerializer serializer = new XmlSerializer(_type);
-                    result = (T)serializer.Deserialize(reader);
+                    var serializer = new XmlSerializer(_type);
+                    result = (T) serializer.Deserialize(reader);
                 }
             }
+
             return result;
         }
     }

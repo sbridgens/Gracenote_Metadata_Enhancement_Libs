@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Concrete.Validation;
@@ -14,19 +14,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
     public class ProdisAdiContentManager
     {
         /// <summary>
-        /// Initialize Log4net
+        ///     Initialize Log4net
         /// </summary>
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(ProdisAdiContentManager));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ProdisAdiContentManager));
 
-        private EnrichmentDataLists EnrichmentDataLists { get; set; }
-
-        private EnhancementDataValidator AdiDataValidator { get; set; }
-
-        public List<GnApiProgramsSchema.programsProgramSeason> SeasonInfo { get; set; }
-
-        private bool IdmbDataInserted { get; set; }
-
-        private List<string> AdiNodesToRemove = new List<string>()
+        private readonly List<string> AdiNodesToRemove = new List<string>
         {
             //look at the set or update method to add if not exists
             //or update if it does, need a bool for crew/cast data.
@@ -66,12 +58,20 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             AdiDataValidator = new EnhancementDataValidator();
         }
 
-        public void InitialiseAndSeedObjectLists(GnApiProgramsSchema.programsProgram episodeMovieData,string seasonId)
+        private EnrichmentDataLists EnrichmentDataLists { get; set; }
+
+        private EnhancementDataValidator AdiDataValidator { get; }
+
+        public List<GnApiProgramsSchema.programsProgramSeason> SeasonInfo { get; set; }
+
+        private bool IdmbDataInserted { get; set; }
+
+        public void InitialiseAndSeedObjectLists(GnApiProgramsSchema.programsProgram episodeMovieData, string seasonId)
         {
             //Instantiate List Entities
             EnrichmentDataLists = new EnrichmentDataLists();
 
-            UpdateListData(episodeMovieData,seasonId);
+            UpdateListData(episodeMovieData, seasonId);
         }
 
 
@@ -79,7 +79,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             //Build Data Lists
             //Asset List
-            
+
             EnrichmentDataLists.AddProgramAssetsToList(apiData?.assets, "program(series/movie)");
             //Cast List
             EnrichmentDataLists.AddCastMembersToList(apiData?.cast, "program(series/movie)");
@@ -131,10 +131,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $"Error Setting Metadata for Node {nodeName}:" +
                           $" {atmadnEx.Message}");
                 if (atmadnEx.InnerException != null)
-                {
                     Log.Error("[AddTitleMetadataApp_DataNode] Inner Exception:" +
                               $" {atmadnEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -154,7 +152,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 }
                 else
                 {
-                    var newAppData = new ADIAssetAssetMetadataApp_Data()
+                    var newAppData = new ADIAssetAssetMetadataApp_Data
                     {
                         App = "VOD",
                         Name = nodeName,
@@ -165,6 +163,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         .FirstOrDefault(a => a.Metadata.AMS.Asset_ID == assetId)
                         ?.Metadata.App_Data.Add(newAppData);
                 }
+
                 return true;
             }
             catch (Exception aamdadnEx)
@@ -173,20 +172,18 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $"Error Setting Metadata for Node {nodeName}:" +
                           $" {aamdadnEx.Message}");
                 if (aamdadnEx.InnerException != null)
-                {
                     Log.Error("[AddAssetMetadataApp_DataNode] Inner Exception:" +
                               $" {aamdadnEx.InnerException.Message}");
-                }
                 return false;
             }
         }
 
-       
+
         public bool SetAdiAssetContentField(string assetClass, string assetFileName)
         {
             var contentFile = EnrichmentWorkflowEntities.AdiFile
                 .Asset.Asset
-                .FirstOrDefault(asset => $"{assetClass}".Equals(value: asset.Metadata.AMS.Asset_Class));
+                .FirstOrDefault(asset => $"{assetClass}".Equals(asset.Metadata.AMS.Asset_Class));
 
             if (contentFile == null)
                 return false;
@@ -194,21 +191,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             contentFile.Content.Value = assetFileName;
             Log.Info($"Successfully Set Content Value for Asset Type: {assetClass} to {assetFileName}");
             return true;
-
         }
 
         public void CloneEnrichedAssetDataToAdi(IEnumerable<ADIAssetAsset> clonedData)
         {
             foreach (var assetData in clonedData)
             {
-                var newAsset = new ADIAssetAsset()
+                var newAsset = new ADIAssetAsset
                 {
-                   Content =  assetData.Content,
-                   Metadata = assetData.Metadata
+                    Content = assetData.Content,
+                    Metadata = assetData.Metadata
                 };
 
                 EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newAsset);
             }
+
             Log.Info("Successfully cloned Enriched asset data to ADI.");
         }
 
@@ -226,11 +223,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Provider_ID;
         }
+
         public string GetAssetPaid(string assetType)
         {
-            return (EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+            return EnrichmentWorkflowEntities.AdiFile.Asset.Asset
                 .Where(asset => asset.Metadata.AMS.Asset_Class.Equals(assetType))
-                .Select(asset => asset.Metadata.AMS.Asset_ID.ToString())).FirstOrDefault();
+                .Select(asset => asset.Metadata.AMS.Asset_ID.ToString()).FirstOrDefault();
         }
 
         public string GetLicenceEndData()
@@ -246,20 +244,18 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 foreach (var assetData in EnrichmentWorkflowEntities
                     .EnrichedAdi.Asset.Asset
                     .Select(assetSection => new ADIAssetAsset
-                {
-                    Content = new ADIAssetAssetContent
                     {
-                        Value = assetSection.Content.Value
-                    },
-                    Metadata = new ADIAssetAssetMetadata
-                    {
-                        AMS = assetSection.Metadata.AMS,
-                        App_Data = assetSection.Metadata.App_Data
-                    }
-                }))
-                {
+                        Content = new ADIAssetAssetContent
+                        {
+                            Value = assetSection.Content.Value
+                        },
+                        Metadata = new ADIAssetAssetMetadata
+                        {
+                            AMS = assetSection.Metadata.AMS,
+                            App_Data = assetSection.Metadata.App_Data
+                        }
+                    }))
                     EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetData);
-                }
 
                 return true;
             }
@@ -269,9 +265,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $"previously enriched asset data: {cpeadtaEx.Message}");
 
                 if (cpeadtaEx.InnerException != null)
-                {
-                    Log.Error($"[CopyPreviouslyEnrichedAssetDataToAdi] Inner Exception: {cpeadtaEx.InnerException.Message}");
-                }
+                    Log.Error(
+                        $"[CopyPreviouslyEnrichedAssetDataToAdi] Inner Exception: {cpeadtaEx.InnerException.Message}");
                 return false;
             }
         }
@@ -282,9 +277,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 foreach (var item in EnrichmentWorkflowEntities.AdiFile.Asset.Asset
                     .Where(item => item.Metadata.AMS.Version_Major != newVersionMajor))
-                {
                     item.Metadata.AMS.Version_Major = newVersionMajor;
-                }
 
                 return true;
             }
@@ -294,9 +287,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {uavmvEx.Message}");
 
                 if (uavmvEx.InnerException != null)
-                {
                     Log.Error($"[UpdateAllVersionMajorValues] Inner Exception: {uavmvEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -305,9 +296,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             foreach (var adiNode in AdiNodesToRemove.SelectMany(item => EnrichmentWorkflowEntities.AdiFile
                 .Asset.Metadata.App_Data.Where(attr => attr.Name == item).ToList()))
-            {
                 EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data.Remove(adiNode);
-            }
         }
 
         public void CheckAndAddBlockPlatformData()
@@ -318,7 +307,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var assetId =
                     EnrichmentWorkflowEntities.AdiFile.Asset.Asset
                         .FirstOrDefault(a =>
-                        a.Metadata.AMS.Asset_Class.Equals("movie"))
+                            a.Metadata.AMS.Asset_Class.Equals("movie"))
                         ?.Metadata.AMS.Asset_ID;
 
                 var providerList = Block_Platform.Providers
@@ -326,8 +315,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     .ToList();
 
                 foreach (var provider in providerList
-                    .Where(provider => !string.IsNullOrEmpty(provider) && 
-                           provider.ToLower().Trim() == providerName.ToLower().Trim()))
+                    .Where(provider => !string.IsNullOrEmpty(provider) &&
+                                       provider.ToLower().Trim() == providerName.ToLower().Trim()))
                 {
                     Log.Info($"Provider: {provider} matches the Block list, " +
                              "adding the Block_Platform entry with a value of: " +
@@ -336,7 +325,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                     AddAssetMetadataApp_DataNode(assetId,
                         "Block_Platform",
-                        nodeValue: Block_Platform.BlockPlatformValue);
+                        Block_Platform.BlockPlatformValue);
                 }
             }
             catch (Exception caabpdEx)
@@ -345,10 +334,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {caabpdEx.Message}");
 
                 if (caabpdEx.InnerException != null)
-                {
-                    Log.Error($"[CheckAndAddBlockPlatformData] Inner Exception: " +
+                    Log.Error("[CheckAndAddBlockPlatformData] Inner Exception: " +
                               $"{caabpdEx.InnerException.Message}");
-                }
             }
         }
 
@@ -365,10 +352,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {ipldEx.Message}");
 
                 if (ipldEx.InnerException != null)
-                {
-                    Log.Error($"[InsertProgramLayerData] Inner Exception: " +
+                    Log.Error("[InsertProgramLayerData] Inner Exception: " +
                               $"{ipldEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -386,10 +371,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {isldEx.Message}");
 
                 if (isldEx.InnerException != null)
-                {
-                    Log.Error($"[InsertSeriesLayerData] Inner Exception: " +
+                    Log.Error("[InsertSeriesLayerData] Inner Exception: " +
                               $"{isldEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -415,6 +398,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                                 actorsDisplay.TrimEnd(','));
                             break;
                         }
+
                         var actorName = $"{member.name.first} {member.name.last}";
                         AddTitleMetadataApp_DataNode("Actors", actorName);
                         actorsDisplay += $"{actorName},";
@@ -434,10 +418,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {iadEx.Message}");
 
                 if (iadEx.InnerException != null)
-                {
-                    Log.Error($"[InsertActorData] Inner Exception: " +
+                    Log.Error("[InsertActorData] Inner Exception: " +
                               $"{iadEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -448,7 +430,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 var crewAdded = false;
                 if (EnrichmentDataLists.CrewMembers != null)
-                {
                     foreach (var member in EnrichmentDataLists.CrewMembers.Distinct(new CrewComparer()).ToList())
                     {
                         var memberName = $"{member.name.first} {member.name.last}";
@@ -470,15 +451,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                                 break;
                         }
                     }
-                }
+
                 if (crewAdded)
-                {
                     Log.Info("Crew data successfully added");
-                }
                 else
-                {
                     Log.Warn("No crew data found?");
-                }
                 //non mandatory
                 return true;
             }
@@ -488,10 +465,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {icdEx.Message}");
 
                 if (icdEx.InnerException != null)
-                {
                     Log.Error("[InsertCrewData] Inner Exception: " +
                               $"{icdEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -512,10 +487,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {itdEx.Message}");
 
                 if (itdEx.InnerException != null)
-                {
                     Log.Error("[InsertTitleData] Inner Exception: " +
                               $"{itdEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -535,6 +508,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     Log.Warn("No description Data added");
                 }
+
                 //return true as not mandatory
                 return true;
             }
@@ -544,10 +518,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {iddEx.Message}");
 
                 if (iddEx.InnerException != null)
-                {
                     Log.Error("[InsertDescriptionData] Inner Exception: " +
                               $"{iddEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -556,7 +528,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                if (AdiDataValidator.HasYearData(airDate,movieInfo))
+                if (AdiDataValidator.HasYearData(airDate, movieInfo))
                 {
                     var nodeToRemove =
                         EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data.FirstOrDefault(n =>
@@ -569,6 +541,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     Log.Warn("No Year data found in API, Updated Year data will be omitted.");
                 }
+
                 //return true as non mandatory
                 return true;
             }
@@ -578,16 +551,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {iydEx.Message}");
 
                 if (iydEx.InnerException != null)
-                {
                     Log.Error("[InsertYearData] Inner Exception: " +
                               $"{iydEx.InnerException.Message}");
-                }
                 return false;
             }
         }
 
         /// <summary>
-        /// Required if not a movie asset and requires a zero value for specials episode number.
+        ///     Required if not a movie asset and requires a zero value for specials episode number.
         /// </summary>
         /// <param name="episodeOrdinalValue"></param>
         /// <param name="episodeTitle"></param>
@@ -597,10 +568,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                return AddTitleMetadataApp_DataNode("Episode_ID", tmsid)&&
-                       AddTitleMetadataApp_DataNode("Episode_Name", episodeTitle)&&
-                       AddTitleMetadataApp_DataNode("Episode_Ordinal", nodeValue: episodeOrdinalValue);
-
+                return AddTitleMetadataApp_DataNode("Episode_ID", tmsid) &&
+                       AddTitleMetadataApp_DataNode("Episode_Name", episodeTitle) &&
+                       AddTitleMetadataApp_DataNode("Episode_Ordinal", episodeOrdinalValue);
             }
             catch (Exception iedEx)
             {
@@ -608,10 +578,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {iedEx.Message}");
 
                 if (iedEx.InnerException != null)
-                {
                     Log.Error("[InsertCrewData] Inner Exception: " +
                               $"{iedEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -641,10 +609,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {igdEx.Message}");
 
                 if (igdEx.InnerException != null)
-                {
                     Log.Error("[InsertGenreData] Inner Exception: " +
                               $"{igdEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -659,13 +625,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (seasonId == 0)
                     return false;
 
-                
-                AddTitleMetadataApp_DataNode("Series_Name", 
+
+                AddTitleMetadataApp_DataNode("Series_Name",
                     $"Season {episodeSeason}");
 
 
-
-                if(SeasonInfo != null && SeasonInfo.Any())
+                if (SeasonInfo != null && SeasonInfo.Any())
                 {
                     var seasonData = SeasonInfo.FirstOrDefault(i => i.seasonId == seasonId.ToString());
 
@@ -678,17 +643,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                                 ?.Value);
 
                         if (seasonData.totalSeasonEpisodes != "0")
-                        {
                             AddTitleMetadataApp_DataNode("Series_NumberOfItems",
                                 seasonData.totalSeasonEpisodes);
-                        }
                     }
                 }
 
-                
 
                 return true;
-
             }
             catch (Exception isdEx)
             {
@@ -696,32 +657,27 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {isdEx.Message}");
 
                 if (isdEx.InnerException != null)
-                {
                     Log.Error("[InsertSeriesdata] Inner Exception: " +
                               $"{isdEx.InnerException.Message}");
-                }
                 return false;
             }
         }
 
-        public bool InsertShowData(string showId, string showName, int totalSeasons, GnApiProgramsSchema.programsProgramDescriptions descriptions)
+        public bool InsertShowData(string showId, string showName, int totalSeasons,
+            GnApiProgramsSchema.programsProgramDescriptions descriptions)
         {
             try
             {
-                if (SeasonInfo != null)
-                {
-                    AddTitleMetadataApp_DataNode("Show_NumberOfItems",totalSeasons.ToString());
-                }
-
+                if (SeasonInfo != null) AddTitleMetadataApp_DataNode("Show_NumberOfItems", totalSeasons.ToString());
 
 
                 return AddTitleMetadataApp_DataNode("Show_ID", showId) &&
                        AddTitleMetadataApp_DataNode("Show_Name", showName) &&
                        AddTitleMetadataApp_DataNode(
-                            "Show_Summary_Short",
-                            AdiDataValidator.CheckAndReturnDescriptionData(
-                                programDescriptions: descriptions,
-                                true));
+                           "Show_Summary_Short",
+                           AdiDataValidator.CheckAndReturnDescriptionData(
+                               descriptions,
+                               true));
             }
             catch (Exception shDEx)
             {
@@ -729,10 +685,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {shDEx.Message}");
 
                 if (shDEx.InnerException != null)
-                {
                     Log.Error("[InsertShowData] Inner Exception: " +
                               $"{shDEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -749,7 +703,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     if (gId != genre.genreId)
                     {
-                        AddTitleMetadataApp_DataNode("Show_Genre", nodeValue: genre.Value);
+                        AddTitleMetadataApp_DataNode("Show_Genre", genre.Value);
                         AddTitleMetadataApp_DataNode("Show_GenreID", genre.genreId);
                         hasGenres = true;
                     }
@@ -765,15 +719,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {isgdEx.Message}");
 
                 if (isgdEx.InnerException != null)
-                {
                     Log.Error("[InsertSeriesGenreData] Inner Exception: " +
                               $"{isgdEx.InnerException.Message}");
-                }
                 return false;
             }
         }
 
-        private bool ValidateYear (string year)
+        private bool ValidateYear(string year)
         {
             return year.Length == 4;
         }
@@ -808,13 +760,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 else
                 {
                     productionYears = sPremiere;
-                    Log.Info($"No Finale year, using Premiere year only");
+                    Log.Info("No Finale year, using Premiere year only");
                 }
 
-                AddTitleMetadataApp_DataNode("Production_Years", nodeValue: productionYears);
+                AddTitleMetadataApp_DataNode("Production_Years", productionYears);
 
                 return true;
-
             }
             catch (Exception ipyEx)
             {
@@ -822,21 +773,19 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {ipyEx.Message}");
 
                 if (ipyEx.InnerException != null)
-                {
                     Log.Error("[InsertProductionYears] Inner Exception: " +
                               $"{ipyEx.InnerException.Message}");
-                }
                 return false;
             }
         }
 
-        public  bool InsertIdmbData(List<GnApiProgramsSchema.externalLinksTypeExternalLink> externalLinks, bool hasMovieInfo)
+        public bool InsertIdmbData(List<GnApiProgramsSchema.externalLinksTypeExternalLink> externalLinks,
+            bool hasMovieInfo)
         {
             try
             {
                 if (externalLinks != null && IdmbDataInserted == false)
                 {
-
                     var links = externalLinks;
                     Log.Info("Adding IMDb_ID data.");
                     AddTitleMetadataApp_DataNode("IMDb_ID", links.FirstOrDefault()?.id);
@@ -844,9 +793,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     if (hasMovieInfo)
                     {
                         Log.Info("Adding Show_IMDb_ID data.");
-                        AddTitleMetadataApp_DataNode("Show_IMDb_ID", 
-                            links.Any() 
-                                ? links.Last().id 
+                        AddTitleMetadataApp_DataNode("Show_IMDb_ID",
+                            links.Any()
+                                ? links.Last().id
                                 : links.FirstOrDefault()?.id);
                     }
 
@@ -862,10 +811,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $": {iidEx.Message}");
 
                 if (iidEx.InnerException != null)
-                {
-                    Log.Error($"[InsertIdmbData] Inner Exception: " +
+                    Log.Error("[InsertIdmbData] Inner Exception: " +
                               $"{iidEx.InnerException.Message}");
-                }
                 return false;
             }
         }
@@ -890,13 +837,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 var paid = $"{imageQualifier}{titlPaid.Replace("TITL", "")}";
                 var adiObject = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault();
-                
+
                 if (adiObject != null)
                     EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(new ADIAssetAsset
                     {
                         Content = new ADIAssetAssetContent
                         {
-                            Value = GetImageName(imageName,imageMapping)
+                            Value = GetImageName(imageName, imageMapping)
                         },
                         Metadata = new ADIAssetAssetMetadata
                         {
