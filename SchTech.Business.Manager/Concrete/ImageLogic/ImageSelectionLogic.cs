@@ -247,6 +247,10 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <returns></returns>
         private bool PassesImageLogic(Image_Category imageCategory, GnApiProgramsSchema.assetType image, string configTier, string imageTier, bool _IsLandscape)
         {
+            //no image tier for movies so ensure the value matches config tier string.empty
+            if (imageTier == null)
+                imageTier = "";
+
             return imageCategory.AllowedAspects.Aspect
                        .Any(a =>
                            a.AspectHeight == image.height &&
@@ -279,7 +283,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             }
             else if (identifiersCount == 0)
             {
-                Log.Debug("No Identifier config found for current image Type.");
+                Log.Info("No Identifier config found for current image Type.");
             }
         }
 
@@ -288,7 +292,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         {
             try
             {
-                Log.Debug($"Processing Image: {ImageTypeRequired}");
+                Log.Info($"Processing Image: {ImageTypeRequired}");
 
                 if (ApiAssetList != null)
                 {
@@ -299,12 +303,12 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                     {
                         foreach (var imageTier in category.ImageTier)
                         {
+
                             // Populate asset list based on Tier
                             UpdateAssetList(imageTier);
                             UpdateCategoryList(ConfigImageCategories);
                             foreach (var image in ApiAssetSortedList)
                             {
-                                
                                 ImageAspect(image.width, image.height);
 
                                 if (image.category != category.CategoryName &&
@@ -318,7 +322,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 {
                                     LogIdentifierLogic(image.identifiers.Count(), image.assetId);
 
-                                    Log.Debug($"Image {image.assetId} for {ImageTypeRequired} passed Image logic");
+                                    Log.Info($"Image {image.assetId} for {ImageTypeRequired} passed Image logic");
 
                                     SetAspect(image.width,image.height,Convert.ToInt32(category.AllowedAspects.Aspect.Select(r => r.ResizeHeight).FirstOrDefault()));
                                     var encodingType = GetEncodingType(image.type);
@@ -332,7 +336,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                     //Is new ingest or update?
                                     if (!IsUpdate || gnimages == null)
                                     {
-                                        Log.Debug($"Updating Database with Image {ImageTypeRequired}: {image.URI}");
+                                        Log.Info($"Updating Database with Image {ImageTypeRequired}: {image.URI}");
                                         SetDbImages(ImageTypeRequired, image.URI);
                                         Log.Info($"Image URI: {image.URI} for: {ImageTypeRequired} and Image Priority: {category.PriorityOrder}");
 
@@ -354,7 +358,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                                 CurrentMappingData.GN_Images.Replace(match.Value, $"{ImageTypeRequired}: {image.URI}");
                                         }
 
-                                        Log.Debug($"Update package detected a new image, updating db for {ImageTypeRequired} with {image.URI}");
+                                        Log.Info($"Update package detected a new image, updating db for {ImageTypeRequired} with {image.URI}");
                                         
                                         SetDbImages(ImageTypeRequired, image.URI);
 
@@ -381,6 +385,9 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                 return null;
             }
+
+
+            Log.Warn($"No Matching images found for: {ImageTypeRequired}");
 
             return null;
         }

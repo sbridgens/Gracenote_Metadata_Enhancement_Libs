@@ -63,10 +63,5 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _gnMappingDataDal.ReturnMapData(paid);
         }
 
-        public void UpdateGNImages(string NewGnImages)
-        {
-            _gnMappingDataDal.UpdateGNImages(NewGnImages);
-        }
-
     }
 }

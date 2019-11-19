@@ -136,13 +136,5 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        public void UpdateGNImages(string NewGnImages)
-        {
-            using (var db = new ADI_EnrichmentContext())
-            {
-
-                db.SaveChanges();
-            }
-        }
     }
 }

@@ -4,7 +4,6 @@ using SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia;
 using SchTech.Configuration.Manager.Concrete;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
-using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
 
@@ -16,19 +15,14 @@ namespace ADIWFE_TestClient
         /// Initialize Log4net
         /// </summary>
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(AdiWfOperations));
-
         private EnrichmentWorkflowManager WorkflowManager { get; set; }
-
         private EfAdiEnrichmentDal AdiEnrichmentDal { get; set; }
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
-
-        private EnrichmentWorkflowEntities WorkflowEntities { get; set; }
-
         private WorkQueueItem IngestFile { get; set; }
 
         private Timer _timer;
-        public bool IsInCleanup { get; set; }
+        public bool IsInCleanup => false;
 
         private bool Success { get; set; }
         public static void LogError(string functionName, string message, Exception ex)
@@ -149,7 +143,6 @@ namespace ADIWFE_TestClient
             {
                 try
                 {
-                    WorkflowEntities = new EnrichmentWorkflowEntities();
                     IngestFile = (WorkQueueItem) AdiEnrichmentQueueController.QueuedPackages[package];
 
 
@@ -160,23 +153,17 @@ namespace ADIWFE_TestClient
                     {
                         throw new Exception("Error encountered during GetMappingAndExtractPackage process, check logs and package.");
                     }
-                    if (!WorkflowEntities.IsPackageAnUpdate)
+                    if (!WorkflowManager.IsPackageAnUpdate)
                     {
                         Success = ProcessFullPackage();
                     }
 
-                    if (WorkflowEntities.IsPackageAnUpdate)
+                    if (WorkflowManager.IsPackageAnUpdate)
                     {
                         Success = ProcessUpdatePackage();
                     }
 
-                    if (WorkflowEntities.IsPackageTvod)
-                    {
-                        Success = ProcessTvodPackage();
-                    }
-
-                    WorkflowManager.ImageSelectionLogic();
-                    WorkflowEntities.SaveAdiFile();
+                    AllPackageTasks();
                 }
                 catch (Exception pqiEx)
                 {
@@ -201,7 +188,7 @@ namespace ADIWFE_TestClient
                     WorkflowManager.SeedGnMappingData() && 
                     WorkflowManager.ExtractPackageMedia() &&
                     WorkflowManager.SetAdiMovieMetadata() &&
-                    WorkflowManager.CheckAndAddPreviewData())
+                    WorkflowManager.GetGracenoteMovieEpisodeData())
                     return true;
 
                 throw new Exception();
@@ -221,25 +208,21 @@ namespace ADIWFE_TestClient
         {
             try
             {
-                Success = WorkflowManager.GetGracenoteMovieEpisodeData() &&
-                          WorkflowManager.GetSeriesSeasonSpecialsData() &&
-                          WorkflowManager.SetAdiEpisodeMetadata();
-                if (Success)
-                {
-                    if (!WorkflowEntities.IsMoviePackage)
-                    {
-                        return WorkflowManager.SetAdiSeriesData() &&
-                               WorkflowManager.SetAdiSeasonData() &&
-                               WorkflowManager.RemoveDerivedFromAsset();
-                    }
-                }
 
+                if (!WorkflowManager.IsMoviePackage)
+                {
+                    Success = WorkflowManager.GetSeriesSeasonSpecialsData() &&
+                              WorkflowManager.SetAdiEpisodeMetadata() &&
+                              WorkflowManager.SetAdiSeriesData() &&
+                              WorkflowManager.SetAdiSeasonData();
+                }
             }
             catch (Exception pfpex)
             {
                 LogError("ProcessFullPackage","Error Processing Full package", pfpex);
+                Success = false;
             }
-            throw new NotImplementedException();
+            return Success;
         }
 
         private bool ProcessUpdatePackage()
@@ -247,9 +230,21 @@ namespace ADIWFE_TestClient
             throw new NotImplementedException();
         }
 
-        private bool ProcessTvodPackage()
+        private void AllPackageTasks()
         {
-            throw new NotImplementedException();
+            try
+            {
+                Success = WorkflowManager.ImageSelectionLogic() &&
+                          WorkflowManager.RemoveDerivedFromAsset() &&
+                          WorkflowManager.FinalisePackageData() &&
+                          WorkflowManager.SaveAdiFile() &&
+                          WorkflowManager.PackageEnrichedAsset() &&
+                          WorkflowManager.DeliverEnrichedAsset();
+            }
+            catch (Exception aptex)
+            {
+                LogError("AllPackageTasks", "Error Carrying out all common package tasks", aptex);
+            }
         }
     }
 

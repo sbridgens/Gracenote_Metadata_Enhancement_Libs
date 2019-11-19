@@ -82,6 +82,10 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
             return sId > 0 ? sId : 0;
         }
 
+        public string GetEpisodeSeason()
+        {
+            return MovieEpisodeProgramData.episodeInfo.season;
+        }
 
         public string GetEpisodeOrdinalValue()
         {
@@ -151,6 +155,31 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
         public List<GnApiProgramsSchema.programsProgramSeason> GetSeasonInfo()
         {
             return ShowSeriesSeasonProgramData.seasons ?? MovieEpisodeProgramData.seasons;
+        }
+
+        public DateTime GetSeriesPremiere()
+        {
+            return ShowSeriesSeasonProgramData.seriesPremiere;
+        }
+
+        public DateTime GetSeriesFinale()
+        {
+            return ShowSeriesSeasonProgramData.seriesFinale;
+        }
+
+        public DateTime? GetSeasonPremiere()
+        {
+            var first = 
+                ShowSeriesSeasonProgramData.seasons?.FirstOrDefault();
+
+            return first?.seasonPremiere;
+        }
+
+        public DateTime? GetSeasonFinale()
+        {
+            var last =
+                ShowSeriesSeasonProgramData.seasons?.LastOrDefault();
+            return last?.seasonFinale;
         }
     }
 }

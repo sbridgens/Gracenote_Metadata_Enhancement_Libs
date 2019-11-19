@@ -19,6 +19,5 @@ namespace SchTech.DataAccess.Abstract
 
         GN_Mapping_Data ReturnMapData(string paid);
 
-        void UpdateGNImages(string NewGnImages);
     }
 }

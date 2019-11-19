@@ -14,8 +14,6 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
         public string AdiYearValue { get; set; }
 
-        public string ProductionYears { get; set; }
-
         public static bool ValidateVersionMajor(int? dbVersionMajor, bool isTvod)
         {
             var adiVersionMajor = EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
@@ -82,45 +80,17 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
         public bool HasYearData(DateTime airDate, GnApiProgramsSchema.programsProgramMovieInfo movieInfo)
         {
-            AdiYearValue = airDate.Year.ToString().Length == 4
-                ? airDate.Year.ToString()
-                : (movieInfo?.yearOfRelease?.Length == 4
-                    ? movieInfo.yearOfRelease
-                    : string.Empty);
-
-            return !string.IsNullOrEmpty(AdiYearValue) && AdiYearValue.Length == 4;
-        }
-
-        public bool HasPremiereData(string firstSeasonId, string lastSeasonId,
-            DateTime seriesPremiere, 
-            DateTime seriesFinale, 
-            GnApiProgramsSchema.programsProgramSeason seasons)
-        {
-
-            var SeriesPremiere = !string.IsNullOrEmpty(seriesPremiere.Year.ToString())
-                            ? seriesPremiere.Year.ToString()
-                            : seasons?.seasonPremiere.Year.ToString();
-
-            if (SeriesPremiere == null || SeriesPremiere.Length != 4)
-                return false;
-
-            Log.Info($"Premiere year: {seriesPremiere}");
-
-            var SeriesFinale = !string.IsNullOrEmpty(seriesFinale.Year.ToString())
-                ? seriesFinale.Year.ToString()
-                : seasons?.seasonFinale.Year.ToString();
-
-            if (SeriesFinale != null && SeriesFinale.Length == 4)
+            if (!string.IsNullOrEmpty(airDate.Year.ToString()))
             {
-                Log.Info($"Finale year: {seriesFinale}");
-                ProductionYears = $"{seriesPremiere.Year}-{seriesFinale.Year}";
-                return true;
+                AdiYearValue = airDate.Year.ToString().Length == 4
+                    ? airDate.Year.ToString()
+                    : (movieInfo?.yearOfRelease?.Length == 4
+                        ? movieInfo.yearOfRelease
+                        : string.Empty);
+
             }
 
-            ProductionYears = SeriesPremiere;
-            Log.Info($"No Finale year, using Premiere year only");
-            return true;
-
+            return !string.IsNullOrEmpty(AdiYearValue);
         }
     }
 }

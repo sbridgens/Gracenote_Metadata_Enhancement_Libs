@@ -20,17 +20,13 @@ namespace SchTech.Entities.ConcreteTypes
 
         private XmlSerializationManager<ADI> xmlSerializer { get; set; }
         public static ADI AdiFile { get; private set; }
-
         public static ADI EnrichedAdi { get; set; }
-
         public string MovieFileSize { get; set; }
         public string PreviewFileSize { get; set; }
         public string MovieChecksum { get; set; }
         public string PreviewCheckSum { get; set; }
         public bool IsSdContent { get; set; }
         public bool IsHolidaySpecial { get; set; }
-        public bool IsPackageTvod { get; private set; }
-        public bool IsPackageAnUpdate { get; private set; }
         public bool PackageIsAOneOffSpecial { get; set; }
         public bool PackageHasPreviewAsset { get; set; }
         public bool HasPackagesToProcess { get; set; }
@@ -116,27 +112,20 @@ namespace SchTech.Entities.ConcreteTypes
                 Log.Info("Package Contains a Preview Asset.");
         }
 
-        public void CheckIfTvodAsset()
+        public bool CheckIfTvodAsset()
         {
-            IsPackageTvod = false;
-
             var first = AdiFile.Asset.Asset?.FirstOrDefault();
 
             if (first == null || !first.Metadata.AMS.Product.ToLower().Contains("tvod"))
-                return;
+                return false;
 
-            IsPackageTvod = true;
             Log.Info("Package Detected as a TVOD Asset.");
+            return true;
         }
 
-        public void SetPackageOrUpdate(bool isUpdate)
+        public void CheckSetSdPackage(bool isupdate)
         {
-            IsPackageAnUpdate = isUpdate;
-        }
-
-        public void CheckSetSdPackage()
-        {
-            if (!IsPackageAnUpdate)
+            if (!isupdate)
             {
                 var adiAssetAssetMetadata = AdiFile.Asset.Asset?.FirstOrDefault()
                     ?.Metadata;
@@ -290,10 +279,10 @@ namespace SchTech.Entities.ConcreteTypes
             SerializeAdiFile(true, System.IO.File.ReadAllText(adidata));
         }
 
-        public void SaveAdiFile()
+        public void SaveAdiFile(string filePath, ADI adiFileContent)
         {
             xmlSerializer = new XmlSerializationManager<ADI>();
-            xmlSerializer.Save(@"D:\ADITEST.xml", AdiFile);
+            xmlSerializer.Save(filePath,adiFileContent);
         }
     }
 }
