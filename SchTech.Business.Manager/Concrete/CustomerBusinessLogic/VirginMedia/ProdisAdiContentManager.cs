@@ -7,6 +7,7 @@ using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Concrete.Validation;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.Entities.ConcreteTypes;
+using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.File.Manager.Concrete.Serialization;
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
@@ -876,6 +877,41 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             catch (Exception spidEx)
             {
                 Log.Error($"Error Encountered Setting Image Data: {spidEx.Message}");
+                return false;
+            }
+        }
+
+        public bool UpdateImageData(
+            string imageQualifier, 
+            string titlPaid, 
+            string imageName,
+            string imageMapping,
+            string imageAspectRatio,
+            string checksum,
+            string filesize)
+        {
+            try
+            {
+                var paid = $"{imageQualifier}{titlPaid.Replace("TITL", "")}";
+                var adiObject = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(i => i.Metadata.AMS.Asset_ID == paid);
+
+                if (adiObject == null)
+                    throw new Exception($"Error retrieving ADI data for image: {paid}");
+
+                adiObject.Content.Value = GetImageName(imageName, imageMapping);
+                var cSum = adiObject.Metadata.App_Data.FirstOrDefault(c => c.Name == "Content_CheckSum");
+                var fSize = adiObject.Metadata.App_Data.FirstOrDefault(s => s.Name == "Content_FileSize");
+                var aRatio = adiObject.Metadata.App_Data.FirstOrDefault(a => a.Name == "Image_Aspect_Ratio");
+
+                if (cSum != null) cSum.Value = checksum;
+                if (fSize != null) fSize.Value = filesize;
+                if (aRatio != null) aRatio.Value = imageAspectRatio;
+
+                return true;
+            }
+            catch (Exception uidex)
+            {
+                Log.Error($"Error Encountered Updating Image Data: {uidex.Message}");
                 return false;
             }
         }

@@ -712,8 +712,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         public bool ImageSelectionLogic()
         {
+            //initialise as true and allow the workflow to falsify
+            //this is needed for update packages as there is not always an updated image.
+            InsertSuccess = true;
             var currentImage = "";
-
             var imageLookups = _gnImageLookupService.GetList().OrderBy(o => Convert.ToInt32(o.Image_AdiOrder));
             var serialization = new XmlSerializationManager<ImageMapping>();
 
@@ -753,31 +755,47 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (string.IsNullOrEmpty(imageUri))
                     continue;
 
-                if (!string.IsNullOrEmpty(isl.DbImages))
-                    UpdateDbImages(isl.DbImages);
-
-                isl.DbImages = null;
-
                 if (!isl.DownloadImageRequired)
                     continue;
 
                 var localImage = GetImageName(imageUri, configLookup.Image_Mapping);
                 isl.DownloadImage(imageUri, localImage);
-                //download and insert image
-                InsertSuccess = AdiContentManager.InsertImageData
-                (
-                    WorkflowEntities.TitlPaidValue,
-                    imageUri.Replace("assets/", ""),
-                    configLookup.Image_Mapping,
-                    FileDirectoryManager.GetFileHash(localImage),
-                    FileDirectoryManager.GetFileSize(localImage),
-                    Path.GetExtension(localImage),
-                    isl.ImageQualifier,
-                    isl.GetFileAspectRatio(localImage)
-                );
 
+                if (IsPackageAnUpdate && !string.IsNullOrEmpty(isl.DbImages))
+                {
+                    //update image data in db and adi
+                    UpdateDbImages(isl.DbImages);
+
+                    InsertSuccess = AdiContentManager.UpdateImageData(
+                        isl.ImageQualifier,
+                        WorkflowEntities.TitlPaidValue,
+                        imageUri.Replace("assets/", ""),
+                        configLookup.Image_Mapping,
+                        isl.GetFileAspectRatio(localImage),
+                        FileDirectoryManager.GetFileHash(localImage),
+                        FileDirectoryManager.GetFileSize(localImage)
+                    );
+                }
+                else
+                {
+                    //download and insert image
+                    InsertSuccess = AdiContentManager.InsertImageData
+                    (
+                        WorkflowEntities.TitlPaidValue,
+                        imageUri.Replace("assets/", ""),
+                        configLookup.Image_Mapping,
+                        FileDirectoryManager.GetFileHash(localImage),
+                        FileDirectoryManager.GetFileSize(localImage),
+                        Path.GetExtension(localImage),
+                        isl.ImageQualifier,
+                        isl.GetFileAspectRatio(localImage)
+                    );
+                }
+                
                 if (InsertSuccess)
                     currentImage = configLookup.Image_Mapping;
+
+                isl.DbImages = null;
             }
 
             return InsertSuccess;

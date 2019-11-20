@@ -107,8 +107,6 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <returns></returns>
         private bool HasAsset(Dictionary<string, string> keyValuePairs, string imageTypeRequired)
         {
-            var exists = false;
-
             foreach (var item in keyValuePairs)
             {
                 foreach (var image in ApiAssetSortedList)
