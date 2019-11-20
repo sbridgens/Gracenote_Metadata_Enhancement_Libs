@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchTech.Entities.ConcreteTypes
 {

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SchTech.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using SchTech.Core.Entities;
 
 namespace SchTech.Core.DataAccess
 {

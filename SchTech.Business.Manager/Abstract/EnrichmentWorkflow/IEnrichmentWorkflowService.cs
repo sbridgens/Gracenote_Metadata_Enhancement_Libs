@@ -55,5 +55,7 @@ namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
         void ProcessFailedPackage(FileInfo packageFile);
 
         bool SaveAdiFile();
+
+        void PackageCleanup(FileInfo packageFile);
     }
 }

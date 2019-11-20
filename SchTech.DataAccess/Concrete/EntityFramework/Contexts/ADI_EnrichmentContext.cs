@@ -1,10 +1,10 @@
-﻿using System;
-using System.Data.Entity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SchTech.Configuration.Manager.Parameters;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework.Mappings;
 using SchTech.Entities.ConcreteTypes;
+using System;
+using System.Data.Entity;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts

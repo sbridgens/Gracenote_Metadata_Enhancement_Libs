@@ -1,6 +1,6 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.IO;
-using log4net;
 
 namespace SchTech.File.Manager.Concrete.FileSystem
 {

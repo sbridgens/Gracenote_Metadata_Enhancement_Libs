@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using SchTech.Queue.Manager.Abstract;
+using System.Collections;
 using System.IO;
-using SchTech.Queue.Manager.Abstract;
 
 namespace SchTech.Queue.Manager.Concrete
 {

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SchTech.Core.Entities;
+using System.Collections.Generic;
 using System.Xml.Serialization;
-using SchTech.Core.Entities;
 
 namespace SchTech.DataAccess.Concrete
 {

@@ -1,5 +1,5 @@
-﻿using System;
-using SchTech.Core.Entities;
+﻿using SchTech.Core.Entities;
+using System;
 
 namespace SchTech.Entities.ConcreteTypes
 {

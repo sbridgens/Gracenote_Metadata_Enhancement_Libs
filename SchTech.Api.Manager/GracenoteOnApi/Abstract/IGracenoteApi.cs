@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
+﻿using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
+using System.Collections.Generic;
 
 namespace SchTech.Api.Manager.GracenoteOnApi.Abstract
 {

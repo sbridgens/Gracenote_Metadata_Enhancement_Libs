@@ -19,7 +19,7 @@ namespace SchTech.Api.Manager.Serialization
             using (TextReader textReader = new StringReader(fileContent))
             {
                 var deserializer = new XmlSerializer(ApiType);
-                result = (T) deserializer.Deserialize(textReader);
+                result = (T)deserializer.Deserialize(textReader);
             }
 
             return result;

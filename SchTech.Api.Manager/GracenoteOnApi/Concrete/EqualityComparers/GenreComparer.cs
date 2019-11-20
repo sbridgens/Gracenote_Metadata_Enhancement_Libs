@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
+using System;
 using System.Collections.Generic;
-using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 
 namespace SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers
 {

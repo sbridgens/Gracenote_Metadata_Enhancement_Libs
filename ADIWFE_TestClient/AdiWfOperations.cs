@@ -1,6 +1,4 @@
-﻿using System;
-using System.Timers;
-using ADIWFE_TestClient.Properties;
+﻿using ADIWFE_TestClient.Properties;
 using log4net;
 using SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia;
 using SchTech.Configuration.Manager.Concrete;
@@ -8,6 +6,8 @@ using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
+using System;
+using System.Timers;
 
 namespace ADIWFE_TestClient
 {
@@ -83,7 +83,6 @@ namespace ADIWFE_TestClient
             AdiEnrichmentDal = new EfAdiEnrichmentDal();
             InitialiseTimer();
 
-
             PollController = new AdiEnrichmentPollController
             {
                 LastFailedMappingPoll =
@@ -107,7 +106,8 @@ namespace ADIWFE_TestClient
                 if (!CanProcess())
                     return;
 
-                if (PollController.StartPollingOperations(ADIWF_Config.InputDirectory, "*.zip")) ProcessQueuedItems();
+                if (PollController.StartPollingOperations(ADIWF_Config.InputDirectory, "*.zip"))
+                    ProcessQueuedItems();
             }
             catch (Exception spex)
             {
@@ -125,7 +125,7 @@ namespace ADIWFE_TestClient
             {
                 try
                 {
-                    IngestFile = (WorkQueueItem) AdiEnrichmentQueueController.QueuedPackages[package];
+                    IngestFile = (WorkQueueItem)AdiEnrichmentQueueController.QueuedPackages[package];
 
 
                     Log.Info(
@@ -136,9 +136,13 @@ namespace ADIWFE_TestClient
                     if (!Success)
                         throw new Exception(
                             "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
-                    if(!WorkflowManager.IsMoviePackage)
+                    if (!WorkflowManager.IsMoviePackage)
                         ProcessSeriesEpisodePackage();
+
                     AllPackageTasks();
+                    WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
+                    AdiEnrichmentQueueController.QueuedPackages.Remove(package);
+                    Log.Info($"############### Processing FINISHED For Queued file: {IngestFile.AdiPackage.Name} ###############\r\n");
                 }
                 catch (Exception pqiEx)
                 {
@@ -147,6 +151,8 @@ namespace ADIWFE_TestClient
                         pqiEx);
 
                     WorkflowManager.ProcessFailedPackage(IngestFile.AdiPackage);
+                    Log.Info($"############### Processing FAILED! for item: {IngestFile.AdiPackage.Name} ###############\r\n");
+
                 }
             }
         }

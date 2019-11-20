@@ -34,7 +34,7 @@ namespace SchTech.File.Manager.Concrete.Serialization
                 {
                     reader.Namespaces = false;
                     var serializer = new XmlSerializer(_type);
-                    result = (T) serializer.Deserialize(reader);
+                    result = (T)serializer.Deserialize(reader);
                 }
             }
 

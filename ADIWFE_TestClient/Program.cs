@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using ADIWFE_TestClient.Properties;
+﻿using ADIWFE_TestClient.Properties;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.Serialization;
@@ -14,6 +9,11 @@ using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.Web.Manager.Concrete;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
 
 namespace ADIWFE_TestClient
 {

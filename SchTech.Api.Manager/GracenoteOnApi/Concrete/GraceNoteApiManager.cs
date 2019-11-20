@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SchTech.Api.Manager.GracenoteOnApi.Abstract;
+﻿using SchTech.Api.Manager.GracenoteOnApi.Abstract;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 {
@@ -34,6 +34,10 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
             return externalLinks;
         }
 
+        public string GetUpdateId()
+        {
+            return MovieEpisodeProgramData.updateId;
+        }
 
         public string GetConnectorId()
         {

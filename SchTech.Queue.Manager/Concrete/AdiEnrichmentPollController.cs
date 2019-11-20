@@ -1,9 +1,9 @@
-﻿using System;
+﻿using log4net;
+using SchTech.Queue.Manager.Abstract;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using log4net;
-using SchTech.Queue.Manager.Abstract;
 
 namespace SchTech.Queue.Manager.Concrete
 {
@@ -33,6 +33,8 @@ namespace SchTech.Queue.Manager.Concrete
         public bool StartPollingOperations(string sourcePollDirectory, string fileExtensionToPoll)
         {
             HasFilesToProcess = false;
+            WorkQueue = new AdiEnrichmentQueueController();
+            WorkQueue.ClearWorkQueue();
             IncludeFailedMappingPackages = false;
             _sourcePollDirectory = sourcePollDirectory;
             _fileExtensionToPoll = fileExtensionToPoll;
@@ -48,8 +50,6 @@ namespace SchTech.Queue.Manager.Concrete
 
                 if (WorkflowFileList().Count >= 1)
                 {
-                    WorkQueue = new AdiEnrichmentQueueController();
-                    WorkQueue.ClearWorkQueue();
                     foreach (var package in PackageList) WorkQueue.AddPackageToQueue(package);
 
                     HasFilesToProcess = true;
@@ -69,7 +69,8 @@ namespace SchTech.Queue.Manager.Concrete
             try
             {
                 BuildPackageList();
-                if (IncludeFailedMappingPackages) AddMappingFailuresToList();
+                if (IncludeFailedMappingPackages)
+                    AddMappingFailuresToList();
 
                 if (packageCount >= 1)
                     Log.Info($"Number of Packages added to the Work queue for Processing: {packageCount}\r\n\r\n");

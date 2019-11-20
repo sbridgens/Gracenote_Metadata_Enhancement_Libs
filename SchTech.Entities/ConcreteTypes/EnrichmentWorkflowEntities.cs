@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.Web.Manager.Concrete;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace SchTech.Entities.ConcreteTypes
 {
@@ -15,7 +15,7 @@ namespace SchTech.Entities.ConcreteTypes
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentWorkflowEntities));
 
-        private XmlSerializationManager<ADI> xmlSerializer { get; set; }
+        private XmlSerializationManager<ADI> XmlSerializer { get; set; }
         public static ADI AdiFile { get; private set; }
         public static ADI EnrichedAdi { get; set; }
         public string MovieFileSize { get; set; }
@@ -23,7 +23,6 @@ namespace SchTech.Entities.ConcreteTypes
         public string MovieChecksum { get; set; }
         public string PreviewCheckSum { get; set; }
         public bool IsSdContent { get; set; }
-        public bool IsHolidaySpecial { get; set; }
         public bool PackageIsAOneOffSpecial { get; set; }
         public bool PackageHasPreviewAsset { get; set; }
         public bool HasPackagesToProcess { get; set; }
@@ -59,22 +58,22 @@ namespace SchTech.Entities.ConcreteTypes
                 Path.GetFileNameWithoutExtension(CurrentPackage.Name));
         }
 
-        public bool SerializeAdiFile(bool IsUpdate, string adiData = "")
+        public bool SerializeAdiFile(bool isUpdate, string adiData = "")
         {
             try
             {
-                xmlSerializer = new XmlSerializationManager<ADI>();
+                XmlSerializer = new XmlSerializationManager<ADI>();
 
-                if (!IsUpdate)
+                if (!isUpdate)
                 {
                     AdiFile = new ADI();
-                    AdiFile = xmlSerializer.Read(
+                    AdiFile = XmlSerializer.Read(
                         System.IO.File.ReadAllText(Path.Combine(CurrentWorkingDirectory, "ADI.xml")));
                 }
                 else
                 {
                     EnrichedAdi = new ADI();
-                    EnrichedAdi = xmlSerializer.Read(adiData);
+                    EnrichedAdi = XmlSerializer.Read(adiData);
                 }
 
                 if (AdiFile != null)
@@ -87,11 +86,11 @@ namespace SchTech.Entities.ConcreteTypes
 
                 throw new Exception("Adi file is null check namespaces and adi document structure?");
             }
-            catch (Exception ADF_EX)
+            catch (Exception adfEx)
             {
-                Log.Error($"[SerializeAdiFile] Error during serialization of ADI file: {ADF_EX.Message}");
-                if (ADF_EX.InnerException != null)
-                    Log.Error($"[SerializeAdiFile] Inner exception: {ADF_EX.InnerException.Message}");
+                Log.Error($"[SerializeAdiFile] Error during serialization of ADI file: {adfEx.Message}");
+                if (adfEx.InnerException != null)
+                    Log.Error($"[SerializeAdiFile] Inner exception: {adfEx.InnerException.Message}");
 
                 return false;
             }
@@ -125,7 +124,7 @@ namespace SchTech.Entities.ConcreteTypes
                     ?.Metadata;
 
                 if (adiAssetAssetMetadata != null)
-                    IsSdContent = (adiAssetAssetMetadata?.App_Data)
+                    IsSdContent = (adiAssetAssetMetadata.App_Data)
                                   .FirstOrDefault(c => c.Name == "HDContent")
                                   ?.Value.ToLower() != "y";
 
@@ -157,11 +156,11 @@ namespace SchTech.Entities.ConcreteTypes
                                     $"Successful Web request: {webClient.SuccessfulWebRequest}," +
                                     $"Web request response code: {webClient.RequestStatusCode}");
             }
-            catch (Exception GGMD_EX)
+            catch (Exception ggmdEx)
             {
-                Log.Error($"[GetGracenoteMappingData] Error obtaining Gracenote mapping data: {GGMD_EX.Message}");
-                if (GGMD_EX.InnerException != null)
-                    Log.Error($"[GetGracenoteMappingData] Inner exception: {GGMD_EX.InnerException.Message}");
+                Log.Error($"[GetGracenoteMappingData] Error obtaining Gracenote mapping data: {ggmdEx.Message}");
+                if (ggmdEx.InnerException != null)
+                    Log.Error($"[GetGracenoteMappingData] Inner exception: {ggmdEx.InnerException.Message}");
             }
 
             return false;
@@ -188,14 +187,14 @@ namespace SchTech.Entities.ConcreteTypes
                                     $"Web request data: {webClient.SuccessfulWebRequest}," +
                                     $"Web request response code: {webClient.RequestStatusCode}");
             }
-            catch (Exception GGPD_EX)
+            catch (Exception ggpdEx)
             {
                 Log.Error("[GetGracenoteProgramData] Error obtaining " +
-                          $"Gracenote Program data: {GGPD_EX.Message}");
+                          $"Gracenote Program data: {ggpdEx.Message}");
 
-                if (GGPD_EX.InnerException != null)
+                if (ggpdEx.InnerException != null)
                     Log.Error("[GetGracenoteProgramData] " +
-                              $"Inner exception: {GGPD_EX.InnerException.Message}");
+                              $"Inner exception: {ggpdEx.InnerException.Message}");
 
                 return false;
             }
@@ -205,25 +204,31 @@ namespace SchTech.Entities.ConcreteTypes
         {
             try
             {
-                var requestUrl = string.Empty;
+                //string requestUrl;
+                //
+                //if (PackageIsAOneOffSpecial)
+                //{
+                //    requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
+                //                 $"updateId={GraceNoteUpdateId}&" +
+                //                 $"api_key={ADIWF_Config.ApiKey}&limit=10";
 
-                if (PackageIsAOneOffSpecial)
-                {
-                    requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
-                                 $"updateId={GraceNoteUpdateId}&" +
-                                 $"api_key={ADIWF_Config.ApiKey}";
+                //    Log.Info("Retrieving MetaData from On API using Update ID: " +
+                //             $"{GraceNoteUpdateId}");
+                //}
+                //else
+                //{
+                //    requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
+                //                 $"tmsId={GraceNoteConnectorId}&" +
+                //                 $"api_key={ADIWF_Config.ApiKey}";
 
-                    Log.Info("Retrieving MetaData from On API using Update ID: " +
-                             $"{GraceNoteUpdateId}");
-                }
-                else
-                {
-                    requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
-                                 $"tmsId={GraceNoteConnectorId}&" +
-                                 $"api_key={ADIWF_Config.ApiKey}";
+                //    Log.Info($"Retrieving MetaData from On API using Connector ID: {GraceNoteConnectorId}");
+                //}
 
-                    Log.Info($"Retrieving MetaData from On API using Connector ID: {GraceNoteConnectorId}");
-                }
+                var requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
+                             $"tmsId={GraceNoteConnectorId}&" +
+                             $"api_key={ADIWF_Config.ApiKey}";
+
+                Log.Info($"Retrieving MetaData from On API using Connector ID: {GraceNoteConnectorId}");
 
                 GraceNoteSeriesSeasonSpecialsData = null;
 
@@ -236,14 +241,14 @@ namespace SchTech.Entities.ConcreteTypes
                                     $"Web request data: {webClient.SuccessfulWebRequest}," +
                                     $"Web request response code: {webClient.RequestStatusCode}");
             }
-            catch (Exception GGPD_EX)
+            catch (Exception ggpdEx)
             {
                 Log.Error("[GetGraceNoteSeriesSeasonSpecialsData] Error obtaining " +
-                          $"Gracenote Api data: {GGPD_EX.Message}");
+                          $"Gracenote Api data: {ggpdEx.Message}");
 
-                if (GGPD_EX.InnerException != null)
+                if (ggpdEx.InnerException != null)
                     Log.Error("[GetGraceNoteSeriesSeasonSpecialsData] " +
-                              $"Inner exception: {GGPD_EX.InnerException.Message}");
+                              $"Inner exception: {ggpdEx.InnerException.Message}");
 
                 return false;
             }
@@ -256,8 +261,8 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void SaveAdiFile(string filePath, ADI adiFileContent)
         {
-            xmlSerializer = new XmlSerializationManager<ADI>();
-            xmlSerializer.Save(filePath, adiFileContent);
+            XmlSerializer = new XmlSerializationManager<ADI>();
+            XmlSerializer.Save(filePath, adiFileContent);
         }
     }
 }

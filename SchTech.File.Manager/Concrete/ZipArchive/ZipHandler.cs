@@ -1,9 +1,9 @@
-﻿using System;
+﻿using log4net;
+using SchTech.File.Manager.Abstract;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using log4net;
-using SchTech.File.Manager.Abstract;
 
 namespace SchTech.File.Manager.Concrete.ZipArchive
 {

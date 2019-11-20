@@ -1,6 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using log4net;
+﻿using log4net;
 using SchTech.Entities.ConcreteTypes;
+using System.Text.RegularExpressions;
 
 namespace SchTech.Business.Manager.Concrete.Validation
 {
@@ -15,7 +15,9 @@ namespace SchTech.Business.Manager.Concrete.Validation
         public string ValidatePaidValue(string adiPaid)
         {
             if (adiPaid.Length == 20)
-                return null;
+            {
+                return $"{EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Provider_ID}{adiPaid}";
+            }
 
             var tmpPaid = Regex.Replace(adiPaid, "[A-Za-z]", "").TrimStart('0');
             NewTitlPaid = $"TITL{new string('0', 16 - tmpPaid.Length)}{tmpPaid}";

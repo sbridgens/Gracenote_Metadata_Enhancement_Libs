@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Concrete.Validation;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 {
@@ -883,8 +883,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         }
 
         public bool UpdateImageData(
-            string imageQualifier, 
-            string titlPaid, 
+            string imageQualifier,
+            string titlPaid,
             string imageName,
             string imageMapping,
             string imageAspectRatio,
@@ -926,7 +926,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         c.Metadata.AMS.Asset_Class == "movie");
                 if (movieAsset == null)
                     throw new Exception("Error retrieving previously Enriched movie section for QAM Update.");
-                movieAsset.Content = new ADIAssetAssetContent {Value = MovieContent};
+                movieAsset.Content = new ADIAssetAssetContent { Value = MovieContent };
 
                 return true;
             }

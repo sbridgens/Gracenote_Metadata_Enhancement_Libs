@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text.RegularExpressions;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete;
 using SchTech.Entities.ConcreteTypes;
 using SchTech.Web.Manager.Concrete;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SchTech.Business.Manager.Concrete.ImageLogic
 {
@@ -228,17 +228,17 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 return false;
 
             foreach (var idArr in identifiers)
-            foreach (var confIdentifier in ImageMapping.ImageIdentifier
-                .Where(confIdentifier => idArr.type == confIdentifier.Type))
-            {
-                if (idArr.id.FirstOrDefault() == confIdentifier.Id)
+                foreach (var confIdentifier in ImageMapping.ImageIdentifier
+                    .Where(confIdentifier => idArr.type == confIdentifier.Type))
                 {
-                    IdentifierId = idArr.id.FirstOrDefault();
-                    return true;
-                }
+                    if (idArr.id.FirstOrDefault() == confIdentifier.Id)
+                    {
+                        IdentifierId = idArr.id.FirstOrDefault();
+                        return true;
+                    }
 
-                IdentifierType = idArr.type;
-            }
+                    IdentifierType = idArr.type;
+                }
 
             return true;
         }
@@ -314,81 +314,81 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                     SortAssets();
 
                     foreach (var category in ConfigImageCategories)
-                    foreach (var imageTier in category.ImageTier)
-                    {
-                        // Populate asset list based on Tier
-                        UpdateAssetList(imageTier);
-                        UpdateCategoryList(ConfigImageCategories);
-                        foreach (var image in ApiAssetSortedList)
+                        foreach (var imageTier in category.ImageTier)
                         {
-                            ImageAspect(image.width, image.height);
-
-                            if (image.category != category.CategoryName &&
-                                !string.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
-                                continue;
-
-                            if (MatchIdentifier(image.identifiers) &&
-                                PassesImageLogic(category, image, imageTier, image.tier, IsLandscape))
+                            // Populate asset list based on Tier
+                            UpdateAssetList(imageTier);
+                            UpdateCategoryList(ConfigImageCategories);
+                            foreach (var image in ApiAssetSortedList)
                             {
-                                LogIdentifierLogic(image.identifiers.Count(), image.assetId);
+                                ImageAspect(image.width, image.height);
 
-                                Log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
+                                if (image.category != category.CategoryName &&
+                                    !string.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
+                                    continue;
 
-                                SetAspect(image.width, image.height,
-                                    Convert.ToInt32(category.AllowedAspects.Aspect.Select(r => r.ResizeHeight)
-                                        .FirstOrDefault()));
-
-                                //gets any existing images
-                                var gnimages = CurrentMappingData.GN_Images;
-
-                                //IMGA, IMGB etc
-                                ImageQualifier = ImageMapping.ImageQualifier;
-
-                                //Is new ingest or update?
-                                if (!IsUpdate || gnimages == null)
+                                if (MatchIdentifier(image.identifiers) &&
+                                    PassesImageLogic(category, image, imageTier, image.tier, IsLandscape))
                                 {
-                                    Log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
-                                    SetDbImages(imageTypeRequired, image.URI);
-                                    Log.Info(
-                                        $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                    LogIdentifierLogic(image.identifiers.Count(), image.assetId);
+
+                                    Log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
+
+                                    SetAspect(image.width, image.height,
+                                        Convert.ToInt32(category.AllowedAspects.Aspect.Select(r => r.ResizeHeight)
+                                            .FirstOrDefault()));
+
+                                    //gets any existing images
+                                    var gnimages = CurrentMappingData.GN_Images;
+
+                                    //IMGA, IMGB etc
+                                    ImageQualifier = ImageMapping.ImageQualifier;
+
+                                    //Is new ingest or update?
+                                    if (!IsUpdate || gnimages == null)
+                                    {
+                                        Log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
+                                        SetDbImages(imageTypeRequired, image.URI);
+                                        Log.Info(
+                                            $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+
+                                        return image.URI;
+                                    }
+
+                                    Log.Debug("Retrieved images for update package from db");
+
+                                    if (!HasAsset(DbImagesForAsset, imageTypeRequired))
+                                    {
+                                        var match = Regex.Match(CurrentMappingData.GN_Images,
+                                            $"(?m){imageTypeRequired}:.*?.jpg");
+
+                                        if (match.Success || match.Value == "")
+                                        {
+                                            if (string.IsNullOrEmpty(match.Value))
+                                                CurrentMappingData.GN_Images =
+                                                    CurrentMappingData.GN_Images.Replace(match.Value,
+                                                        $"{imageTypeRequired}: {image.URI}");
+
+                                            Log.Info(
+                                                $"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
+
+                                            UpdateDbImages(match.Value, imageTypeRequired, image.URI);
+
+
+                                            Log.Info(
+                                                $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.Info("Update Package - image is up to date not required for download.");
+                                        DownloadImageRequired = false;
+                                    }
 
                                     return image.URI;
                                 }
-
-                                Log.Debug("Retrieved images for update package from db");
-
-                                if (!HasAsset(DbImagesForAsset, imageTypeRequired))
-                                {
-                                    var match = Regex.Match(CurrentMappingData.GN_Images,
-                                        $"(?m){imageTypeRequired}:.*?.jpg");
-
-                                    if (match.Success || match.Value == "")
-                                    {
-                                        if (string.IsNullOrEmpty(match.Value))
-                                            CurrentMappingData.GN_Images =
-                                                CurrentMappingData.GN_Images.Replace(match.Value,
-                                                    $"{imageTypeRequired}: {image.URI}");
-
-                                        Log.Info(
-                                            $"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
-
-                                        UpdateDbImages(match.Value, imageTypeRequired, image.URI);
-
-
-                                        Log.Info(
-                                            $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
-                                    }
-                                }
-                                else
-                                {
-                                    Log.Info("Update Package - image is up to date not required for download.");
-                                    DownloadImageRequired = false;
-                                }
-
-                                return image.URI;
                             }
                         }
-                    }
                 }
             }
             catch (Exception ggiEx)

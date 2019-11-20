@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
@@ -19,6 +16,9 @@ using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.File.Manager.Concrete.ZipArchive;
 using SchTech.Queue.Manager.Concrete;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 {
@@ -73,7 +73,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
-                if(_adiDataService == null)
+                if (_adiDataService == null)
                     _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
                 return _adiDataService.CleanAdiDataWithNoMapping() &&
                        _gnMappingDataService.CleanMappingDataWithNoAdi();
@@ -221,7 +221,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
             if (IsPackageAnUpdate && adiMajor != null)
             {
-                if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor,IsTvodPackage))
+                if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor, IsTvodPackage))
                     return false;
 
                 Log.Info("Package is confirmed as a valid Update Package");
@@ -461,6 +461,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 Log.Info("Successfully serialized Gracenote Episode/Movie data");
 
                 WorkflowEntities.GraceNoteConnectorId = ApiManager.GetConnectorId();
+                WorkflowEntities.GraceNoteUpdateId = ApiManager.GetUpdateId();
                 GnMappingData.GN_connectorId = WorkflowEntities.GraceNoteConnectorId;
                 _gnMappingDataService.Update(GnMappingData);
 
@@ -475,7 +476,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     Log.Info("Program is a Holiday Special of type: " +
                              $"{ApiManager.MovieEpisodeProgramData.holiday.Value}" +
                              $" and ID: {ApiManager.MovieEpisodeProgramData.holiday.holidayId}");
-                    WorkflowEntities.IsHolidaySpecial = true;
+                    WorkflowEntities.PackageIsAOneOffSpecial = true;
                 }
 
                 //set default vars for workflow
@@ -793,7 +794,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     //update image data in db and adi
                     UpdateDbImages(isl.DbImages);
                 }
-                
+
                 if (InsertSuccess)
                     currentImage = configLookup.Image_Mapping;
             }
@@ -807,9 +808,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 //<App_Data App="VOD" Name="DeriveFromAsset" Value="ASST0000000001506105" />
                 foreach (var asset in from asset in EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                    let dfa = asset.Metadata.App_Data.FirstOrDefault(d => d.Name.ToLower() == "derivefromasset")
-                    where dfa != null
-                    select asset)
+                                      let dfa = asset.Metadata.App_Data.FirstOrDefault(d => d.Name.ToLower() == "derivefromasset")
+                                      where dfa != null
+                                      select asset)
                 {
                     Log.Info("Removing DeriveFromAsset section from ADI.xml");
                     EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(asset);
@@ -925,7 +926,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AdiData.VersionMajor = AdiContentManager.GetVersionMajor();
                 AdiData.VersionMinor = AdiContentManager.GetVersionMinor();
                 AdiData.Licensing_Window_End = AdiContentManager.GetLicenceEndData();
-                
+
                 //if tvod remove enhanced movie section
                 if (IsTvodPackage)
                 {
@@ -1003,7 +1004,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 }
 
                 _adiDataService.Update(AdiData);
-
                 return true;
             }
             catch (Exception safex)
@@ -1019,7 +1019,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 var source = packageFile.FullName;
-                var destination = FailedToMap 
+                var destination = FailedToMap
                     ? $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageFile.Name}"
                     : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}";
 
@@ -1029,22 +1029,51 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                              $"{ADIWF_Config.MoveNonMappedDirectory}");
                     Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
                              $" before it is failed completely.");
-                }
-                else
-                {
-                    Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
-                             $"{ADIWF_Config.FailedDirectory}");
 
+                    var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
+
+                    if (dt >= packageFile.LastWriteTime.Date)
+                    {
+                        Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
+                        System.IO.File.Delete(packageFile.FullName);
+                        return;
+                    }
                 }
+
+                Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
+                         $"{ADIWF_Config.FailedDirectory}");
                 System.IO.File.Move(source, destination);
                 if (System.IO.File.Exists(destination))
-                   Log.Info("Move to failed directory successful.");
+                    Log.Info("Move to failed directory successful.");
             }
             catch (Exception pfpex)
             {
                 LogError(
                     "ProcessFailedPackage",
                     "Error Processing Failed Package", pfpex);
+            }
+        }
+
+        public void PackageCleanup(FileInfo packageFile)
+        {
+            try
+            {
+                Log.Info($"Deleting package file: {packageFile.FullName}");
+                System.IO.File.Delete(packageFile.FullName);
+                if (!System.IO.File.Exists(packageFile.FullName))
+                    Log.Info($"Successfully deleted {packageFile.FullName}");
+
+                Log.Info($"Removing working directory: {WorkflowEntities.CurrentWorkingDirectory}");
+                Directory.Delete(WorkflowEntities.CurrentWorkingDirectory, true);
+                if (!Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
+                    Log.Info($"Successfully deleted Working directory {WorkflowEntities.CurrentWorkingDirectory}");
+
+            }
+            catch (Exception pcuex)
+            {
+                LogError(
+                    "PackageCleanup",
+                    "Error Cleaning up processed Package", pcuex);
             }
         }
     }

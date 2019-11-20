@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Entities.ConcreteTypes;
+using System;
+using System.Linq;
 
 namespace SchTech.Business.Manager.Concrete.Validation
 {

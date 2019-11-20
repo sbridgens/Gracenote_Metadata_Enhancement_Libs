@@ -1,10 +1,10 @@
-﻿using System;
+﻿using log4net;
+using SchTech.Web.Manager.Abstract;
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
-using log4net;
-using SchTech.Web.Manager.Abstract;
 
 namespace SchTech.Web.Manager.Concrete
 {
@@ -24,7 +24,7 @@ namespace SchTech.Web.Manager.Concrete
         public string HttpGetRequest(string url, bool followRedirect = true)
         {
             RequestStatusCode = 0;
-            WebClientRequest = (HttpWebRequest) WebRequest.Create(url);
+            WebClientRequest = (HttpWebRequest)WebRequest.Create(url);
             WebClientRequest.CookieContainer = cJar;
             WebClientRequest.UserAgent = WebUserAgentString;
             WebClientRequest.Accept = "*/*";
@@ -35,29 +35,29 @@ namespace SchTech.Web.Manager.Concrete
 
             if (CheckWebResponse())
             {
-                if (followRedirect && (RequestStatusCode == (int) HttpStatusCode.Moved ||
-                                       RequestStatusCode == (int) HttpStatusCode.Found))
+                if (followRedirect && (RequestStatusCode == (int)HttpStatusCode.Moved ||
+                                       RequestStatusCode == (int)HttpStatusCode.Found))
                     while (WebClientResponse.StatusCode == HttpStatusCode.Found ||
                            WebClientResponse.StatusCode == HttpStatusCode.Moved)
                     {
                         WebClientResponse.Close();
-                        WebClientRequest = (HttpWebRequest) WebRequest.Create(WebClientResponse.Headers["Location"]);
+                        WebClientRequest = (HttpWebRequest)WebRequest.Create(WebClientResponse.Headers["Location"]);
                         WebClientRequest.AllowAutoRedirect = false;
                         WebClientRequest.CookieContainer = cJar;
-                        WebClientResponse = (HttpWebResponse) WebClientRequest.GetResponse();
+                        WebClientResponse = (HttpWebResponse)WebClientRequest.GetResponse();
                     }
 
                 StreamReader = new StreamReader(WebClientResponse.GetResponseStream()
                                                 ?? throw new InvalidOperationException());
 
-                RequestStatusCode = (int) WebClientResponse.StatusCode;
+                RequestStatusCode = (int)WebClientResponse.StatusCode;
                 var responseData = StreamReader.ReadToEnd();
 
                 return responseData;
             }
 
             throw new Exception("Exception during http get call - status code: " +
-                                $"{(int) WebClientResponse.StatusCode}, " +
+                                $"{(int)WebClientResponse.StatusCode}, " +
                                 $"status string: {WebClientResponse.StatusCode} " +
                                 $"{WebClientResponse.StatusDescription}");
         }
@@ -81,7 +81,7 @@ namespace SchTech.Web.Manager.Concrete
 
         public string HttpPostRequest(string url, string post, bool followRedirect = true, string refer = "")
         {
-            WebClientRequest = (HttpWebRequest) WebRequest.Create(url);
+            WebClientRequest = (HttpWebRequest)WebRequest.Create(url);
             WebClientRequest.CookieContainer = cJar;
             WebClientRequest.UserAgent = WebUserAgentString;
             WebClientRequest.KeepAlive = false;
@@ -99,7 +99,7 @@ namespace SchTech.Web.Manager.Concrete
             requestStream.Write(postBytes, 0, postBytes.Length);
             requestStream.Close();
 
-            WebClientResponse = (HttpWebResponse) WebClientRequest.GetResponse();
+            WebClientResponse = (HttpWebResponse)WebClientRequest.GetResponse();
 
             if (followRedirect && (WebClientResponse.StatusCode == HttpStatusCode.Moved
                                    || WebClientResponse.StatusCode == HttpStatusCode.Found))
@@ -107,10 +107,10 @@ namespace SchTech.Web.Manager.Concrete
                        || WebClientResponse.StatusCode == HttpStatusCode.Moved)
                 {
                     WebClientResponse.Close();
-                    WebClientRequest = (HttpWebRequest) WebRequest.Create(WebClientResponse.Headers["Location"]);
+                    WebClientRequest = (HttpWebRequest)WebRequest.Create(WebClientResponse.Headers["Location"]);
                     WebClientRequest.AllowAutoRedirect = false;
                     WebClientRequest.CookieContainer = cJar;
-                    WebClientResponse = (HttpWebResponse) WebClientRequest.GetResponse();
+                    WebClientResponse = (HttpWebResponse)WebClientRequest.GetResponse();
                 }
 
             StreamReader = new StreamReader(WebClientResponse.GetResponseStream()
@@ -130,10 +130,10 @@ namespace SchTech.Web.Manager.Concrete
         {
             try
             {
-                WebClientResponse = (HttpWebResponse) WebClientRequest.GetResponse();
+                WebClientResponse = (HttpWebResponse)WebClientRequest.GetResponse();
 
-                RequestStatusCode = (int) WebClientResponse.StatusCode;
-                if (RequestStatusCode != (int) HttpStatusCode.OK)
+                RequestStatusCode = (int)WebClientResponse.StatusCode;
+                if (RequestStatusCode != (int)HttpStatusCode.OK)
                 {
                     SuccessfulWebRequest = false;
                     throw new Exception($"Api Error: Request status code does not match 200OK: {RequestStatusCode}");

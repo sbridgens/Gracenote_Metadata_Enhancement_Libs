@@ -1,10 +1,10 @@
-﻿using System;
+﻿using log4net;
+using SchTech.Configuration.Manager.Schema.ADIWFE;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using SchTech.Configuration.Manager.Schema.ADIWFE;
 
 namespace ADIWFE_TestClient
 {
