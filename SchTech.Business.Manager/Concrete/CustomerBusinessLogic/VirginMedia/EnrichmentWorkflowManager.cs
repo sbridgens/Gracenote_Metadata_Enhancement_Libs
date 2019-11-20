@@ -592,29 +592,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     WorkflowEntities.MovieFileSize
                 );
 
-                if (!IsPackageAnUpdate)
-                {
-                    AdiContentManager.SetAdiAssetContentField(
-                        "movie",
-                        PrimaryAsset.Name);
-
-                    if (WorkflowEntities.PackageHasPreviewAsset)
-                    {
-                        Log.Info("Adding Preview metadata");
-                        CheckAndAddPreviewData();
-                    }
+                if (IsPackageAnUpdate)
                     return true;
-                }
-                //WorkflowEntities.GetDbEnrichedAdi(
-                //    EfStaticMethods.GetEnrichedAdiFile(WorkflowEntities.TitlPaidValue));
 
-                //Log.Info("Cloning enriched asset data to ADI");
-                //AdiContentManager.CloneEnrichedAssetDataToAdi(EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset);
+                AdiContentManager.SetAdiAssetContentField(
+                    "movie",
+                    PrimaryAsset.Name);
 
-                //EfStaticMethods.CheckAndUpdateTmsId(WorkflowEntities.TitlPaidValue,
-                //    WorkflowEntities.GraceNoteTmsId);
+                if (!WorkflowEntities.PackageHasPreviewAsset)
+                    return true;
+
+                Log.Info("Adding Preview metadata");
+                CheckAndAddPreviewData();
 
                 return true;
+
             }
             catch (Exception ex)
             {

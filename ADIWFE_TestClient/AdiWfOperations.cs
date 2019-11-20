@@ -182,7 +182,7 @@ namespace ADIWFE_TestClient
             }
         }
 
-        private bool ProcessSeriesEpisodePackage()
+        private void ProcessSeriesEpisodePackage()
         {
             try
             {
@@ -197,8 +197,6 @@ namespace ADIWFE_TestClient
                 LogError("ProcessFullPackage", "Error Processing Full package", pfpex);
                 Success = false;
             }
-
-            return Success;
         }
 
 

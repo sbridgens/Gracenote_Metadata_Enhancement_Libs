@@ -7,7 +7,6 @@ using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Concrete.Validation;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.Entities.ConcreteTypes;
-using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.File.Manager.Concrete.Serialization;
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
