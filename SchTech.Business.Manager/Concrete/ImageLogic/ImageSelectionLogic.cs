@@ -107,12 +107,21 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <returns></returns>
         private bool HasAsset(Dictionary<string, string> keyValuePairs, string imageTypeRequired)
         {
-            return (
-                from item in keyValuePairs
-                from image in ApiAssetList
-                where imageTypeRequired == item.Key.Trim() &&
-                      image.URI == item.Value.Trim()
-                select item).Any();
+            var exists = false;
+
+            foreach (var item in keyValuePairs)
+            {
+                foreach (var image in ApiAssetSortedList)
+                {
+
+                    if (imageTypeRequired == item.Key.Trim() && image.URI == item.Value.Trim())
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -244,10 +253,10 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <param name="image"></param>
         /// <param name="configTier"></param>
         /// <param name="imageTier"></param>
-        /// <param name="_IsLandscape"></param>
+        /// <param name="isLandscape"></param>
         /// <returns></returns>
         private bool PassesImageLogic(Image_Category imageCategory, GnApiProgramsSchema.assetType image,
-            string configTier, string imageTier, bool _IsLandscape)
+            string configTier, string imageTier, bool isLandscape)
         {
             //no image tier for movies so ensure the value matches config tier string.empty
             if (imageTier == null)
@@ -259,18 +268,30 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                            a.AspectWidth == image.width
                        ) &&
                    configTier == imageTier &&
-                   IsLandscape == _IsLandscape &&
+                   IsLandscape == isLandscape &&
                    !IsSquare &&
                    !image.identifiers.Any();
         }
 
-        private void SetDbImages(string imageTypeRequired, string URI)
+        private void SetDbImages(string imageTypeRequired, string uri)
         {
             var gnimages = CurrentMappingData.GN_Images;
 
+
             DbImages = string.IsNullOrEmpty(gnimages)
-                ? $"{imageTypeRequired}: {URI}"
-                : $"{gnimages}, {imageTypeRequired}: {URI}";
+                ? $"{imageTypeRequired}: {uri}"
+                : $"{gnimages}, {imageTypeRequired}: {uri}";
+        }
+
+        private void UpdateDbImages(string matchValue, string imageTypeRequired, string uri)
+        {
+            if (DbImages == null)
+                DbImages = CurrentMappingData.GN_Images;
+
+            DbImages = string.IsNullOrEmpty(matchValue)
+                ? $"{DbImages}, {imageTypeRequired}: {uri}"
+                : DbImages.Replace(matchValue, $"{imageTypeRequired}: {uri}");
+
         }
 
         private void LogIdentifierLogic(int identifiersCount, string imageName)
@@ -283,11 +304,11 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         }
 
 
-        public string GetGracenoteImage(string ImageTypeRequired, string ProgramType, string PAID, int seasonId = 0)
+        public string GetGracenoteImage(string imageTypeRequired, string programType, string paid, int seasonId = 0)
         {
             try
             {
-                Log.Info($"Processing Image: {ImageTypeRequired}");
+                Log.Info($"Processing Image: {imageTypeRequired}");
 
                 if (ApiAssetList != null)
                 {
@@ -313,12 +334,11 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                             {
                                 LogIdentifierLogic(image.identifiers.Count(), image.assetId);
 
-                                Log.Info($"Image {image.assetId} for {ImageTypeRequired} passed Image logic");
+                                Log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
                                 SetAspect(image.width, image.height,
                                     Convert.ToInt32(category.AllowedAspects.Aspect.Select(r => r.ResizeHeight)
                                         .FirstOrDefault()));
-                                var encodingType = GetEncodingType(image.type);
 
                                 //gets any existing images
                                 var gnimages = CurrentMappingData.GN_Images;
@@ -329,40 +349,41 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 //Is new ingest or update?
                                 if (!IsUpdate || gnimages == null)
                                 {
-                                    Log.Info($"Updating Database with Image {ImageTypeRequired}: {image.URI}");
-                                    SetDbImages(ImageTypeRequired, image.URI);
+                                    Log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
+                                    SetDbImages(imageTypeRequired, image.URI);
                                     Log.Info(
-                                        $"Image URI: {image.URI} for: {ImageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                        $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
 
                                     return image.URI;
                                 }
 
                                 Log.Debug("Retrieved images for update package from db");
 
-                                if (!HasAsset(DbImagesForAsset, ImageTypeRequired))
+                                if (!HasAsset(DbImagesForAsset, imageTypeRequired))
                                 {
                                     var match = Regex.Match(CurrentMappingData.GN_Images,
-                                        $"(?m){ImageTypeRequired}:.*?.jpg");
-                                    //if "" then the image doesnt exist in the db so grab it.
-                                    if (!match.Success || match.Value != "")
-                                        continue;
+                                        $"(?m){imageTypeRequired}:.*?.jpg");
 
-                                    if (string.IsNullOrEmpty(match.Value))
-                                        CurrentMappingData.GN_Images =
-                                            CurrentMappingData.GN_Images.Replace(match.Value,
-                                                $"{ImageTypeRequired}: {image.URI}");
+                                    if (match.Success || match.Value == "")
+                                    {
+                                        if (string.IsNullOrEmpty(match.Value))
+                                            CurrentMappingData.GN_Images =
+                                                CurrentMappingData.GN_Images.Replace(match.Value,
+                                                    $"{imageTypeRequired}: {image.URI}");
 
-                                    Log.Info(
-                                        $"Update package detected a new image, updating db for {ImageTypeRequired} with {image.URI}");
+                                        Log.Info(
+                                            $"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
 
-                                    SetDbImages(ImageTypeRequired, image.URI);
+                                        UpdateDbImages(match.Value, imageTypeRequired, image.URI);
 
 
-                                    Log.Info(
-                                        $"Image URI: {image.URI} for: {ImageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                        Log.Info(
+                                            $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                    }
                                 }
                                 else
                                 {
+                                    Log.Info("Update Package - image is up to date not required for download.");
                                     DownloadImageRequired = false;
                                 }
 
@@ -382,7 +403,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             }
 
 
-            Log.Warn($"No Matching images found for: {ImageTypeRequired}");
+            Log.Warn($"No Matching images found for: {imageTypeRequired}");
 
             return null;
         }

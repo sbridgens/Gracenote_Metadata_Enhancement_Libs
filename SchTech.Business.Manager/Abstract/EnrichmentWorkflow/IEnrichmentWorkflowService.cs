@@ -36,12 +36,11 @@ namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
         bool SetAdiEpisodeMetadata();
 
         bool SetAdiMovieMetadata();
+        bool CheckAndAddPreviewData();
 
         bool SetAdiSeriesData();
 
         bool SetAdiSeasonData();
-
-        bool CheckAndAddPreviewData();
 
         bool ImageSelectionLogic();
 
@@ -54,5 +53,7 @@ namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
         bool DeliverEnrichedAsset();
 
         bool ProcessFailedPackage();
+
+        bool SaveAdiFile();
     }
 }

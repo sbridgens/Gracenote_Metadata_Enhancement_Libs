@@ -18,7 +18,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(ProdisAdiContentManager));
 
-        private readonly List<string> AdiNodesToRemove = new List<string>
+        private readonly List<string> _adiNodesToRemove = new List<string>
         {
             //look at the set or update method to add if not exists
             //or update if it does, need a bool for crew/cast data.
@@ -294,7 +294,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         public void RemoveDefaultAdiNodes()
         {
-            foreach (var adiNode in AdiNodesToRemove.SelectMany(item => EnrichmentWorkflowEntities.AdiFile
+            foreach (var adiNode in _adiNodesToRemove.SelectMany(item => EnrichmentWorkflowEntities.AdiFile
                 .Asset.Metadata.App_Data.Where(attr => attr.Name == item).ToList()))
                 EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data.Remove(adiNode);
         }

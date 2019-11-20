@@ -33,11 +33,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                 return false;
             }
-            catch (Exception CAWND_EX)
+            catch (Exception cawndEx)
             {
-                EfStaticMethods.Log.Error($"General Exception during database connection: {CAWND_EX.Message}");
-                if (CAWND_EX.InnerException != null)
-                    EfStaticMethods.Log.Error($"Inner Exception: {CAWND_EX.InnerException.Message}");
+                EfStaticMethods.Log.Error($"General Exception during database connection: {cawndEx.Message}");
+                if (cawndEx.InnerException != null)
+                    EfStaticMethods.Log.Error($"Inner Exception: {cawndEx.InnerException.Message}");
 
                 return false;
             }
@@ -82,6 +82,20 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             CheckAndClearOrphanedData();
 
             ExpiryProcessing = false;
+        }
+
+        public Adi_Data GetAdiData(string titlPaid)
+        {
+            using (var db = new ADI_EnrichmentContext())
+            {
+                var adiPaid = titlPaid
+                    .Replace("TITL", "")
+                    .Replace("i", "")
+                    .TrimStart('0');
+
+                return db.Adi_Data.FirstOrDefault(
+                    i => i.TitlPaid.Contains(adiPaid));
+            }
         }
 
         private void CheckAndClearOrphanedData()
@@ -186,11 +200,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     if (sqlEx.InnerException != null)
                         EfStaticMethods.Log.Error($"Inner Exception: {sqlEx.InnerException.Message}");
                 }
-                catch (Exception CAPO_EX)
+                catch (Exception capoEx)
                 {
-                    EfStaticMethods.Log.Error($"General Exception during database connection: {CAPO_EX.Message}");
-                    if (CAPO_EX.InnerException != null)
-                        EfStaticMethods.Log.Error($"Inner Exception: {CAPO_EX.InnerException.Message}");
+                    EfStaticMethods.Log.Error($"General Exception during database connection: {capoEx.Message}");
+                    if (capoEx.InnerException != null)
+                        EfStaticMethods.Log.Error($"Inner Exception: {capoEx.InnerException.Message}");
                 }
             }
         }

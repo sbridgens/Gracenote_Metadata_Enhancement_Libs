@@ -23,8 +23,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchTech.Queue.Manager", "Sc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADIWFE_TestClient", "ADIWFE_TestClient\ADIWFE_TestClient.csproj", "{C294BC2C-E1F7-4DF1-B164-DE5F90F1CE0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchTech.Workflow.Director", "SchTech.Workflow.Director\SchTech.Workflow.Director.csproj", "{744726C2-2179-4705-B5CA-61215F95C2CC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,10 +69,6 @@ Global
 		{C294BC2C-E1F7-4DF1-B164-DE5F90F1CE0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C294BC2C-E1F7-4DF1-B164-DE5F90F1CE0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C294BC2C-E1F7-4DF1-B164-DE5F90F1CE0A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{744726C2-2179-4705-B5CA-61215F95C2CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{744726C2-2179-4705-B5CA-61215F95C2CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{744726C2-2179-4705-B5CA-61215F95C2CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{744726C2-2179-4705-B5CA-61215F95C2CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

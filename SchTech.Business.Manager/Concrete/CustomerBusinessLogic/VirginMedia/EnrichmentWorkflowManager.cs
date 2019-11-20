@@ -34,17 +34,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private readonly IGnImageLookupService _gnImageLookupService;
 
         private readonly IGnMappingDataService _gnMappingDataService;
-
-        public EnrichmentWorkflowManager()
-        {
-            ApiManager = new GraceNoteApiManager();
-            WorkflowEntities = new EnrichmentWorkflowEntities();
-            AdiContentManager = new ProdisAdiContentManager();
-            _gnImageLookupService = new GnImageLookupManager(new EfGnImageLookupDal());
-            _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
-            GnMappingData = new GN_Mapping_Data();
-        }
-
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         private ProdisAdiContentManager AdiContentManager { get; }
         private GraceNoteApiManager ApiManager { get; }
@@ -58,6 +47,17 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private Adi_Data AdiData { get; set; }
         public FileInfo PrimaryAsset { get; set; }
         public FileInfo PreviewAsset { get; set; }
+
+        public EnrichmentWorkflowManager()
+        {
+            ApiManager = new GraceNoteApiManager();
+            WorkflowEntities = new EnrichmentWorkflowEntities();
+            AdiContentManager = new ProdisAdiContentManager();
+
+            _gnImageLookupService = new GnImageLookupManager(new EfGnImageLookupDal());
+            _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
+            GnMappingData = new GN_Mapping_Data();
+        }
 
         public void LogError(string functionName, string message, Exception ex)
         {
@@ -117,7 +117,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
 
                 Log.Info("Validating ADI XML is well formed");
-                if (!WorkflowEntities.SerializeAdiFile(false)) return false;
+                if (!WorkflowEntities.SerializeAdiFile(false))
+                    return false;
 
                 Log.Info("XML well formed, Retrieving PAID Value from ADI to use in Gracenote Mapping Lookup");
                 WorkflowEntities.TitlPaidValue =
@@ -214,8 +215,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
             if (IsPackageAnUpdate && adiMajor != null)
             {
-                if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor,
-                    IsTvodPackage))
+                if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor,IsTvodPackage))
                     return false;
 
                 Log.Info("Package is confirmed as a valid Update Package");
@@ -241,14 +241,22 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return false;
         }
 
+        private GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping GetGnMappingData()
+        {
+            return ApiManager.CoreGnMappingData
+                .programMappings
+                .programMapping
+                .FirstOrDefault();
+        }
+
         public bool SeedGnMappingData()
         {
             try
             {
-                var mapData = ApiManager.CoreGnMappingData
-                    .programMappings
-                    .programMapping
-                    .FirstOrDefault();
+                if (IsPackageAnUpdate)
+                    return UpdateGnMappingData();
+
+                var mapData = GetGnMappingData();
 
                 var data = new GN_Mapping_Data
                 {
@@ -291,14 +299,46 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
+        private bool UpdateGnMappingData()
+        {
+            try
+            {
+                var mapData = GetGnMappingData();
+                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
+
+                if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
+                {
+                    Log.Info($"TMSID Mismatch updating db with new value.");
+                    GnMappingData.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
+                }
+
+                Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
+
+                GnMappingData.GN_Availability_Start = mapData?.availability.start;
+                GnMappingData.GN_Availability_End = mapData?.availability.end;
+                GnMappingData.GN_updateId = mapData?.updateId;
+                _gnMappingDataService.Update(GnMappingData);
+
+                return true;
+            }
+            catch (Exception ugmdex)
+            {
+                LogError(
+                    "UpdateGnMappingData",
+                    "Error updating db Mapping data", ugmdex);
+                return false;
+            }
+        }
+
         public bool ExtractPackageMedia()
         {
             try
             {
-                Log.Info("Extracting Media from Package");
 
                 if (!IsPackageAnUpdate)
                 {
+                    Log.Info("Extracting Media from Package");
+
                     //Extract remaining items from package
                     ZipHandler.ExtractItemFromArchive(WorkflowEntities.CurrentPackage.FullName,
                         WorkflowEntities.CurrentWorkingDirectory,
@@ -340,7 +380,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 var isMapped = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue) != null;
 
-                if (!isMapped || IsPackageAnUpdate)
+                if (!isMapped && !IsPackageAnUpdate)
                 {
                     Log.Info("Seeding Adi Data to the database");
 
@@ -382,11 +422,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     return true;
                 }
 
-                if (IsPackageAnUpdate)
-                    return true;
-
-                Log.Error("Cannot seed data as the package is not an update" +
-                          $" and data exists for paid: {WorkflowEntities.TitlPaidValue}" +
+                Log.Error("Failed to seed data" +
+                          $" data exists for paid: {WorkflowEntities.TitlPaidValue}" +
                           "Failing Ingest.");
                 return false;
             }
@@ -555,27 +592,27 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     WorkflowEntities.MovieFileSize
                 );
 
-                AdiContentManager.SetAdiAssetContentField(
-                    "movie",
-                    PrimaryAsset.Name);
-
-                if (WorkflowEntities.PackageHasPreviewAsset)
+                if (!IsPackageAnUpdate)
                 {
-                    Log.Info("Adding Preview metadata");
-                    CheckAndAddPreviewData();
+                    AdiContentManager.SetAdiAssetContentField(
+                        "movie",
+                        PrimaryAsset.Name);
+
+                    if (WorkflowEntities.PackageHasPreviewAsset)
+                    {
+                        Log.Info("Adding Preview metadata");
+                        CheckAndAddPreviewData();
+                    }
+                    return true;
                 }
+                //WorkflowEntities.GetDbEnrichedAdi(
+                //    EfStaticMethods.GetEnrichedAdiFile(WorkflowEntities.TitlPaidValue));
 
-                if (IsPackageAnUpdate)
-                {
-                    WorkflowEntities.GetDbEnrichedAdi(
-                        EfStaticMethods.GetEnrichedAdiFile(WorkflowEntities.TitlPaidValue));
+                //Log.Info("Cloning enriched asset data to ADI");
+                //AdiContentManager.CloneEnrichedAssetDataToAdi(EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset);
 
-                    Log.Info("Cloning enriched asset data to ADI");
-                    AdiContentManager.CloneEnrichedAssetDataToAdi(EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset);
-
-                    EfStaticMethods.CheckAndUpdateTmsId(WorkflowEntities.TitlPaidValue,
-                        WorkflowEntities.GraceNoteTmsId);
-                }
+                //EfStaticMethods.CheckAndUpdateTmsId(WorkflowEntities.TitlPaidValue,
+                //    WorkflowEntities.GraceNoteTmsId);
 
                 return true;
             }
@@ -705,7 +742,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     ApiAssetList = AdiContentManager.ReturnAssetList()
                 };
 
-
                 isl.DbImagesForAsset = _gnMappingDataService.ReturnDbImagesForAsset(
                     WorkflowEntities.TitlPaidValue,
                     isl.CurrentMappingData.Id
@@ -719,6 +755,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 if (!string.IsNullOrEmpty(isl.DbImages))
                     UpdateDbImages(isl.DbImages);
+
+                isl.DbImages = null;
 
                 if (!isl.DownloadImageRequired)
                     continue;
@@ -854,30 +892,36 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 //Get the correct stored adi data
-                AdiData = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue);
+                AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
+                if (AdiData.EnrichedAdi == null)
+                    throw new Exception($"Previously Enriched ADI data for Paid: {WorkflowEntities.TitlPaidValue}" +
+                                        $" was not found in the database?");
+
                 //Serialize previously enriched Adi File to obtain Asset data
                 WorkflowEntities.SerializeAdiFile(true, AdiData.EnrichedAdi);
+                AdiData.TmsId = WorkflowEntities.GraceNoteTmsId;
+                AdiData.VersionMajor = AdiContentManager.GetVersionMajor();
+                AdiData.VersionMinor = AdiContentManager.GetVersionMinor();
+                AdiData.Licensing_Window_End = AdiContentManager.GetLicenceEndData();
 
                 //Get original asset data and modify new adi.
                 if (!AdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi())
                     return false;
 
                 //Update all version major values to correct value.
-                if (AdiContentManager
-                    .UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
-                {
-                    //update the db with the new license window end date.
-                    var licEnd = AdiContentManager.GetLicenceEndData();
-                    AdiData.Licensing_Window_End = licEnd;
-                    _adiDataService.Update(AdiData);
-                    Log.Info($"Update Adi Data row id:{AdiData.Id} with new Licensing_Window_End value: {licEnd}");
-                    //nullify un-required data.
-                    EnrichmentWorkflowEntities.EnrichedAdi = null;
+                if (!AdiContentManager.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
+                    return false;
 
-                    return true;
-                }
 
-                return false;
+                _adiDataService.Update(AdiData);
+                Log.Info("Adi data updated in the database.");
+                //nullify un-required data.
+                EnrichmentWorkflowEntities.EnrichedAdi = null;
+
+
+                return true;
+
+
             }
             catch (Exception ex)
             {
@@ -909,7 +953,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
             gnMappingRow.GN_Images = dbImages;
             var rowId = _gnMappingDataService.Update(gnMappingRow);
-            Log.Info($"GN Mapping table with row id: {rowId} updated with new image data");
+            Log.Info($"GN Mapping table with row id: {rowId.Id} updated with new image data");
         }
 
         public bool SaveAdiFile()

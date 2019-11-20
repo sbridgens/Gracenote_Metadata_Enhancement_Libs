@@ -128,6 +128,7 @@ namespace ADIWFE_TestClient
                 return;
 
             for (var package = 0; package < AdiEnrichmentQueueController.QueuedPackages.Count; package++)
+            {
                 try
                 {
                     IngestFile = (WorkQueueItem) AdiEnrichmentQueueController.QueuedPackages[package];
@@ -140,10 +141,8 @@ namespace ADIWFE_TestClient
                     if (!Success)
                         throw new Exception(
                             "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
-                    if (!WorkflowManager.IsPackageAnUpdate) Success = ProcessFullPackage();
-
-                    if (WorkflowManager.IsPackageAnUpdate) Success = ProcessUpdatePackage();
-
+                    if(!WorkflowManager.IsMoviePackage)
+                        ProcessSeriesEpisodePackage();
                     AllPackageTasks();
                 }
                 catch (Exception pqiEx)
@@ -154,6 +153,7 @@ namespace ADIWFE_TestClient
 
                     WorkflowManager.ProcessFailedPackage();
                 }
+            }
         }
 
         private bool GetMappingAndExtractPackage()
@@ -171,26 +171,26 @@ namespace ADIWFE_TestClient
 
                 throw new Exception();
             }
-            catch (Exception gmaeadiEx)
+            catch (Exception gmaepEx)
             {
                 LogError(
                     "GetMappingAndExtractPackage",
                     "Error encountered during initial mapping check / package extraction",
-                    gmaeadiEx
+                    gmaepEx
                 );
                 return false;
             }
         }
 
-        private bool ProcessFullPackage()
+        private bool ProcessSeriesEpisodePackage()
         {
             try
             {
-                if (!WorkflowManager.IsMoviePackage)
-                    Success = WorkflowManager.GetSeriesSeasonSpecialsData() &&
-                              WorkflowManager.SetAdiEpisodeMetadata() &&
-                              WorkflowManager.SetAdiSeriesData() &&
-                              WorkflowManager.SetAdiSeasonData();
+                Success = WorkflowManager.GetSeriesSeasonSpecialsData() &&
+                          WorkflowManager.SetAdiEpisodeMetadata() &&
+                          WorkflowManager.SetAdiSeriesData() &&
+                          WorkflowManager.SetAdiSeasonData();
+
             }
             catch (Exception pfpex)
             {
@@ -201,10 +201,6 @@ namespace ADIWFE_TestClient
             return Success;
         }
 
-        private bool ProcessUpdatePackage()
-        {
-            throw new NotImplementedException();
-        }
 
         private void AllPackageTasks()
         {

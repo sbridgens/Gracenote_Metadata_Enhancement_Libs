@@ -251,7 +251,7 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void GetDbEnrichedAdi(string adidata)
         {
-            SerializeAdiFile(true, System.IO.File.ReadAllText(adidata));
+            SerializeAdiFile(true, adidata);
         }
 
         public void SaveAdiFile(string filePath, ADI adiFileContent)
