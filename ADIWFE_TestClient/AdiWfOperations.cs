@@ -84,12 +84,6 @@ namespace ADIWFE_TestClient
             InitialiseTimer();
 
 
-            if (WorkflowManager == null)
-                WorkflowManager = new EnrichmentWorkflowManager();
-
-            //initial check for orphaned data in the db
-            WorkflowManager.CheckAndCleanOrphanedData();
-
             PollController = new AdiEnrichmentPollController
             {
                 LastFailedMappingPoll =
@@ -136,6 +130,7 @@ namespace ADIWFE_TestClient
 
                     Log.Info(
                         $"############### Processing STARTED For Queued item {package + 1} of {AdiEnrichmentQueueController.QueuedPackages.Count}: {IngestFile.AdiPackage.FullName} ###############\r\n");
+                    WorkflowManager = new EnrichmentWorkflowManager();
 
                     Success = GetMappingAndExtractPackage();
                     if (!Success)
@@ -151,7 +146,7 @@ namespace ADIWFE_TestClient
                         $"Error encountered processing package: {IngestFile.AdiPackage.Name}",
                         pqiEx);
 
-                    WorkflowManager.ProcessFailedPackage();
+                    WorkflowManager.ProcessFailedPackage(IngestFile.AdiPackage);
                 }
             }
         }

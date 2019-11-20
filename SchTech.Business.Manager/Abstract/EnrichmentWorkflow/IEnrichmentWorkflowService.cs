@@ -52,7 +52,7 @@ namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
 
         bool DeliverEnrichedAsset();
 
-        bool ProcessFailedPackage();
+        void ProcessFailedPackage(FileInfo packageFile);
 
         bool SaveAdiFile();
     }

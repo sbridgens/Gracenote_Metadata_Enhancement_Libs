@@ -44,6 +44,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private ZipHandler ZipHandler { get; set; }
         public bool IsMoviePackage { get; set; }
         public bool IsTvodPackage { get; set; }
+        public bool FailedToMap { get; set; }
         private Adi_Data AdiData { get; set; }
         public FileInfo PrimaryAsset { get; set; }
         public FileInfo PreviewAsset { get; set; }
@@ -53,7 +54,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             ApiManager = new GraceNoteApiManager();
             WorkflowEntities = new EnrichmentWorkflowEntities();
             AdiContentManager = new ProdisAdiContentManager();
-
+            _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
             _gnImageLookupService = new GnImageLookupManager(new EfGnImageLookupDal());
             _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
             GnMappingData = new GN_Mapping_Data();
@@ -72,7 +73,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
-                _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
+                if(_adiDataService == null)
+                    _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
                 return _adiDataService.CleanAdiDataWithNoMapping() &&
                        _gnMappingDataService.CleanMappingDataWithNoAdi();
             }
@@ -177,6 +179,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (gnMappingData.GraceNoteMappingData == null)
                 {
                     Log.Warn("Package is not yet mapped and will not continue to be processed until a later time.");
+                    FailedToMap = true;
                     return false;
                 }
 
@@ -204,6 +207,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
             catch (Exception ex)
             {
+                FailedToMap = true;
                 LogError(
                     "CallAndParseGnMappingData",
                     "Error During Mapping Gracenote of Data", ex);
@@ -870,8 +874,15 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 var fInfo = new FileInfo(DeliveryPackage);
-                var tmpPackage = Path.Combine(ADIWF_Config.IngestDirectory, $"{fInfo.Name}.tmp");
-                var finalPackage = Path.Combine(ADIWF_Config.IngestDirectory, fInfo.Name);
+
+                var tmpPackage = IsTvodPackage
+                    ? Path.Combine(ADIWF_Config.TVOD_Delivery_Directory, $"{fInfo.Name}.tmp")
+                    : Path.Combine(ADIWF_Config.IngestDirectory, $"{fInfo.Name}.tmp");
+
+                var finalPackage = IsTvodPackage
+                    ? Path.Combine(ADIWF_Config.TVOD_Delivery_Directory, fInfo.Name)
+                    : Path.Combine(ADIWF_Config.IngestDirectory, fInfo.Name);
+
                 Log.Info($"Moving Temp Package to ingest: {DeliveryPackage} to {tmpPackage}");
                 System.IO.File.Move(DeliveryPackage, tmpPackage);
                 if (System.IO.File.Exists(tmpPackage))
@@ -892,11 +903,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
 
             return false;
-        }
-
-        public bool ProcessFailedPackage()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -982,8 +988,20 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var outputAdi = Path.Combine(WorkflowEntities.CurrentWorkingDirectory, "ADI.xml");
                 WorkflowEntities.SaveAdiFile(outputAdi, EnrichmentWorkflowEntities.AdiFile);
 
-                AdiData.EnrichedAdi = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
-                AdiData.Enrichment_DateTime = DateTime.Now;
+                var adiString = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
+
+
+                if (!IsPackageAnUpdate)
+                {
+                    AdiData.EnrichedAdi = adiString;
+                    AdiData.Enrichment_DateTime = DateTime.Now;
+                }
+                else
+                {
+                    AdiData.UpdateAdi = adiString;
+                    AdiData.Update_DateTime = DateTime.Now;
+                }
+
                 _adiDataService.Update(AdiData);
 
                 return true;
@@ -994,6 +1012,39 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     "SaveAdiFile",
                     "Error Saving Enriched ADI", safex);
                 return false;
+            }
+        }
+        public void ProcessFailedPackage(FileInfo packageFile)
+        {
+            try
+            {
+                var source = packageFile.FullName;
+                var destination = FailedToMap 
+                    ? $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageFile.Name}"
+                    : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}";
+
+                if (FailedToMap)
+                {
+                    Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
+                             $"{ADIWF_Config.MoveNonMappedDirectory}");
+                    Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
+                             $" before it is failed completely.");
+                }
+                else
+                {
+                    Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
+                             $"{ADIWF_Config.FailedDirectory}");
+
+                }
+                System.IO.File.Move(source, destination);
+                if (System.IO.File.Exists(destination))
+                   Log.Info("Move to failed directory successful.");
+            }
+            catch (Exception pfpex)
+            {
+                LogError(
+                    "ProcessFailedPackage",
+                    "Error Processing Failed Package", pfpex);
             }
         }
     }
