@@ -126,6 +126,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 WorkflowEntities.OnapiProviderid =
                     adiValidation.ValidatePaidValue(WorkflowEntities.TitlPaidValue);
+                if (!string.IsNullOrEmpty(adiValidation.NewTitlPaid))
+                    WorkflowEntities.TitlPaidValue = adiValidation.NewTitlPaid;
 
                 IsPackageAnUpdate = ZipHandler.IsUpdatePackage;
                 WorkflowEntities.CheckSetSdPackage(IsPackageAnUpdate);
@@ -281,8 +283,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     GN_programMappingId = mapData?.programMappingId,
                     GN_creationDate = Convert.ToDateTime(mapData?.creationDate),
                     GN_updateId = mapData?.updateId,
-                    GN_Availability_Start = mapData?.availability.start,
-                    GN_Availability_End = mapData?.availability.end
+                    GN_Availability_Start = mapData?.availability?.start,
+                    GN_Availability_End = mapData?.availability?.end
                 };
 
                 GnMappingData = _gnMappingDataService.Add(data);
@@ -314,8 +316,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
 
-                GnMappingData.GN_Availability_Start = mapData?.availability.start;
-                GnMappingData.GN_Availability_End = mapData?.availability.end;
+                GnMappingData.GN_Availability_Start = mapData?.availability?.start;
+                GnMappingData.GN_Availability_End = mapData?.availability?.end;
                 GnMappingData.GN_updateId = mapData?.updateId;
                 _gnMappingDataService.Update(GnMappingData);
 
@@ -755,8 +757,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 if (IsPackageAnUpdate && !string.IsNullOrEmpty(isl.DbImages))
                 {
-                    //update image data in db and adi
-                    UpdateDbImages(isl.DbImages);
 
                     InsertSuccess = AdiContentManager.UpdateImageData(
                         isl.ImageQualifier,
@@ -767,6 +767,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         FileDirectoryManager.GetFileHash(localImage),
                         FileDirectoryManager.GetFileSize(localImage)
                     );
+
+                    //update image data in db and adi
+                    UpdateDbImages(isl.DbImages);
+                    isl.DbImages = null;
                 }
                 else
                 {
@@ -782,12 +786,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         isl.ImageQualifier,
                         isl.GetFileAspectRatio(localImage)
                     );
+                    //update image data in db and adi
+                    UpdateDbImages(isl.DbImages);
                 }
                 
                 if (InsertSuccess)
                     currentImage = configLookup.Image_Mapping;
-
-                isl.DbImages = null;
             }
 
             return InsertSuccess;
@@ -825,6 +829,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 AdiContentManager.CheckAndAddBlockPlatformData();
+                if (IsTvodPackage && IsPackageAnUpdate)
+                    AdiContentManager.SetQamUpdateContent();
             }
             catch (Exception ex)
             {
@@ -913,11 +919,17 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AdiData.VersionMajor = AdiContentManager.GetVersionMajor();
                 AdiData.VersionMinor = AdiContentManager.GetVersionMinor();
                 AdiData.Licensing_Window_End = AdiContentManager.GetLicenceEndData();
-
+                
+                //if tvod remove enhanced movie section
+                if (IsTvodPackage)
+                {
+                    var movieData = EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(m => m.Metadata.AMS.Asset_Class == "movie");
+                    AdiContentManager.MovieContent = movieData?.Content.Value;
+                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Remove(movieData);
+                }
                 //Get original asset data and modify new adi.
                 if (!AdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi())
                     return false;
-
                 //Update all version major values to correct value.
                 if (!AdiContentManager.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
                     return false;
@@ -925,9 +937,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 _adiDataService.Update(AdiData);
                 Log.Info("Adi data updated in the database.");
-                //nullify un-required data.
-                EnrichmentWorkflowEntities.EnrichedAdi = null;
-
 
                 return true;
 

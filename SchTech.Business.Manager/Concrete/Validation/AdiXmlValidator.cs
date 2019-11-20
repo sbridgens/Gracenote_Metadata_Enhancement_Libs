@@ -11,21 +11,23 @@ namespace SchTech.Business.Manager.Concrete.Validation
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnhancementDataValidator));
 
-        public string ValidatePaidValue(string TitlPaidValue)
+        public string NewTitlPaid { get; set; }
+        public string ValidatePaidValue(string adiPaid)
         {
-            if (TitlPaidValue.Length != 20)
-            {
-                var tmpPaid = Regex.Replace(TitlPaidValue, "[A-Za-z ]", "").TrimStart('0');
-                TitlPaidValue = $"TITL{new string('0', 16 - tmpPaid.Length)}{tmpPaid}";
-                Log.Info($"Qam asset detected setting GN_Paid = {TitlPaidValue}, " +
-                         $"TitlPaid Value = {TitlPaidValue}");
-                EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID = TitlPaidValue;
-            }
+            if (adiPaid.Length == 20)
+                return null;
 
-            var OnapiProviderid = $"{EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Provider_ID}{TitlPaidValue}";
-            Log.Info($"On api Provider id = {OnapiProviderid}");
+            var tmpPaid = Regex.Replace(adiPaid, "[A-Za-z]", "").TrimStart('0');
+            NewTitlPaid = $"TITL{new string('0', 16 - tmpPaid.Length)}{tmpPaid}";
+            Log.Info($"Qam asset detected setting GN_Paid = {adiPaid}, " +
+                     $"ADI Titl Paid Value = {NewTitlPaid}");
 
-            return OnapiProviderid;
+            var onapiProviderid = $"{EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Provider_ID}{adiPaid}";
+            EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID = NewTitlPaid;
+            Log.Info($"On api Provider id = {onapiProviderid}");
+
+            return onapiProviderid;
+
         }
     }
 }

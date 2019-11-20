@@ -66,6 +66,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         private bool IdmbDataInserted { get; set; }
 
+        public string MovieContent { get; set; }
+
         public void InitialiseAndSeedObjectLists(GnApiProgramsSchema.programsProgram episodeMovieData, string seasonId)
         {
             //Instantiate List Entities
@@ -911,6 +913,26 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             catch (Exception uidex)
             {
                 Log.Error($"Error Encountered Updating Image Data: {uidex.Message}");
+                return false;
+            }
+        }
+
+        public bool SetQamUpdateContent()
+        {
+            try
+            {
+                var movieAsset =
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
+                        c.Metadata.AMS.Asset_Class == "movie");
+                if (movieAsset == null)
+                    throw new Exception("Error retrieving previously Enriched movie section for QAM Update.");
+                movieAsset.Content = new ADIAssetAssetContent {Value = MovieContent};
+
+                return true;
+            }
+            catch (Exception squcex)
+            {
+                Log.Error($"Error Encountered Setting QAM Update content field: {squcex.Message}");
                 return false;
             }
         }
