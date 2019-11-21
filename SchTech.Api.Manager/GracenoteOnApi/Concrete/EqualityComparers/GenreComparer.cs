@@ -9,7 +9,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers
         public bool Equals(GnApiProgramsSchema.programsProgramGenre episodeGenres,
             GnApiProgramsSchema.programsProgramGenre seriesGenres)
         {
-            return episodeGenres.Value == seriesGenres.Value;
+            return episodeGenres?.Value == seriesGenres?.Value;
         }
 
         public int GetHashCode(GnApiProgramsSchema.programsProgramGenre genres)

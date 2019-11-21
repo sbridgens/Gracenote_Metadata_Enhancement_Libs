@@ -9,8 +9,8 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers
         public bool Equals(GnApiProgramsSchema.castTypeMember episodeMovieMember,
             GnApiProgramsSchema.castTypeMember seriesSeasonMember)
         {
-            return episodeMovieMember != null && episodeMovieMember.name.first == seriesSeasonMember.name.first &&
-                   episodeMovieMember.name.last == seriesSeasonMember.name.last;
+            return episodeMovieMember != null && episodeMovieMember.name.first == seriesSeasonMember?.name.first &&
+                   episodeMovieMember.name.last == seriesSeasonMember?.name.last;
         }
 
         public int GetHashCode(GnApiProgramsSchema.castTypeMember member)

@@ -255,6 +255,26 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 .FirstOrDefault();
         }
 
+        private DateTime? GetAvailability(string typeRequired, 
+            GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping mapdata)
+        {
+            DateTime? availableDateTime = null;
+
+
+            if (typeRequired == "start")
+            {
+                if (mapdata.availability?.start != null && mapdata.availability?.start.Year != 1)
+                    availableDateTime = Convert.ToDateTime(mapdata.availability?.start);
+            }
+            else if (typeRequired == "end")
+            {
+                if (mapdata.availability?.end != null && mapdata.availability?.end.Year != 1)
+                    availableDateTime = Convert.ToDateTime(mapdata.availability?.end);
+            }
+
+            return availableDateTime;
+        }
+
         public bool SeedGnMappingData()
         {
             try
@@ -285,10 +305,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         .FirstOrDefault(),
 
                     GN_programMappingId = mapData?.programMappingId,
-                    GN_creationDate = Convert.ToDateTime(mapData?.creationDate),
+                    GN_creationDate = mapData?.creationDate != null 
+                        ? Convert.ToDateTime(mapData.creationDate)
+                        : DateTime.Now,
                     GN_updateId = mapData?.updateId,
-                    GN_Availability_Start = mapData?.availability?.start,
-                    GN_Availability_End = mapData?.availability?.end
+                    GN_Availability_Start = GetAvailability("start",mapData),
+                    GN_Availability_End = GetAvailability("end", mapData)
                 };
 
                 GnMappingData = _gnMappingDataService.Add(data);

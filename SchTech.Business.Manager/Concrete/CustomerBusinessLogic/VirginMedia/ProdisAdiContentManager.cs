@@ -116,6 +116,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
+                if (string.IsNullOrEmpty(nodeValue))
+                    return false;
+
                 var newAppData = new ADIAssetMetadataApp_Data
                 {
                     App = "VOD",
@@ -126,6 +129,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data.Add(newAppData);
 
                 return true;
+
             }
             catch (Exception atmadnEx)
             {
@@ -636,17 +640,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     var seasonData = SeasonInfo.FirstOrDefault(i => i.seasonId == seasonId.ToString());
 
-                    if (seasonData != null)
+                    if (seasonData?.totalSeasonEpisodes != "0")
+                        AddTitleMetadataApp_DataNode("Series_NumberOfItems",
+                            seasonData?.totalSeasonEpisodes);
+
+                    if (seasonData?.descriptions != null)
                     {
                         AddTitleMetadataApp_DataNode("Series_Summary_Short",
-                            seasonData.descriptions.desc
+                            seasonData.descriptions?.desc
                                 .FirstOrDefault(d => Convert.ToInt32(d.size) == 250 ||
                                                      Convert.ToInt32(d.size) >= 100)
                                 ?.Value);
-
-                        if (seasonData.totalSeasonEpisodes != "0")
-                            AddTitleMetadataApp_DataNode("Series_NumberOfItems",
-                                seasonData.totalSeasonEpisodes);
+                    }
+                    else
+                    {
+                        Log.Warn("Season Description data not available?");
                     }
                 }
 
@@ -786,7 +794,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                if (externalLinks != null && IdmbDataInserted == false)
+                if (externalLinks.Count > 0 && IdmbDataInserted == false)
                 {
                     var links = externalLinks;
                     Log.Info("Adding IMDb_ID data.");
