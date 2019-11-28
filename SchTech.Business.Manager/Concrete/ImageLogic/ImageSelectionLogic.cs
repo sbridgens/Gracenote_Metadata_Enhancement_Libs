@@ -73,16 +73,17 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <param name="destinationImage"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        public bool DownloadImage(string sourceImage, string destinationImage, int height = 0)
+        public bool DownloadImage(string sourceImage, string destinationImage)
         {
             try
             {
-                var downloadUrl = height != 0
-                    ? $"{ADIWF_Config.MediaCloud}/{sourceImage}?h={height}"
-                    : $"{ADIWF_Config.MediaCloud}/{sourceImage}";
+                var downloadUrl = $"{ADIWF_Config.MediaCloud}/{sourceImage}";
 
                 var webClient = new WebClientManager();
-                webClient.DownloadWebBasedFile(downloadUrl, false, destinationImage);
+                webClient.DownloadWebBasedFile(
+                    downloadUrl, 
+                    false,
+                    destinationImage);
 
                 Log.Info($"Successfully Downloaded Image: {sourceImage} as {destinationImage}");
 
@@ -202,13 +203,13 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <summary>
         ///     Returns the formatted aspect ratio
         /// </summary>
-        /// <param name="resizeHeight"></param>
+        /// <param name="TrimImage"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        private void SetAspect(string width, string height, int resizeHeight = 0)
+        private void SetAspect(string width, string height, int TrimImage = 0)
         {
-            AspectRatio = resizeHeight != 0
-                ? AspectRatio = $"{width}x{resizeHeight}"
+            AspectRatio = TrimImage != 0
+                ? AspectRatio = $"{width}x{TrimImage}"
                 : AspectRatio = $"{width}x{height}";
         }
 
@@ -334,9 +335,12 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                                     Log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
-                                    SetAspect(image.width, image.height,
-                                        Convert.ToInt32(category.AllowedAspects.Aspect.Select(r => r.ResizeHeight)
-                                            .FirstOrDefault()));
+                                    var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
+                                        .Select(r => r.TrimImage).FirstOrDefault());
+
+                                    var imageUri = requiresTrim
+                                        ? $"{image.URI}?trim=true"
+                                        : image.URI;
 
                                     //gets any existing images
                                     var gnimages = CurrentMappingData.GN_Images;
@@ -352,7 +356,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                         Log.Info(
                                             $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
 
-                                        return image.URI;
+                                        return imageUri;
                                     }
 
                                     Log.Debug("Retrieved images for update package from db");
@@ -385,7 +389,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                         DownloadImageRequired = false;
                                     }
 
-                                    return image.URI;
+                                    return imageUri;
                                 }
                             }
                         }

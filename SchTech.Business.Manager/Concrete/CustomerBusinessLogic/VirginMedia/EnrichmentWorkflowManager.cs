@@ -987,12 +987,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         private string GetImageName(string imageUri, string imageMapping)
         {
-            var originalFileName = Path.GetFileNameWithoutExtension(imageUri);
-            if (originalFileName == null)
-                return string.Empty;
+            var baseImage = imageUri.Replace("?trim=true", "");
+            var originalFileName = Path.GetFileNameWithoutExtension(baseImage);
 
             var newFileName = originalFileName.Replace(originalFileName,
-                $"{imageMapping}_{originalFileName}{Path.GetExtension(imageUri)}");
+                $"{imageMapping}_{originalFileName}{Path.GetExtension(baseImage)}");
             return Path.Combine(WorkflowEntities.CurrentWorkingDirectory, newFileName);
         }
 

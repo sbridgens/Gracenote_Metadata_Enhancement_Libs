@@ -22,8 +22,8 @@ namespace SchTech.DataAccess.Concrete
         [XmlElement(ElementName = "Aspect_Height")]
         public string AspectHeight { get; set; }
 
-        [XmlElement(ElementName = "Resize_Height")]
-        public string ResizeHeight { get; set; }
+        [XmlElement(ElementName = "Trim_Image")]
+        public string TrimImage { get; set; }
     }
 
     [XmlRoot(ElementName = "AllowedAspects")]
