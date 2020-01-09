@@ -17,13 +17,12 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <summary>
         ///     Initialize log4net
         /// </summary>
-        private readonly ILog Log = LogManager.GetLogger(typeof(ImageSelectionLogic));
+        private readonly ILog _log = LogManager.GetLogger(typeof(ImageSelectionLogic));
 
         private List<GnApiProgramsSchema.assetType> ApiAssetSortedList { get; set; }
         private string IdentifierType { get; set; }
         private List<string> AssetTier { get; set; }
         private string IdentifierId { get; set; }
-        private string AspectRatio { get; set; }
         private bool IsSquare { get; set; }
         public List<GnApiProgramsSchema.assetType> ApiAssetList { get; set; }
         public List<Image_Category> ConfigImageCategories { get; set; }
@@ -39,39 +38,10 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         public int SeasonId { get; set; }
 
         /// <summary>
-        ///     Gets the image encoding type
-        /// </summary>
-        /// <param name="assetType"></param>
-        /// <returns></returns>
-        private string GetEncodingType(string assetType)
-        {
-            string encodingType = null;
-
-            switch (assetType)
-            {
-                case "image/gif":
-                    encodingType = "GIF";
-                    break;
-                case "image/jpeg":
-                    encodingType = "JPG";
-                    break;
-                case "image/png":
-                    encodingType = "PNG";
-                    break;
-                case "image/svg+xml":
-                    encodingType = "SVG";
-                    break;
-            }
-
-            return encodingType;
-        }
-
-        /// <summary>
         ///     Downloads the image from the configured image url and the image path found in the api
         /// </summary>
         /// <param name="sourceImage"></param>
         /// <param name="destinationImage"></param>
-        /// <param name="height"></param>
         /// <returns></returns>
         public bool DownloadImage(string sourceImage, string destinationImage)
         {
@@ -85,18 +55,24 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                     false,
                     destinationImage);
 
-                Log.Info($"Successfully Downloaded Image: {sourceImage} as {destinationImage}");
+                _log.Info($"Successfully Downloaded Image: {sourceImage} as {destinationImage}");
 
                 return true;
             }
             catch (Exception diEx)
             {
-                Log.Error($"[DownloadImage] Error Downloading Image: {diEx.Message}");
+                _log.Error($"[DownloadImage] Error Downloading Image: {diEx.Message}");
                 if (diEx.InnerException != null)
-                    Log.Error($"[DownloadImage] Inner Exception: {diEx.InnerException.Message}");
+                    _log.Error($"[DownloadImage] Inner Exception: {diEx.InnerException.Message}");
 
                 return false;
             }
+        }
+
+        private string ImageTrim(string imageUrl)
+        {
+            var cleanString = imageUrl.TrimStart();
+            return cleanString.TrimEnd();
         }
 
         /// <summary>
@@ -105,22 +81,16 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// </summary>
         /// <param name="keyValuePairs"></param>
         /// <param name="imageTypeRequired"></param>
+        /// <param name="currentImageUri"></param>
         /// <returns></returns>
-        private bool HasAsset(Dictionary<string, string> keyValuePairs, string imageTypeRequired)
+        private bool HasAsset(Dictionary<string, string> keyValuePairs, string imageTypeRequired, string currentImageUri)
         {
-            foreach (var item in keyValuePairs)
-            {
-                foreach (var image in ApiAssetSortedList)
-                {
-
-                    if (imageTypeRequired == item.Key.Trim() && image.URI == item.Value.Trim())
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return (from item in keyValuePairs
+                let assetKey = ImageTrim(item.Key)
+                let assetValue = ImageTrim(item.Value)
+                where imageTypeRequired.Equals(assetKey) &&
+                      currentImageUri.Equals(assetValue)
+                select assetKey).Any();
         }
 
         /// <summary>
@@ -191,27 +161,14 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             }
             catch (Exception ex)
             {
-                Log.Error($"[GetFileAspectRatio] Error Getting Image File Aspect Ratio: {ex.Message}");
+                _log.Error($"[GetFileAspectRatio] Error Getting Image File Aspect Ratio: {ex.Message}");
                 if (ex.InnerException != null)
-                    Log.Error($"[GetFileAspectRatio] Inner Exception: {ex.InnerException.Message}");
+                    _log.Error($"[GetFileAspectRatio] Inner Exception: {ex.InnerException.Message}");
 
                 return null;
             }
         }
 
-
-        /// <summary>
-        ///     Returns the formatted aspect ratio
-        /// </summary>
-        /// <param name="TrimImage"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        private void SetAspect(string width, string height, int TrimImage = 0)
-        {
-            AspectRatio = TrimImage != 0
-                ? AspectRatio = $"{width}x{TrimImage}"
-                : AspectRatio = $"{width}x{height}";
-        }
 
         private void UpdateCategoryList(List<Image_Category> imageCategories)
         {
@@ -296,10 +253,10 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         private void LogIdentifierLogic(int identifiersCount, string imageName)
         {
             if (!string.IsNullOrEmpty(IdentifierType))
-                Log.Info($"Image: {imageName} - Image Identifier TYPE Match: {IdentifierType} matches Config value");
+                _log.Info($"Image: {imageName} - Image Identifier TYPE Match: {IdentifierType} matches Config value");
             if (!string.IsNullOrEmpty(IdentifierId))
-                Log.Info($"Image: {imageName} - Image Identifier ID: {IdentifierId} matches Config value");
-            else if (identifiersCount == 0) Log.Info("No Identifier config found for current image Type.");
+                _log.Info($"Image: {imageName} - Image Identifier ID: {IdentifierId} matches Config value");
+            else if (identifiersCount == 0) _log.Info("No Identifier config found for current image Type.");
         }
 
 
@@ -307,7 +264,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         {
             try
             {
-                Log.Info($"Processing Image: {imageTypeRequired}");
+                _log.Info($"Processing Image: {imageTypeRequired}");
 
                 if (ApiAssetList != null)
                 {
@@ -333,7 +290,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 {
                                     LogIdentifierLogic(image.identifiers.Count(), image.assetId);
 
-                                    Log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
+                                    _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
                                     var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
                                         .Select(r => r.TrimImage).FirstOrDefault());
@@ -351,17 +308,17 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                     //Is new ingest or update?
                                     if (!IsUpdate || gnimages == null)
                                     {
-                                        Log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
+                                        _log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
                                         SetDbImages(imageTypeRequired, image.URI);
-                                        Log.Info(
+                                        _log.Info(
                                             $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
 
                                         return imageUri;
                                     }
 
-                                    Log.Debug("Retrieved images for update package from db");
+                                    _log.Debug("Retrieved images for update package from db");
 
-                                    if (!HasAsset(DbImagesForAsset, imageTypeRequired))
+                                    if (!HasAsset(DbImagesForAsset, imageTypeRequired, image.URI))
                                     {
                                         var match = Regex.Match(CurrentMappingData.GN_Images,
                                             $"(?m){imageTypeRequired}:.*?.jpg");
@@ -373,19 +330,19 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                                     CurrentMappingData.GN_Images.Replace(match.Value,
                                                         $"{imageTypeRequired}: {image.URI}");
 
-                                            Log.Info(
+                                            _log.Info(
                                                 $"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
 
                                             UpdateDbImages(match.Value, imageTypeRequired, image.URI);
 
 
-                                            Log.Info(
+                                            _log.Info(
                                                 $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
                                         }
                                     }
                                     else
                                     {
-                                        Log.Info("Update Package - image is up to date not required for download.");
+                                        _log.Info("Update Package - image is up to date not required for download.");
                                         DownloadImageRequired = false;
                                     }
 
@@ -397,15 +354,15 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             }
             catch (Exception ggiEx)
             {
-                Log.Error($"[GetGracenoteImage] Error Getting Gracenote Image: {ggiEx.Message}");
+                _log.Error($"[GetGracenoteImage] Error Getting Gracenote Image: {ggiEx.Message}");
                 if (ggiEx.InnerException != null)
-                    Log.Error($"[GetGracenoteImage] Inner Exception: {ggiEx.InnerException.Message}");
+                    _log.Error($"[GetGracenoteImage] Inner Exception: {ggiEx.InnerException.Message}");
 
                 return null;
             }
 
 
-            Log.Warn($"No Matching images found for: {imageTypeRequired}");
+            _log.Warn($"No Matching images found for: {imageTypeRequired}");
 
             return null;
         }

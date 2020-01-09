@@ -560,7 +560,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool SetAdiEpisodeMetadata()
+        public bool SetAdiMovieEpisodeMetadata()
         {
             try
             {
@@ -574,7 +574,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     _gnMappingDataService.AddGraceNoteProgramData(WorkflowEntities.TitlPaidValue,
                         ApiManager.GetSeriesTitle(),
                         ApiManager.GetEpisodeTitle(),
-                        ApiManager.ShowSeriesSeasonProgramData)
+                        ApiManager.MovieEpisodeProgramData)
                     &&
                     AdiContentManager.InsertProgramLayerData(WorkflowEntities.GraceNoteTmsId,
                         WorkflowEntities.GraceNoteRootId)

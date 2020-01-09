@@ -434,6 +434,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
+                var producer = 0;
                 var crewAdded = false;
                 if (EnrichmentDataLists.CrewMembers != null)
                     foreach (var member in EnrichmentDataLists.CrewMembers.Distinct(new CrewComparer()).ToList())
@@ -445,10 +446,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                                 AddTitleMetadataApp_DataNode("Director", memberName);
                                 crewAdded = true;
                                 break;
-                            case "Producer":
-                            case "Executive Producer":
+                            case "Producer" when producer < 2:
+                            case "Executive Producer" when producer < 2:
                                 AddTitleMetadataApp_DataNode("Producer", memberName);
                                 crewAdded = true;
+                                producer++;
                                 break;
                             case "Writer":
                             case "Screenwriter":
@@ -484,6 +486,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var title = EnrichmentDataLists.ProgramTitles.Where(t => t.type == "full")
                     .Select(t => t.Value)
                     .FirstOrDefault();
+
+                var sortTitle = EnrichmentDataLists.ProgramTitles.FirstOrDefault(t => t.type == "sort")?.Value;
+
+                if (!string.IsNullOrEmpty(sortTitle))
+                {
+                    Log.Info("Title contains sort data, adding Show_Title_Sort_Name to ADI.");
+                    AddTitleMetadataApp_DataNode("Show_Title_Sort_Name", sortTitle);
+                }
 
                 return AddTitleMetadataApp_DataNode("Title", title);
             }
@@ -625,6 +635,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
+                
                 AddTitleMetadataApp_DataNode("Series_ID", seriesId);
                 AddTitleMetadataApp_DataNode("Series_Ordinal", seriesOrdinalValue);
 
@@ -800,7 +811,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     Log.Info("Adding IMDb_ID data.");
                     AddTitleMetadataApp_DataNode("IMDb_ID", links.FirstOrDefault()?.id);
 
-                    if (hasMovieInfo)
+                    if (!hasMovieInfo)
                     {
                         Log.Info("Adding Show_IMDb_ID data.");
                         AddTitleMetadataApp_DataNode("Show_IMDb_ID",

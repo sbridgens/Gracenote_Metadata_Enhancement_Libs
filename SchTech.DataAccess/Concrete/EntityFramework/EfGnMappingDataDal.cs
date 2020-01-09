@@ -65,9 +65,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 if (gnMappingData == null)
                     return false;
 
-                gnMappingData.GN_SeasonId = Convert.ToInt32(programData.seasonId);
+                gnMappingData.GN_SeasonId = Convert.ToInt32(programData?.seasonId);
                 gnMappingData.GN_SeasonNumber = Convert.ToInt32(programData.episodeInfo?.season);
-                gnMappingData.GN_SeriesId = Convert.ToInt32(programData.seriesId);
+                gnMappingData.GN_SeriesId = Convert.ToInt32(programData?.seriesId);
                 gnMappingData.GN_EpisodeNumber = Convert.ToInt32(programData.episodeInfo?.number);
                 gnMappingData.GN_EpisodeTitle = episodeTitle;
                 gnMappingData.GN_SeriesTitle = seriesTitle;

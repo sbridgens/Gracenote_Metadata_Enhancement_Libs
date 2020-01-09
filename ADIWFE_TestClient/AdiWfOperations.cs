@@ -139,6 +139,8 @@ namespace ADIWFE_TestClient
                     if (!WorkflowManager.IsMoviePackage)
                         ProcessSeriesEpisodePackage();
 
+
+
                     AllPackageTasks();
                     WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
                     AdiEnrichmentQueueController.QueuedPackages.Remove(package);
@@ -167,7 +169,8 @@ namespace ADIWFE_TestClient
                     WorkflowManager.SeedGnMappingData() &&
                     WorkflowManager.ExtractPackageMedia() &&
                     WorkflowManager.SetAdiMovieMetadata() &&
-                    WorkflowManager.GetGracenoteMovieEpisodeData())
+                    WorkflowManager.GetGracenoteMovieEpisodeData() &&
+                    WorkflowManager.SetAdiMovieEpisodeMetadata())
                     return true;
 
                 throw new Exception();
@@ -188,7 +191,6 @@ namespace ADIWFE_TestClient
             try
             {
                 Success = WorkflowManager.GetSeriesSeasonSpecialsData() &&
-                          WorkflowManager.SetAdiEpisodeMetadata() &&
                           WorkflowManager.SetAdiSeriesData() &&
                           WorkflowManager.SetAdiSeasonData();
 

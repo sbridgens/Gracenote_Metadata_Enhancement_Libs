@@ -33,7 +33,7 @@ namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
 
         bool GetSeriesSeasonSpecialsData();
 
-        bool SetAdiEpisodeMetadata();
+        bool SetAdiMovieEpisodeMetadata();
 
         bool SetAdiMovieMetadata();
         bool CheckAndAddPreviewData();
