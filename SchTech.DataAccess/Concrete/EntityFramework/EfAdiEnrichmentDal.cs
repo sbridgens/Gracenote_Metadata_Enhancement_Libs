@@ -53,7 +53,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 EfStaticMethods.Log.Info("Checking for expired data in the adi db");
 
                 var expiredRows = CurrentContext.Adi_Data
-                    .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now);
+                    .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now).ToList();
 
                 var mapData = new List<GN_Mapping_Data>();
 
@@ -105,7 +105,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 try
                 {
                     EfStaticMethods.Log.Info(
-                        "Checking for orphaned db data, this may take time dependant on db size; please be patient");
+                        "Checking for orphaned db data, this may take time dependent on db size; please be patient");
 
                     var stopWatch = new Stopwatch();
                     stopWatch.Start();

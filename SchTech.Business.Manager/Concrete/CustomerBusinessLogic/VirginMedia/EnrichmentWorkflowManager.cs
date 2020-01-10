@@ -576,8 +576,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         ApiManager.GetEpisodeTitle(),
                         ApiManager.MovieEpisodeProgramData)
                     &&
-                    AdiContentManager.InsertProgramLayerData(WorkflowEntities.GraceNoteTmsId,
-                        WorkflowEntities.GraceNoteRootId)
+                    AdiContentManager.InsertProgramLayerData(WorkflowEntities.GraceNoteTmsId, ApiManager.GetSeriesId())
                     &&
                     AdiContentManager.InsertActorData()
                     &&
@@ -698,7 +697,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                            ApiManager.ShowSeriesSeasonProgramData.descriptions) &&
                        AdiContentManager.InsertSeriesGenreData() &&
                        AdiContentManager.InsertSeriesData(
-                           ApiManager.GetSeriesId(),
+                           ApiManager.GetGnSeriesId(),
                            ApiManager.GetSeriesOrdinalValue(),
                            ApiManager.GetSeasonId(),
                            ApiManager.GetEpisodeSeason());

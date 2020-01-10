@@ -345,12 +345,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool InsertProgramLayerData(string tmsid, string rootid)
+        public bool InsertProgramLayerData(string tmsid, string seriesId)
         {
             try
             {
                 return AddTitleMetadataApp_DataNode("GN_Layer1_TMSId", tmsid) &&
-                       AddTitleMetadataApp_DataNode("GN_Layer2_RootId", rootid);
+                       AddTitleMetadataApp_DataNode("GN_Layer2_RootId", seriesId);
             }
             catch (Exception ipldEx)
             {
@@ -635,8 +635,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                
-                AddTitleMetadataApp_DataNode("Series_ID", seriesId);
+                var seriesIdData = !string.IsNullOrWhiteSpace(ADIWF_Config.Prefix_Series_ID_Value)
+                    ? $"{ADIWF_Config.Prefix_Series_ID_Value}{seriesId}"
+                    : seriesId;
+
+                AddTitleMetadataApp_DataNode("Series_ID", seriesIdData);
                 AddTitleMetadataApp_DataNode("Series_Ordinal", seriesOrdinalValue);
 
                 if (seasonId == 0)

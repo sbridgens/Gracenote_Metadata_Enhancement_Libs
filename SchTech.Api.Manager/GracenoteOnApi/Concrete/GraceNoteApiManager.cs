@@ -69,11 +69,21 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetSeriesId()
         {
-            var seriesId = GetSeasonId() == 0
-                ? GetConnectorId()
-                : GetSeasonId().ToString();
+            var seriesId = Convert.ToInt32(MovieEpisodeProgramData.seriesId);
 
-            return seriesId;
+            if (seriesId > 0)
+            {
+                return seriesId.ToString();
+            }
+
+            seriesId = Convert.ToInt32(GetConnectorId());
+            if (seriesId == 0)
+            {
+                seriesId = GetSeasonId();
+            }
+
+
+            return seriesId.ToString();
         }
 
         public int GetSeasonId()
@@ -84,11 +94,13 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetEpisodeOrdinalValue()
         {
-            var num = MovieEpisodeProgramData.episodeInfo?.number;
+            var num = Convert.ToInt32(MovieEpisodeProgramData.episodeInfo?.number);
 
-            return Convert.ToInt32(num) != 0
-                ? num
-                : "100001";
+            return Convert.ToInt32(num) > 0
+                ? num.ToString()
+                : (num == 0 
+                    ? "100001"
+                    : num.ToString());
         }
 
         public string GetSeriesOrdinalValue()
@@ -98,6 +110,12 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
                 : MovieEpisodeProgramData.episodeInfo?.season;
         }
 
+        public string GetGnSeriesId()
+        {
+            return GetSeasonId() == 0
+                ? GetConnectorId()
+                : GetSeasonId().ToString();
+        }
 
         public int GetNumberOfSeasons()
         {
