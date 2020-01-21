@@ -58,25 +58,23 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             EfStaticMethods.Log.Info("Updating Gracenote database Mapping table with Program Data");
 
-            using (var programContext = new ADI_EnrichmentContext())
-            {
-                var gnMappingData = programContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid == paid);
+            var gnMappingData = ReturnMapData(paid);
+            if (gnMappingData == null)
+                return false;
 
-                if (gnMappingData == null)
-                    return false;
+            gnMappingData.GN_SeasonId = Convert.ToInt32(programData?.seasonId);
+            gnMappingData.GN_SeasonNumber = Convert.ToInt32(programData?.episodeInfo?.season);
+            gnMappingData.GN_SeriesId = Convert.ToInt32(programData?.seriesId);
+            gnMappingData.GN_EpisodeNumber = Convert.ToInt32(programData?.episodeInfo?.number);
+            gnMappingData.GN_EpisodeTitle = episodeTitle;
+            gnMappingData.GN_SeriesTitle = seriesTitle;
+            Update(gnMappingData);
 
-                gnMappingData.GN_SeasonId = Convert.ToInt32(programData?.seasonId);
-                gnMappingData.GN_SeasonNumber = Convert.ToInt32(programData.episodeInfo?.season);
-                gnMappingData.GN_SeriesId = Convert.ToInt32(programData?.seriesId);
-                gnMappingData.GN_EpisodeNumber = Convert.ToInt32(programData.episodeInfo?.number);
-                gnMappingData.GN_EpisodeTitle = episodeTitle;
-                gnMappingData.GN_SeriesTitle = seriesTitle;
+            EfStaticMethods.Log.Info($"GN Mapping database updated," +
+                                     $" where Paid: {paid} & Row ID: {gnMappingData.Id}");
 
-                var row = programContext.SaveChanges();
-                EfStaticMethods.Log.Info(
-                    $"GN Mapping database number of records updated: {row}, where Paid: {paid} & Row ID: {gnMappingData.Id}");
-            }
 
+            
             return true;
         }
 

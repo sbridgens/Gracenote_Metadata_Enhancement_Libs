@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace ADIWFE_TestClient
 {
@@ -84,8 +85,14 @@ namespace ADIWFE_TestClient
             while (IsRunning)
                 try
                 {
-                    if (AdiWfOperations.IsInCleanup == false) AdiWfOperations.StartProcessing();
+                    EfAdiEnrichmentDal.IsWorkflowProcessing = false;
+
+                    AdiWfOperations.Cleanup();
+
+                    if (AdiWfOperations.IsInCleanup == false)
+                        AdiWfOperations.StartProcessing();
                     Thread.Sleep(Convert.ToInt32(ADIWF_Config.PollIntervalInSeconds) * 1000);
+
                 }
                 catch (Exception saeEx)
                 {

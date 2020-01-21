@@ -69,21 +69,11 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetSeriesId()
         {
-            var seriesId = Convert.ToInt32(MovieEpisodeProgramData.seriesId);
-
-            if (seriesId > 0)
-            {
-                return seriesId.ToString();
-            }
-
-            seriesId = Convert.ToInt32(GetConnectorId());
-            if (seriesId == 0)
-            {
-                seriesId = GetSeasonId();
-            }
-
-
-            return seriesId.ToString();
+            return Convert.ToInt32(MovieEpisodeProgramData.seriesId) > 0
+                ? MovieEpisodeProgramData.seriesId
+                : GetSeasonId() > 0
+                    ? GetSeasonId().ToString()
+                    : GetConnectorId();
         }
 
         public int GetSeasonId()

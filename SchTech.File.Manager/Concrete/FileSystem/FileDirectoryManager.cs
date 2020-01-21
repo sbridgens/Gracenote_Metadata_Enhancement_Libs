@@ -27,6 +27,9 @@ namespace SchTech.File.Manager.Concrete.FileSystem
             if (string.IsNullOrEmpty(fileName))
                 return string.Empty;
             var fsizeInfo = new FileInfo(fileName);
+            if (fileName.Contains("hzn4_adi_titletreatment_p11782984_ttn_h95_ad"))
+                Log.Info("");
+
             Log.Info($"Filesize retrieved for {fileName}: {fsizeInfo.Length}");
             return fsizeInfo.Length.ToString();
         }

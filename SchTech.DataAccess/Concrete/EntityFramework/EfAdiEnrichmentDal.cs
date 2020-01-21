@@ -15,13 +15,18 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
     {
         public static bool ExpiryProcessing { get; private set; }
 
+        public static bool IsWorkflowProcessing { get; set; }
+
         private ADI_EnrichmentContext CurrentContext { get; set; }
 
         public bool CleanAdiDataWithNoMapping()
         {
             try
             {
-                if (!ExpiryProcessing) Task.Run(ClearExpiredAssets);
+                if (!IsWorkflowProcessing)
+                    CheckAndClearOrphanedData();
+                if (!ExpiryProcessing)
+                    Task.Run(ClearExpiredAssets);
 
                 return true;
             }
@@ -50,36 +55,52 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
             using (CurrentContext = new ADI_EnrichmentContext())
             {
-                EfStaticMethods.Log.Info("Checking for expired data in the adi db");
-
-                var expiredRows = CurrentContext.Adi_Data
-                    .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now).ToList();
-
-                var mapData = new List<GN_Mapping_Data>();
-
-                foreach (var item in expiredRows)
+                try
                 {
-                    expiryCount++;
+                    EfStaticMethods.Log.Info("Checking for expired data in the adi db");
 
-                    var adiPaid = EfStaticMethods.GetPaidLastValue(item.TitlPaid);
-                    var gnMappingData = CurrentContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid.Contains(adiPaid));
-                    mapData.Add(gnMappingData);
+                    var expiredRows = CurrentContext.Adi_Data
+                        .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now).ToList();
+
+                    var mapData = new List<GN_Mapping_Data>();
+
+                    foreach (var item in expiredRows)
+                    {
+                        expiryCount++;
+
+                        var adiPaid = EfStaticMethods.GetPaidLastValue(item.TitlPaid);
+                        var gnMappingData = CurrentContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid.Contains(adiPaid));
+                        if (gnMappingData == null)
+                            continue;
+
+                        EfStaticMethods.Log.Debug($"DB Row ID {item.Id} with PAID Value: {item.TitlPaid} " +
+                                                  $"has expired with License Window End Date: {item.Licensing_Window_End.Trim()}, " +
+                                                  $"marked for removal.");
+
+                        mapData.Add(gnMappingData);
+                    }
+
+
+                    EfStaticMethods.Log.Info($"Number of expired assets for removal: {expiredRows.Count()}");
+                    CurrentContext.Adi_Data.RemoveRange(expiredRows);
+                    CurrentContext.GN_Mapping_Data.RemoveRange(mapData);
+                    CurrentContext.SaveChanges();
+
+
+                    if (expiryCount == 0)
+                        EfStaticMethods.Log.Info("No expired data present.");
+                    else
+                        EfStaticMethods.Log.Info($"Number of expired assets removed from database = {expiryCount}");
+
                 }
-
-
-                EfStaticMethods.Log.Info($"Number of expired assets for removal: {expiredRows.Count()}");
-                CurrentContext.Adi_Data.RemoveRange(expiredRows);
-                CurrentContext.GN_Mapping_Data.RemoveRange(mapData);
-                CurrentContext.SaveChanges();
-
-
-                if (expiryCount == 0)
-                    EfStaticMethods.Log.Info("No expired data present.");
-                else
-                    EfStaticMethods.Log.Info($"Number of expired assets removed from database = {expiryCount}");
+                catch (Exception cea_ex)
+                {
+                    EfStaticMethods.Log.Error($"General Exception during Cleanup of Expired Assets: {cea_ex.Message}");
+                    if (cea_ex.InnerException != null)
+                        EfStaticMethods.Log.Error($"Inner Exception: {cea_ex.InnerException.Message}");
+                }
+                
             }
-
-            CheckAndClearOrphanedData();
 
             ExpiryProcessing = false;
         }

@@ -51,6 +51,10 @@ namespace ADIWFE_TestClient
                 return false;
             }
         }
+        public void Cleanup()
+        {
+            AdiEnrichmentDal.CleanAdiDataWithNoMapping();
+        }
 
         /// <summary>
         ///     Timer Event for cleanup, flags a boolean in case there is processing underway
@@ -105,7 +109,6 @@ namespace ADIWFE_TestClient
             {
                 if (!CanProcess())
                     return;
-
                 if (PollController.StartPollingOperations(ADIWF_Config.InputDirectory, "*.zip"))
                     ProcessQueuedItems();
             }
@@ -120,6 +123,8 @@ namespace ADIWFE_TestClient
             if (AdiEnrichmentQueueController.QueuedPackages?.Count < 1 ||
                 AdiEnrichmentQueueController.QueuedPackages == null)
                 return;
+
+            EfAdiEnrichmentDal.IsWorkflowProcessing = true;
 
             for (var package = 0; package < AdiEnrichmentQueueController.QueuedPackages.Count; package++)
             {

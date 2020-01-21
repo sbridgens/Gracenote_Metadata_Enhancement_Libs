@@ -102,9 +102,9 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             ApiAssetSortedList = new List<GnApiProgramsSchema.assetType>();
 
             ApiAssetSortedList = IsLandscape
-                ? ApiAssetList.OrderByDescending(w => w.width).ThenBy(h => h.height).ThenBy(i => i.identifiers.Any())
+                ? ApiAssetList.OrderByDescending(i => i.identifiers.Any()).ThenBy(w => w.width).ThenBy(h => h.height)
                     .ToList()
-                : ApiAssetList.OrderByDescending(h => h.height).ThenBy(w => w.width).ThenBy(i => i.identifiers.Any())
+                : ApiAssetList.OrderByDescending(i => i.identifiers.Any()).ThenBy(h => h.height).ThenBy(w => w.width)
                     .ToList();
         }
 
@@ -285,69 +285,70 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                     !string.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
                                     continue;
 
-                                if (MatchIdentifier(image.identifiers) &&
-                                    PassesImageLogic(category, image, imageTier, image.tier, IsLandscape))
+                                if (!MatchIdentifier(image.identifiers) &&
+                                    !PassesImageLogic(category, image, imageTier, image.tier, IsLandscape))
+                                    continue;
+
+
+                                LogIdentifierLogic(image.identifiers.Count(), image.assetId);
+
+                                _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
+
+                                var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
+                                    .Select(r => r.TrimImage).FirstOrDefault());
+
+                                var imageUri = requiresTrim
+                                    ? $"{image.URI}?trim=true"
+                                    : image.URI;
+
+                                //gets any existing images
+                                var gnimages = CurrentMappingData.GN_Images;
+
+                                //IMGA, IMGB etc
+                                ImageQualifier = ImageMapping.ImageQualifier;
+
+                                //Is new ingest or update?
+                                if (!IsUpdate || gnimages == null)
                                 {
-                                    LogIdentifierLogic(image.identifiers.Count(), image.assetId);
-
-                                    _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
-
-                                    var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
-                                        .Select(r => r.TrimImage).FirstOrDefault());
-
-                                    var imageUri = requiresTrim
-                                        ? $"{image.URI}?trim=true"
-                                        : image.URI;
-
-                                    //gets any existing images
-                                    var gnimages = CurrentMappingData.GN_Images;
-
-                                    //IMGA, IMGB etc
-                                    ImageQualifier = ImageMapping.ImageQualifier;
-
-                                    //Is new ingest or update?
-                                    if (!IsUpdate || gnimages == null)
-                                    {
-                                        _log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
-                                        SetDbImages(imageTypeRequired, image.URI);
-                                        _log.Info(
-                                            $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
-
-                                        return imageUri;
-                                    }
-
-                                    _log.Debug("Retrieved images for update package from db");
-
-                                    if (!HasAsset(DbImagesForAsset, imageTypeRequired, image.URI))
-                                    {
-                                        var match = Regex.Match(CurrentMappingData.GN_Images,
-                                            $"(?m){imageTypeRequired}:.*?.jpg");
-
-                                        if (match.Success || match.Value == "")
-                                        {
-                                            if (string.IsNullOrEmpty(match.Value))
-                                                CurrentMappingData.GN_Images =
-                                                    CurrentMappingData.GN_Images.Replace(match.Value,
-                                                        $"{imageTypeRequired}: {image.URI}");
-
-                                            _log.Info(
-                                                $"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
-
-                                            UpdateDbImages(match.Value, imageTypeRequired, image.URI);
-
-
-                                            _log.Info(
-                                                $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _log.Info("Update Package - image is up to date not required for download.");
-                                        DownloadImageRequired = false;
-                                    }
+                                    _log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
+                                    SetDbImages(imageTypeRequired, image.URI);
+                                    _log.Info(
+                                        $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
 
                                     return imageUri;
                                 }
+
+                                _log.Debug("Retrieved images for update package from db");
+
+                                if (!HasAsset(DbImagesForAsset, imageTypeRequired, image.URI))
+                                {
+                                    var match = Regex.Match(CurrentMappingData.GN_Images,
+                                        $"(?m){imageTypeRequired}:.*?.jpg");
+
+                                    if (match.Success || match.Value == "")
+                                    {
+                                        if (string.IsNullOrEmpty(match.Value))
+                                            CurrentMappingData.GN_Images =
+                                                CurrentMappingData.GN_Images.Replace(match.Value,
+                                                    $"{imageTypeRequired}: {image.URI}");
+
+                                        _log.Info(
+                                            $"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
+
+                                        UpdateDbImages(match.Value, imageTypeRequired, image.URI);
+
+
+                                        _log.Info(
+                                            $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                    }
+                                }
+                                else
+                                {
+                                    _log.Info("Update Package - image is up to date not required for download.");
+                                    DownloadImageRequired = false;
+                                }
+
+                                return imageUri;
                             }
                         }
                 }

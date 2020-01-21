@@ -52,6 +52,8 @@ namespace SchTech.Entities.ConcreteTypes
 
         public bool IsMoviePackage { get; set; }
 
+        public bool IsDateTime(string txtDate) => DateTime.TryParse(txtDate, out _);
+
         public void SetCurrentWorkingDirectory()
         {
             CurrentWorkingDirectory = Path.Combine(ADIWF_Config.TempWorkingDirectory,
@@ -95,6 +97,7 @@ namespace SchTech.Entities.ConcreteTypes
                 return false;
             }
         }
+
 
         public void CheckIfAssetContainsPreview()
         {
@@ -204,26 +207,6 @@ namespace SchTech.Entities.ConcreteTypes
         {
             try
             {
-                //string requestUrl;
-                //
-                //if (PackageIsAOneOffSpecial)
-                //{
-                //    requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
-                //                 $"updateId={GraceNoteUpdateId}&" +
-                //                 $"api_key={ADIWF_Config.ApiKey}&limit=10";
-
-                //    Log.Info("Retrieving MetaData from On API using Update ID: " +
-                //             $"{GraceNoteUpdateId}");
-                //}
-                //else
-                //{
-                //    requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
-                //                 $"tmsId={GraceNoteConnectorId}&" +
-                //                 $"api_key={ADIWF_Config.ApiKey}";
-
-                //    Log.Info($"Retrieving MetaData from On API using Connector ID: {GraceNoteConnectorId}");
-                //}
-
                 var requestUrl = $"{ADIWF_Config.OnApi}Programs?" +
                              $"tmsId={GraceNoteConnectorId}&" +
                              $"api_key={ADIWF_Config.ApiKey}";

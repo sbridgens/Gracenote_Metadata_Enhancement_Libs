@@ -20,6 +20,10 @@ using System;
 using System.IO;
 using System.Linq;
 
+
+
+
+
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 {
     public class EnrichmentWorkflowManager : IEnrichmentWorkflowService
@@ -408,6 +412,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 var isMapped = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue) != null;
 
+               
                 if (!isMapped && !IsPackageAnUpdate)
                 {
                     Log.Info("Seeding Adi Data to the database");
@@ -432,7 +437,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         VersionMinor = AdiContentManager.GetVersionMinor(),
                         ProviderId = AdiContentManager.GetProviderId(),
                         TmsId = WorkflowEntities.GraceNoteTmsId,
-                        Licensing_Window_End = AdiContentManager.GetLicenceEndData(),
+                        Licensing_Window_End = WorkflowEntities.IsDateTime(
+                            AdiContentManager.GetLicenceEndData()
+                        )
+                            ? AdiContentManager.GetLicenceEndData()
+                            : throw new Exception("Licensing_Window_End Is not a valid DateTime Format," +
+                                                  " Rejecting Ingest"),
                         ProcessedDateTime = DateTime.Now,
                         ContentTsFile = ZipHandler.ExtractedMovieAsset.Name,
                         ContentTsFilePaid = AdiContentManager.GetAssetPaid("movie"),
@@ -567,36 +577,63 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AdiContentManager.RemoveDefaultAdiNodes();
 
                 if (!IsMoviePackage)
-                    AdiContentManager.InsertEpisodeData(WorkflowEntities.GraceNoteTmsId,
-                        ApiManager.GetEpisodeOrdinalValue(), ApiManager.GetEpisodeTitle());
+                {
+                    AdiContentManager.InsertEpisodeData(
+                        WorkflowEntities.GraceNoteTmsId,
+                        episodeOrdinalValue: ApiManager.GetEpisodeOrdinalValue(), 
+                        episodeTitle: ApiManager.GetEpisodeTitle()
+                        );
+
+                }
 
                 return
-                    _gnMappingDataService.AddGraceNoteProgramData(WorkflowEntities.TitlPaidValue,
-                        ApiManager.GetSeriesTitle(),
-                        ApiManager.GetEpisodeTitle(),
-                        ApiManager.MovieEpisodeProgramData)
-                    &&
-                    AdiContentManager.InsertProgramLayerData(WorkflowEntities.GraceNoteTmsId, ApiManager.GetSeriesId())
-                    &&
-                    AdiContentManager.InsertActorData()
-                    &&
-                    AdiContentManager.InsertCrewData()
-                    &&
-                    AdiContentManager.InsertTitleData()
-                    &&
-                    AdiContentManager.InsertDescriptionData(ApiManager.MovieEpisodeProgramData.descriptions)
-                    &&
-                    AdiContentManager.InsertYearData(ApiManager.MovieEpisodeProgramData.origAirDate,
-                        ApiManager.MovieEpisodeProgramData?.movieInfo)
-                    &&
-                    AdiContentManager.InsertGenreData()
-                    &&
-                    AdiContentManager.InsertIdmbData(ApiManager.ExternalLinks(), HasMovieInfo());
+                    //Get and add GN Program Data
+                    _gnMappingDataService.AddGraceNoteProgramData(
+                        paid: WorkflowEntities.TitlPaidValue,
+                        seriesTitle: ApiManager.GetSeriesTitle(),
+                        episodeTitle: ApiManager.GetEpisodeTitle(),
+                        programDatas: ApiManager.MovieEpisodeProgramData
+                        ) &&
+
+                    //Insert Layer data for Program Layer
+                    AdiContentManager.InsertProgramLayerData(
+                        WorkflowEntities.GraceNoteTmsId, 
+                        seriesId: ApiManager.GetSeriesId()
+                        ) &&
+
+                    //Insert Crew Actor Data
+                    AdiContentManager.InsertActorData() &&
+
+                    //Insert Support Crew Data
+                    AdiContentManager.InsertCrewData() &&
+
+                    //Insert Program Title Data
+                    AdiContentManager.InsertTitleData() &&
+
+                    //Add Correct description summaries
+                    AdiContentManager.InsertDescriptionData(
+                        descriptions: ApiManager.MovieEpisodeProgramData.descriptions
+                        ) &&
+
+                    //Insert the Year data based on air date
+                    AdiContentManager.InsertYearData(
+                        airDate: ApiManager.MovieEpisodeProgramData.origAirDate,
+                        movieInfo: ApiManager.MovieEpisodeProgramData?.movieInfo
+                        ) &&
+
+                    //Insert Program Genres and Genre Id's
+                    AdiContentManager.InsertGenreData() &&
+
+                    //Insert required IMDB Data
+                    AdiContentManager.InsertIdmbData(
+                        externalLinks: ApiManager.ExternalLinks(), 
+                        hasMovieInfo: HasMovieInfo()
+                        );
             }
             catch (Exception ex)
             {
                 LogError(
-                    "SetAdiEpisodeMetadata",
+                    "SetAdiMovieEpisodeMetadata",
                     "Error Setting Title Metadata", ex);
                 return false;
             }
@@ -688,19 +725,36 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 ApiManager.SetSeasonData();
                 AdiContentManager.SeasonInfo = ApiManager.GetSeasonInfo();
+                //Insert IMDB Data
+                return AdiContentManager.InsertIdmbData(
+                           ApiManager.ExternalLinks(), 
+                           HasMovieInfo()
+                           ) &&
+                       
+                       //Insert the TITL Series Layerdata
+                       AdiContentManager.InsertSeriesLayerData(
+                           ApiManager.ShowSeriesSeasonProgramData.connectorId,
+                           ApiManager.GetSeriesId()
+                           ) &&
 
-                return AdiContentManager.InsertIdmbData(ApiManager.ExternalLinks(), HasMovieInfo()) &&
-                       AdiContentManager.InsertSeriesLayerData(ApiManager.ShowSeriesSeasonProgramData.connectorId,
-                           ApiManager.GetSeriesId()) &&
-                       AdiContentManager.InsertShowData(ApiManager.GetShowId(), ApiManager.GetShowName(),
-                           ApiManager.GetNumberOfSeasons(),
-                           ApiManager.ShowSeriesSeasonProgramData.descriptions) &&
+                       //Insert the TITL Show Data
+                       AdiContentManager.InsertShowData(
+                           showId: ApiManager.GetShowId(), 
+                           showName: ApiManager.GetShowName(),
+                           totalSeasons: ApiManager.GetNumberOfSeasons(),
+                           descriptions: ApiManager.ShowSeriesSeasonProgramData.descriptions
+                           ) &&
+                      
+                       //Insert the TITLE Series Genres
                        AdiContentManager.InsertSeriesGenreData() &&
+                       
+                       //Insert the Series ID information
                        AdiContentManager.InsertSeriesData(
                            ApiManager.GetGnSeriesId(),
-                           ApiManager.GetSeriesOrdinalValue(),
+                           seriesOrdinalValue: ApiManager.GetSeriesOrdinalValue(),
                            ApiManager.GetSeasonId(),
-                           ApiManager.GetEpisodeSeason());
+                           episodeSeason: ApiManager.GetEpisodeSeason()
+                           );
             }
             catch (Exception ex)
             {
@@ -719,7 +773,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     ApiManager.GetSeriesPremiere(),
                     ApiManager.GetSeasonPremiere(),
                     ApiManager.GetSeriesFinale(),
-                    ApiManager.GetSeasonFinale());
+                    ApiManager.GetSeasonFinale()
+                    );
             }
             catch (Exception ex)
             {
@@ -751,7 +806,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     continue;
 
                 //prevent duplicate processing
-                if (string.IsNullOrEmpty(currentProgramType) || configLookup.Image_Mapping == currentImage)
+                if (string.IsNullOrEmpty(currentProgramType) || 
+                    configLookup.Image_Mapping == currentImage)
                     continue;
 
 
@@ -829,7 +885,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 //<App_Data App="VOD" Name="DeriveFromAsset" Value="ASST0000000001506105" />
                 foreach (var asset in from asset in EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                                      let dfa = asset.Metadata.App_Data.FirstOrDefault(d => d.Name.ToLower() == "derivefromasset")
+                                      let dfa = asset.Metadata.App_Data.FirstOrDefault(d => 
+                                              d.Name.ToLower() == "derivefromasset"
+                                      )
                                       where dfa != null
                                       select asset)
                 {
@@ -929,6 +987,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         /// <summary>
         ///     If update set the required vars for processing an update package.
+        ///     TVOD Media Section is handled here also
         /// </summary>
         /// <returns></returns>
         private bool SetInitialUpdateData()
@@ -946,7 +1005,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AdiData.TmsId = WorkflowEntities.GraceNoteTmsId;
                 AdiData.VersionMajor = AdiContentManager.GetVersionMajor();
                 AdiData.VersionMinor = AdiContentManager.GetVersionMinor();
-                AdiData.Licensing_Window_End = AdiContentManager.GetLicenceEndData();
+
+                AdiData.Licensing_Window_End = WorkflowEntities.IsDateTime(
+                    AdiContentManager.GetLicenceEndData()
+                )
+                    ? AdiContentManager.GetLicenceEndData()
+                    : throw new Exception("Licensing_Window_End Is not a valid DateTime Format, Rejecting Ingest");
+
 
                 //if tvod remove enhanced movie section
                 if (IsTvodPackage)
@@ -1034,6 +1099,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 return false;
             }
         }
+
         public void ProcessFailedPackage(FileInfo packageFile)
         {
             try
