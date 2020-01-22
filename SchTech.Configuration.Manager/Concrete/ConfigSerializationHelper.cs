@@ -26,8 +26,8 @@ namespace SchTech.Configuration.Manager.Concrete
                             //    B_IsRunning = true;
                             //    break;
                             case "Block_Platform":
-                                Block_Platform.Providers = ele.Attribute("providers").Value;
-                                Block_Platform.BlockPlatformValue = ele.Attribute("BlockPlatformValue").Value;
+                                Block_Platform.Providers = ele.Attribute("providers")?.Value;
+                                Block_Platform.BlockPlatformValue = ele.Attribute("BlockPlatformValue")?.Value;
                                 break;
                             default:
                                 pinf.SetValue(pinf.Name, ele.Value);

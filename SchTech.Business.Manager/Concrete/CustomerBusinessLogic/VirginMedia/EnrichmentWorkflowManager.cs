@@ -135,9 +135,16 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (!string.IsNullOrEmpty(adiValidation.NewTitlPaid))
                     WorkflowEntities.TitlPaidValue = adiValidation.NewTitlPaid;
 
-                IsPackageAnUpdate = ZipHandler.IsUpdatePackage;
+                WorkflowEntities.IsQamAsset = adiValidation.IsQamAsset;
+
+                IsPackageAnUpdate = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue)
+                                        ?.VersionMajor < WorkflowEntities.AdiVersionMajor ;
+
+                ZipHandler.IsUpdatePackage = IsPackageAnUpdate;
+
                 WorkflowEntities.CheckSetSdPackage(IsPackageAnUpdate);
                 IsTvodPackage = WorkflowEntities.CheckIfTvodAsset();
+                ZipHandler.IsTvod = IsTvodPackage;
                 WorkflowEntities.CheckIfAssetContainsPreview();
 
                 return true;
@@ -367,7 +374,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
 
-                if (!IsPackageAnUpdate)
+                if (!IsPackageAnUpdate || IsTvodPackage)
                 {
                     Log.Info("Extracting Media from Package");
 
@@ -377,11 +384,18 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         true,
                         false);
 
-                    //Update content adi movie value with ts file name
-                    AdiContentManager.SetAdiAssetContentField("movie",
-                        ZipHandler.ExtractedMovieAsset.Name);
+                    if(!IsPackageAnUpdate)
+                    {
+                        //Update content adi movie value with ts file name
+                        AdiContentManager.SetAdiAssetContentField("movie",
+                            ZipHandler.ExtractedMovieAsset.Name);
 
-                    PrimaryAsset = ZipHandler.ExtractedMovieAsset;
+                        PrimaryAsset = ZipHandler.ExtractedMovieAsset;
+                    }
+
+                    if (!IsPackageAnUpdate && !ZipHandler.HasPreviewAsset)
+                        return SeedAdiData();
+
 
                     if (ZipHandler.HasPreviewAsset)
                     {
@@ -390,9 +404,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                             ZipHandler.ExtractedPreview.Name);
                         PreviewAsset = ZipHandler.ExtractedPreview;
                     }
+                    
+                   
 
-                    //seed adi data
-                    return SeedAdiData();
+                    //seed adi data if main ingest
+                    return !IsPackageAnUpdate ? SeedAdiData(): SetInitialUpdateData();
                 }
 
                 return SetInitialUpdateData();
@@ -608,7 +624,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     AdiContentManager.InsertCrewData() &&
 
                     //Insert Program Title Data
-                    AdiContentManager.InsertTitleData() &&
+                    AdiContentManager.InsertTitleData(IsMoviePackage) &&
 
                     //Add Correct description summaries
                     AdiContentManager.InsertDescriptionData(
@@ -643,35 +659,34 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                Log.Info("Setting ADI Content Metadata");
-                var paid = WorkflowEntities.TitlPaidValue.Replace("TITL", "ASST");
-                AdiContentManager.AddAssetMetadataApp_DataNode(
-                    paid,
-                    "Content_CheckSum",
-                    WorkflowEntities.MovieChecksum
-                );
+                if (!IsPackageAnUpdate)
+                {
+                    Log.Info("Setting ADI Content Metadata");
+                    var paid = WorkflowEntities.TitlPaidValue.Replace("TITL", "ASST");
+                    AdiContentManager.AddAssetMetadataApp_DataNode(
+                        paid,
+                        "Content_CheckSum",
+                        WorkflowEntities.MovieChecksum
+                    );
 
-                AdiContentManager.AddAssetMetadataApp_DataNode(
-                    paid,
-                    "Content_FileSize",
-                    WorkflowEntities.MovieFileSize
-                );
+                    AdiContentManager.AddAssetMetadataApp_DataNode(
+                        paid,
+                        "Content_FileSize",
+                        WorkflowEntities.MovieFileSize
+                    );
 
-                if (IsPackageAnUpdate)
+                    AdiContentManager.SetAdiAssetContentField(
+                        "movie",
+                        PrimaryAsset.Name);
+
+                }
+
+                if (!ZipHandler.HasPreviewAsset)
                     return true;
 
-                AdiContentManager.SetAdiAssetContentField(
-                    "movie",
-                    PrimaryAsset.Name);
-
-                if (!WorkflowEntities.PackageHasPreviewAsset)
-                    return true;
 
                 Log.Info("Adding Preview metadata");
-                CheckAndAddPreviewData();
-
-                return true;
-
+                return CheckAndAddPreviewData();
             }
             catch (Exception ex)
             {
@@ -913,7 +928,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 AdiContentManager.CheckAndAddBlockPlatformData();
-                if (IsTvodPackage && IsPackageAnUpdate)
+                if (WorkflowEntities.IsQamAsset && IsPackageAnUpdate)
                     AdiContentManager.SetQamUpdateContent();
             }
             catch (Exception ex)
@@ -993,7 +1008,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private bool SetInitialUpdateData()
         {
             try
-            {
+            { 
                 //Get the correct stored adi data
                 AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
                 if (AdiData.EnrichedAdi == null)
@@ -1020,6 +1035,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     AdiContentManager.MovieContent = movieData?.Content.Value;
                     EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Remove(movieData);
                 }
+
+                AdiContentManager.RemoveMovieContentFromUpdate();
                 //Get original asset data and modify new adi.
                 if (!AdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi())
                     return false;
@@ -1076,6 +1093,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 var adiString = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
 
+                if(AdiData == null)
+                    AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
 
                 if (!IsPackageAnUpdate)
                 {

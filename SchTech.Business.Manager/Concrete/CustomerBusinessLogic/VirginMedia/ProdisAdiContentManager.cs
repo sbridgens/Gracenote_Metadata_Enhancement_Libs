@@ -184,7 +184,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-
         public bool SetAdiAssetContentField(string assetClass, string assetFileName)
         {
             var contentFile = EnrichmentWorkflowEntities.AdiFile
@@ -195,24 +194,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 return false;
 
             contentFile.Content.Value = assetFileName;
+
             Log.Info($"Successfully Set Content Value for Asset Type: {assetClass} to {assetFileName}");
             return true;
-        }
-
-        public void CloneEnrichedAssetDataToAdi(IEnumerable<ADIAssetAsset> clonedData)
-        {
-            foreach (var assetData in clonedData)
-            {
-                var newAsset = new ADIAssetAsset
-                {
-                    Content = assetData.Content,
-                    Metadata = assetData.Metadata
-                };
-
-                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newAsset);
-            }
-
-            Log.Info("Successfully cloned Enriched asset data to ADI.");
         }
 
         public int GetVersionMajor()
@@ -247,8 +231,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                foreach (var assetData in EnrichmentWorkflowEntities
-                    .EnrichedAdi.Asset.Asset
+                foreach (var assetData in EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset
                     .Select(assetSection => new ADIAssetAsset
                     {
                         Content = new ADIAssetAssetContent
@@ -273,6 +256,48 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (cpeadtaEx.InnerException != null)
                     Log.Error(
                         $"[CopyPreviouslyEnrichedAssetDataToAdi] Inner Exception: {cpeadtaEx.InnerException.Message}");
+                return false;
+            }
+        }
+
+        public bool RemoveMovieContentFromUpdate()
+        {
+            try
+            {
+                var movieAsset =
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
+                        c.Metadata.AMS.Asset_Class == "movie");
+                var previewAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
+                    c.Metadata.AMS.Asset_Class == "preview");
+
+
+                var newMovie = new ADIAssetAsset
+                {
+                    Metadata = new ADIAssetAssetMetadata
+                    {
+                        AMS = new ADIAssetAssetMetadataAMS(),
+                        App_Data = new List<ADIAssetAssetMetadataApp_Data>()
+                    }
+                };
+
+                newMovie.Metadata.AMS = movieAsset?.Metadata.AMS;
+                newMovie.Metadata.App_Data = movieAsset?.Metadata.App_Data;
+
+                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
+                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewAsset);
+                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newMovie);
+                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
+
+                return true;
+            }
+            catch (Exception rmcfuEx)
+            {
+                Log.Error($"[RemoveMovieContentFromUpdate] Error during Removal of " +
+                          $"Movie Content section from Update {rmcfuEx.Message}");
+
+                if (rmcfuEx.InnerException != null)
+                    Log.Error(
+                        $"[RemoveMovieContentFromUpdate] Inner Exception: {rmcfuEx.InnerException.Message}");
                 return false;
             }
         }
@@ -383,7 +408,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-
         public bool InsertActorData()
         {
             try
@@ -479,7 +503,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool InsertTitleData()
+        public bool InsertTitleData(bool IsMoviePackage)
         {
             try
             {
@@ -487,15 +511,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     .Select(t => t.Value)
                     .FirstOrDefault();
 
+                var titleAdded = AddTitleMetadataApp_DataNode("Title", title);
+
+                if (IsMoviePackage)
+                    return titleAdded;
+
                 var sortTitle = EnrichmentDataLists.ProgramTitles.FirstOrDefault(t => t.type == "sort")?.Value;
 
-                if (!string.IsNullOrEmpty(sortTitle))
-                {
-                    Log.Info("Title contains sort data, adding Show_Title_Sort_Name to ADI.");
-                    AddTitleMetadataApp_DataNode("Show_Title_Sort_Name", sortTitle);
-                }
+                if (string.IsNullOrEmpty(sortTitle))
+                    return titleAdded;
 
-                return AddTitleMetadataApp_DataNode("Title", title);
+                Log.Info("Title contains sort data, adding Show_Title_Sort_Name to ADI.");
+                titleAdded = AddTitleMetadataApp_DataNode("Show_Title_Sort_Name", sortTitle);
+
+
+                return titleAdded;
             }
             catch (Exception itdEx)
             {

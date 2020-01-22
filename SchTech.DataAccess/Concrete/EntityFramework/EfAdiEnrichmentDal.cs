@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using SchTech.Configuration.Manager.Schema.ADIWFE;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {
@@ -58,9 +59,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 try
                 {
                     EfStaticMethods.Log.Info("Checking for expired data in the adi db");
-
+                    var checkWindow = Convert.ToInt32(ADIWF_Config.MinusExpiredAssetWindowHours);
                     var expiredRows = CurrentContext.Adi_Data
-                        .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now).ToList();
+                        .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now.AddHours(-checkWindow)).ToList();
 
                     var mapData = new List<GN_Mapping_Data>();
 

@@ -35,6 +35,9 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         [XmlElement(ElementName = "ExpiredAssetCleanupIntervalHours")]
         public static string ExpiredAssetCleanupIntervalHours { get; set; }
 
+        [XmlElement(ElementName = "MinusExpiredAssetWindowHours")]
+        public static string MinusExpiredAssetWindowHours { get; set; }
+
         [XmlElement(ElementName = "AllowSDContentIngest")]
         public static string AllowSDContentIngest { get; set; }
 

@@ -15,10 +15,11 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         private bool AdiExtracted { get; set; }
         private bool MovieAssetExtracted { get; set; }
         private bool PreviewExtracted { get; set; }
-
+        private bool PreviewOnly { get; set; }
         public bool OperationsSuccessful { get; set; }
         public bool HasPreviewAsset { get; set; }
         public bool IsUpdatePackage { get; set; }
+        public bool IsTvod { get; set; }
         public FileInfo ExtractedAdiFile { get; set; }
         public FileInfo ExtractedMovieAsset { get; set; }
         public FileInfo ExtractedPreview { get; set; }
@@ -28,14 +29,20 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         {
             OutputDirectory = outputDirectory;
             OperationsSuccessful = false;
+            PreviewOnly = false;
 
             using (var archive = ZipFile.OpenRead(sourceArchive))
             {
                 try
                 {
                     ValidatePackageEntries(archive);
-                    ProcessArchive(archive, extractAdiOnly);
+                    ProcessArchive(archive, extractAdiOnly, IsUpdatePackage);
+
                     if (extractAdiOnly && AdiExtracted)
+                    {
+                        OperationsSuccessful = true;
+                    }
+                    if (IsUpdatePackage && AdiExtracted && !HasPreviewAsset)
                     {
                         OperationsSuccessful = true;
                     }
@@ -43,7 +50,8 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                     {
                         if (HasPreviewAsset && PreviewExtracted)
                             OperationsSuccessful = true;
-                        else if (!HasPreviewAsset) OperationsSuccessful = true;
+                        else if (!HasPreviewAsset)
+                            OperationsSuccessful = true;
                     }
                 }
                 catch (Exception EIFA_Ex)
@@ -131,25 +139,42 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         /// </summary>
         /// <param name="archive"></param>
         /// <param name="bAdiOnly"></param>
-        private void ProcessArchive(System.IO.Compression.ZipArchive archive, bool bAdiOnly)
+        private void ProcessArchive(System.IO.Compression.ZipArchive archive, bool bAdiOnly,bool bIsUpdate)
         {
             foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
+            {
                 if (!AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
                 {
                     Log.Info("Extracting ADI File from archive.");
                     ExtractEntry(entry, "adi");
                 }
-                else if (!MovieAssetExtracted && !bAdiOnly && entry.FullName.Contains("media/"))
+                if (bAdiOnly)
+                    continue;
+                if (!bIsUpdate)
                 {
-                    Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
-                    ExtractEntry(entry, "movie");
+                    if (!MovieAssetExtracted && entry.FullName.Contains("media/"))
+                    {
+                        Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
+                        ExtractEntry(entry, "movie");
+                    }
+                    if (!PreviewExtracted && entry.FullName.Contains("preview/"))
+                    {
+                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
+                        ExtractEntry(entry, "preview");
+                    }
+
                 }
-                else if (!PreviewExtracted && !bAdiOnly && entry.FullName.Contains("preview/"))
+                else if (PreviewOnly && entry.FullName.Contains("preview/") && !PreviewExtracted)
                 {
-                    Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
-                    ExtractEntry(entry, "preview");
+                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
+                        ExtractEntry(entry, "preview");
+                    
                 }
+            }
+
+           
         }
+    
 
         private void CheckWorkingDirectory()
         {
@@ -171,6 +196,13 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             if (archive.Entries.FirstOrDefault(p => p.FullName.ToLower().Contains("preview/")) != null)
             {
                 Log.Info("Package contains a Preview file.");
+
+                if (IsTvod && IsUpdatePackage)
+                {
+                    Log.Info("TVOD Update package contains a Preview asset for inclusion");
+                    PreviewOnly = true;
+                }
+
                 HasPreviewAsset = true;
             }
         }
