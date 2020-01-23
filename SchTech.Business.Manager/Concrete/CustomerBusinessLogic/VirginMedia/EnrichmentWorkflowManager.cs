@@ -21,9 +21,6 @@ using System.IO;
 using System.Linq;
 
 
-
-
-
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 {
     public class EnrichmentWorkflowManager : IEnrichmentWorkflowService
@@ -137,10 +134,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 WorkflowEntities.IsQamAsset = adiValidation.IsQamAsset;
 
-                IsPackageAnUpdate = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue)
-                                        ?.VersionMajor < WorkflowEntities.AdiVersionMajor ;
+                //IsPackageAnUpdate = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue)
+                //                        ?.VersionMajor < WorkflowEntities.AdiVersionMajor ;
 
-                ZipHandler.IsUpdatePackage = IsPackageAnUpdate;
+                //ZipHandler.IsUpdatePackage = IsPackageAnUpdate;
+                IsPackageAnUpdate = ZipHandler.IsUpdatePackage;
 
                 WorkflowEntities.CheckSetSdPackage(IsPackageAnUpdate);
                 IsTvodPackage = WorkflowEntities.CheckIfTvodAsset();
@@ -236,14 +234,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     return false;
 
                 Log.Info("Package is confirmed as a valid Update Package");
+                IsPackageAnUpdate = true;
                 return true;
             }
-
+            
             if (IsPackageAnUpdate && adiMajor == null)
-                Log.Error(
-                    $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
-            if (!IsPackageAnUpdate &&
-                adiMajor == null)
+                Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+            if (!IsPackageAnUpdate && adiMajor == null)
             {
                 Log.Info($"Package with Paid: {WorkflowEntities.TitlPaidValue} " +
                          "confirmed as a unique package, continuing ingest operations.");
@@ -251,11 +248,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 return true;
             }
 
-            if (!IsPackageAnUpdate &&
-                adiMajor != null)
-                Log.Error($"Package for PAID: {WorkflowEntities.TitlPaidValue} already exists," +
-                          " duplicate ingest detected! Failing Enhancement.");
             return false;
+
         }
 
         private GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping GetGnMappingData()
@@ -1128,6 +1122,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     ? $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageFile.Name}"
                     : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}";
 
+                if(System.IO.File.Exists(destination))
+                    System.IO.File.Delete(destination);
+
                 if (FailedToMap)
                 {
                     Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
@@ -1145,9 +1142,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     }
                 }
 
-                Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
-                         $"{ADIWF_Config.FailedDirectory}");
-                System.IO.File.Move(source, destination);
+                if (IsPackageAnUpdate)
+                {
+                    Log.Info($"Moving Package: {packageFile} to Updates Failed directory: " +
+                             $"{ADIWF_Config.UpdatesFailedDirectory}");
+                    System.IO.File.Move(source, destination);
+                }
+                else
+                {
+                    Log.Info($"Moving Package: {packageFile} to Failed directory: " +
+                             $"{ADIWF_Config.FailedDirectory}");
+
+                    System.IO.File.Move(source, destination);
+                }
+              
+
                 if (System.IO.File.Exists(destination))
                     Log.Info("Move to failed directory successful.");
             }

@@ -22,6 +22,8 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
             if (dbVersionMajor > 0)
             {
+                Log.Info($"[Version Information] DB Version Major: {dbVersionMajor}, ADI Version Major: {adiVersionMajor}");
+
                 if (adiVersionMajor > dbVersionMajor)
                 {
                     if (EnrichmentWorkflowEntities.AdiFile.Asset.Asset?.FirstOrDefault()?.Content == null
@@ -29,9 +31,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
                         isTvod)
                     {
                         Log.Info("Confirmed that package with PAID: " +
-                                 $"{paid} " +
-                                 "is an update. " +
-                                 $"Previous Version Major: {dbVersionMajor}, New Version Major: {adiVersionMajor}");
+                                 $"{paid} is an update. ");
 
                         return true;
                     }
@@ -39,15 +39,23 @@ namespace SchTech.Business.Manager.Concrete.Validation
                     Log.Error("Metadata update contains a media section, failing ingest.");
                     return false;
                 }
-
-                Log.Error(
-                    $"Package for PAID: {paid} detected as an update but does not have a higher Version Major! Failing Enhancement.");
-                return false;
+                if (adiVersionMajor == dbVersionMajor)
+                {
+                    Log.Error($"Package for PAID: {paid} already exists, duplicate ingest detected! Failing Enhancement.");
+                    return false;
+                }
+                else
+                {
+                    Log.Error(
+                        $"Package for PAID: {paid} detected as an update but does not have a higher Version Major! Failing Enhancement.");
+                    return false;
+                }
+                
             }
 
             Log.Error(
                 $"Package for PAID: {paid} detected as an update does not have a database entry! Failing Enhancement.");
-            return false;
+            return true;
         }
 
         public static bool IsProgramOneOffSpecial(GnApiProgramsSchema.programsProgram programData)

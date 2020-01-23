@@ -244,7 +244,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                             App_Data = assetSection.Metadata.App_Data
                         }
                     }))
-                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetData);
+                    if(assetData.Metadata != null)
+                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetData);
 
                 return true;
             }
@@ -270,23 +271,28 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var previewAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
                     c.Metadata.AMS.Asset_Class == "preview");
 
-
-                var newMovie = new ADIAssetAsset
+                if (movieAsset != null)
                 {
-                    Metadata = new ADIAssetAssetMetadata
+                    var newMovie = new ADIAssetAsset
                     {
-                        AMS = new ADIAssetAssetMetadataAMS(),
-                        App_Data = new List<ADIAssetAssetMetadataApp_Data>()
-                    }
-                };
+                        Metadata = new ADIAssetAssetMetadata
+                        {
+                            AMS = new ADIAssetAssetMetadataAMS(),
+                            App_Data = new List<ADIAssetAssetMetadataApp_Data>()
+                        }
+                    };
 
-                newMovie.Metadata.AMS = movieAsset?.Metadata.AMS;
-                newMovie.Metadata.App_Data = movieAsset?.Metadata.App_Data;
+                    newMovie.Metadata.AMS = movieAsset?.Metadata.AMS;
+                    newMovie.Metadata.App_Data = movieAsset?.Metadata.App_Data;
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newMovie);
+                }
 
-                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
+                if (previewAsset == null)
+                    return true;
                 EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewAsset);
-                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newMovie);
                 EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
+
 
                 return true;
             }

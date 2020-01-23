@@ -169,16 +169,16 @@ namespace ADIWFE_TestClient
             try
             {
                 if (WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
-                    WorkflowManager.CallAndParseGnMappingData() &&
                     WorkflowManager.ValidatePackageIsUnique() &&
+                    WorkflowManager.CallAndParseGnMappingData() &&
                     WorkflowManager.SeedGnMappingData() &&
                     WorkflowManager.ExtractPackageMedia() &&
                     WorkflowManager.SetAdiMovieMetadata() &&
                     WorkflowManager.GetGracenoteMovieEpisodeData() &&
                     WorkflowManager.SetAdiMovieEpisodeMetadata())
-                    return true;
 
-                throw new Exception();
+                    return true;
+                return false;
             }
             catch (Exception gmaepEx)
             {

@@ -189,7 +189,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         {
             if (archive.Entries.FirstOrDefault(e => e.FullName.ToLower().Contains("media/")) == null)
             {
-                Log.Info("Marking Package as an update");
+                Log.Info("No Media Directory Initially Marking Package as an update");
                 IsUpdatePackage = true;
             }
 
