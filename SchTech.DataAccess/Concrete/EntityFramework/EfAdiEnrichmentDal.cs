@@ -88,17 +88,15 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     CurrentContext.SaveChanges();
 
 
-                    if (expiryCount == 0)
-                        EfStaticMethods.Log.Info("No expired data present.");
-                    else
-                        EfStaticMethods.Log.Info($"Number of expired assets removed from database = {expiryCount}");
-
+                    EfStaticMethods.Log.Info(expiryCount == 0
+                        ? "No expired data present."
+                        : $"Number of expired assets removed from database = {expiryCount}");
                 }
-                catch (Exception cea_ex)
+                catch (Exception ceaEx)
                 {
-                    EfStaticMethods.Log.Error($"General Exception during Cleanup of Expired Assets: {cea_ex.Message}");
-                    if (cea_ex.InnerException != null)
-                        EfStaticMethods.Log.Error($"Inner Exception: {cea_ex.InnerException.Message}");
+                    EfStaticMethods.Log.Error($"General Exception during Cleanup of Expired Assets: {ceaEx.Message}");
+                    if (ceaEx.InnerException != null)
+                        EfStaticMethods.Log.Error($"Inner Exception: {ceaEx.InnerException.Message}");
                 }
 
             }

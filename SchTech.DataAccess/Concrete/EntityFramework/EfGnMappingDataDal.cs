@@ -14,23 +14,23 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
     {
         public bool CleanMappingDataWithNoAdi()
         {
-            using (var MapContext = new ADI_EnrichmentContext())
+            using (var mapContext = new ADI_EnrichmentContext())
             {
                 try
                 {
-                    //var mappedNoAdi = MapContext.GN_Mapping_Data.Where(map => !MapContext.Adi_Data
-                    //        .Any(adata => EfStaticMethods.GetPaidLastValue(adata.TitlPaid) == EfStaticMethods.GetPaidLastValue(map.GN_Paid)))
-                    //    .ToList();
+                    var mappedNoAdi = mapContext.GN_Mapping_Data.Where(map => !mapContext.Adi_Data
+                            .Any(adata => EfStaticMethods.GetPaidLastValue(adata.TitlPaid) == EfStaticMethods.GetPaidLastValue(map.GN_Paid)))
+                        .ToList();
 
-                    //if (mappedNoAdi.FirstOrDefault() != null)
-                    //{
-                    //    MapContext.RemoveRange(mappedNoAdi);
-                    //    MapContext.SaveChanges();
-                    //}
-                    //else
-                    //{
-                    //    EfStaticMethods.Log.Info("No orphaned GN mappings found.");
-                    //}
+                    if (mappedNoAdi.FirstOrDefault() != null)
+                    {
+                        mapContext.RemoveRange(mappedNoAdi);
+                        mapContext.SaveChanges();
+                    }
+                    else
+                    {
+                        EfStaticMethods.Log.Info("No orphaned GN mappings found.");
+                    }
 
                     return true;
                 }
@@ -42,11 +42,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                     return false;
                 }
-                catch (Exception CMDWND_EX)
+                catch (Exception cmdwndEx)
                 {
-                    EfStaticMethods.Log.Error($"General Exception during database connection: {CMDWND_EX.Message}");
-                    if (CMDWND_EX.InnerException != null)
-                        EfStaticMethods.Log.Error($"Inner Exception: {CMDWND_EX.InnerException.Message}");
+                    EfStaticMethods.Log.Error($"General Exception during database connection: {cmdwndEx.Message}");
+                    if (cmdwndEx.InnerException != null)
+                        EfStaticMethods.Log.Error($"Inner Exception: {cmdwndEx.InnerException.Message}");
 
                     return false;
                 }
@@ -102,12 +102,12 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                 return dbImages;
             }
-            catch (Exception GDBI_EX)
+            catch (Exception gdbiEx)
             {
                 EfStaticMethods.Log.Error(
-                    $"Error obtaining DB Images for GN PAID: {paidValue}, ERROR = {GDBI_EX.Message}");
-                if (GDBI_EX.InnerException != null)
-                    EfStaticMethods.Log.Error($"Inner Exception: {GDBI_EX.InnerException.Message}");
+                    $"Error obtaining DB Images for GN PAID: {paidValue}, ERROR = {gdbiEx.Message}");
+                if (gdbiEx.InnerException != null)
+                    EfStaticMethods.Log.Error($"Inner Exception: {gdbiEx.InnerException.Message}");
                 EfStaticMethods.Log.Info("Continuing with workflow!");
 
                 return dbImages;

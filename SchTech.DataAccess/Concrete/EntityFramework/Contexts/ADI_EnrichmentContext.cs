@@ -31,21 +31,19 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer($"Server={ADIWF_Config.Database_Host},1433;" +
-                                            $"Database={ADIWF_Config.Database_Name};" +
-                                            $"Trusted_Connection={ADIWF_Config.Integrated_Security};" +
-                                            "MultipleActiveResultSets=True;");
+            if (optionsBuilder.IsConfigured)
+                return;
+            optionsBuilder.UseSqlServer($"Server={ADIWF_Config.Database_Host},1433;" +
+                                        $"Database={ADIWF_Config.Database_Name};" +
+                                        $"Trusted_Connection={ADIWF_Config.Integrated_Security};" +
+                                        "MultipleActiveResultSets=True;");
 
-                if (modelBuilder == null)
-                {
-                    modelBuilder = new DbModelBuilder();
-                    modelBuilder.Configurations.Add(new AdiEnrichmentMap());
-                    modelBuilder.Configurations.Add(new GnImageLookupMap());
-                    modelBuilder.Configurations.Add(new GnMappingDataMap());
-                }
-            }
+            if (modelBuilder != null)
+                return;
+            modelBuilder = new DbModelBuilder();
+            modelBuilder.Configurations.Add(new AdiEnrichmentMap());
+            modelBuilder.Configurations.Add(new GnImageLookupMap());
+            modelBuilder.Configurations.Add(new GnMappingDataMap());
         }
 
         /// <summary>
@@ -80,9 +78,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
             var entity = Set<T>().Find(id);
             var prop = typeof(T).GetProperty(propertyName);
 
-            if (prop != null)
-                return prop.GetValue(entity, null).ToString();
-            return string.Empty;
+            return prop != null ? prop.GetValue(entity, null).ToString() : string.Empty;
         }
     }
 }
