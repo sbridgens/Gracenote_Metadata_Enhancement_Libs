@@ -1,6 +1,7 @@
 ﻿using SchTech.Queue.Manager.Abstract;
 using System.Collections;
 using System.IO;
+using System.Linq;
 
 namespace SchTech.Queue.Manager.Concrete
 {
@@ -16,28 +17,22 @@ namespace SchTech.Queue.Manager.Concrete
             QueuedPackages = new ArrayList();
         }
 
-        public static ArrayList QueuedPackages { get; set; }
+        public static ArrayList QueuedPackages { get; private set; }
 
         public void AddPackageToQueue(FileInfo packageFile)
         {
-            var packageExists = false;
+            var packageExists = QueuedPackages.Cast<WorkQueueItem>().Any(
+                queItem => queItem.AdiPackage.FullName == packageFile.FullName);
 
-            foreach (WorkQueueItem queItem in QueuedPackages)
-                if (queItem.AdiPackage.FullName == packageFile.FullName)
-                {
-                    packageExists = true;
-                    break;
-                }
+            if (packageExists)
+                return;
 
-            if (!packageExists)
+            var packageItem = new WorkQueueItem
             {
-                var packageItem = new WorkQueueItem
-                {
-                    AdiPackage = packageFile
-                };
+                AdiPackage = packageFile
+            };
 
-                QueuedPackages.Add(packageItem);
-            }
+            QueuedPackages.Add(packageItem);
         }
 
         public void ClearWorkQueue()

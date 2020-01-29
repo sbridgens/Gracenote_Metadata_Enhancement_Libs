@@ -14,15 +14,15 @@ namespace SchTech.Queue.Manager.Concrete
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(AdiEnrichmentPollController));
 
-        private List<FileInfo> PackageList;
+        private List<FileInfo> _packageList;
 
-        private string _sourcePollDirectory { get; set; }
+        private string SourcePollDirectory { get; set; }
 
-        private string _fileExtensionToPoll { get; set; }
+        private string FileExtensionToPoll { get; set; }
 
         private AdiEnrichmentQueueController WorkQueue { get; set; }
 
-        private int packageCount { get; set; }
+        private int PackageCount { get; set; }
 
         public double FailedMappingRepollHours { get; set; }
         public bool HasFilesToProcess { get; set; }
@@ -36,8 +36,8 @@ namespace SchTech.Queue.Manager.Concrete
             WorkQueue = new AdiEnrichmentQueueController();
             WorkQueue.ClearWorkQueue();
             IncludeFailedMappingPackages = false;
-            _sourcePollDirectory = sourcePollDirectory;
-            _fileExtensionToPoll = fileExtensionToPoll;
+            SourcePollDirectory = sourcePollDirectory;
+            FileExtensionToPoll = fileExtensionToPoll;
 
             Log.Info($"Polling Input Directory: {sourcePollDirectory} for Packages");
 
@@ -48,23 +48,23 @@ namespace SchTech.Queue.Manager.Concrete
                 if (dtnow >= LastFailedMappingPoll) SetFailedMappingPollTime();
 
 
-                if (WorkflowFileList().Count >= 1)
-                {
-                    foreach (var package in PackageList) WorkQueue.AddPackageToQueue(package);
+                if (WorkflowFileList().Count < 1)
+                    return true;
 
-                    HasFilesToProcess = true;
-                }
+                foreach (var package in _packageList) WorkQueue.AddPackageToQueue(package);
+
+                HasFilesToProcess = true;
 
                 return true;
             }
 
-            Log.Error($"Input Directory: {_sourcePollDirectory} Does not Exist!");
+            Log.Error($"Input Directory: {SourcePollDirectory} Does not Exist!");
             return false;
         }
 
         public List<FileInfo> WorkflowFileList()
         {
-            PackageList = new List<FileInfo>();
+            _packageList = new List<FileInfo>();
 
             try
             {
@@ -72,29 +72,29 @@ namespace SchTech.Queue.Manager.Concrete
                 if (IncludeFailedMappingPackages)
                     AddMappingFailuresToList();
 
-                if (packageCount >= 1)
-                    Log.Info($"Number of Packages added to the Work queue for Processing: {packageCount}\r\n\r\n");
+                if (PackageCount >= 1)
+                    Log.Info($"Number of Packages added to the Work queue for Processing: {PackageCount}\r\n\r\n");
             }
-            catch (Exception WFL_EX)
+            catch (Exception wflEx)
             {
                 Log.Error(
-                    $"[AdiEnrichmentPollController] Error encountered during poll list creation: {WFL_EX.Message}");
+                    $"[AdiEnrichmentPollController] Error encountered during poll list creation: {wflEx.Message}");
 
-                if (WFL_EX.InnerException != null)
-                    Log.Error($"[AdiEnrichmentPollController] Inner Exception: {WFL_EX.InnerException.Message}");
+                if (wflEx.InnerException != null)
+                    Log.Error($"[AdiEnrichmentPollController] Inner Exception: {wflEx.InnerException.Message}");
             }
 
-            return PackageList;
+            return _packageList;
         }
 
-        private DateTime? DtNow()
+        private static DateTime? DtNow()
         {
             return DateTime.Now;
         }
 
         private bool InputDirExists()
         {
-            return Directory.Exists(_sourcePollDirectory);
+            return Directory.Exists(SourcePollDirectory);
         }
 
         private void SetFailedMappingPollTime()
@@ -105,17 +105,17 @@ namespace SchTech.Queue.Manager.Concrete
 
         private void BuildPackageList()
         {
-            packageCount = 0;
-            var directoryInfo = new DirectoryInfo(_sourcePollDirectory);
+            PackageCount = 0;
+            var directoryInfo = new DirectoryInfo(SourcePollDirectory);
 
             foreach (var adiPackage in
-                directoryInfo.GetFiles(_fileExtensionToPoll,
+                directoryInfo.GetFiles(FileExtensionToPoll,
                         SearchOption.TopDirectoryOnly)
                     .OrderBy(ct => ct.CreationTime).ToArray())
             {
-                packageCount++;
+                PackageCount++;
                 Log.Info($"Adding File: {adiPackage.FullName} to the Work Queue");
-                PackageList.Add(adiPackage);
+                _packageList.Add(adiPackage);
             }
         }
 
@@ -124,13 +124,13 @@ namespace SchTech.Queue.Manager.Concrete
             var fMapDinfo = new DirectoryInfo(FailedToMapDirectory);
 
             foreach (var mapFailure in
-                fMapDinfo.GetFiles(_fileExtensionToPoll,
+                fMapDinfo.GetFiles(FileExtensionToPoll,
                         SearchOption.TopDirectoryOnly)
                     .OrderBy(ct => ct.CreationTime).ToArray())
             {
-                packageCount++;
+                PackageCount++;
                 Log.Info($"Adding Previously Failed to map Package: {mapFailure.FullName} to the Work Queue");
-                PackageList.Add(mapFailure);
+                _packageList.Add(mapFailure);
             }
         }
     }
