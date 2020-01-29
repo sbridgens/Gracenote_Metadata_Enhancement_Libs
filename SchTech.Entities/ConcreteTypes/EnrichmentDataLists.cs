@@ -22,17 +22,19 @@ namespace SchTech.Entities.ConcreteTypes
 
         public List<GnApiProgramsSchema.programsProgramGenre> GenresList { get; private set; }
 
-        public List<GnApiProgramsSchema.externalLinksTypeExternalLink> ExternalLinks { get; private set; }
+        private List<GnApiProgramsSchema.externalLinksTypeExternalLink> ExternalLinks { get; set; }
 
         public void AddProgramAssetsToList(IEnumerable<GnApiProgramsSchema.assetType> programsList, string apiLevel)
         {
-            if (programsList != null && programsList.Count() > 0)
+            var assetTypes = programsList.ToList();
+
+            if (assetTypes.Any())
             {
                 if (ProgramAssets == null)
                     ProgramAssets = new List<GnApiProgramsSchema.assetType>();
 
-                Log.Debug($"Number of Assets at {apiLevel} Level: {programsList.Count()}");
-                foreach (var item in programsList) ProgramAssets.Add(item);
+                Log.Debug($"Number of Assets at {apiLevel} Level: {assetTypes.Count()}");
+                foreach (var item in assetTypes) ProgramAssets.Add(item);
             }
             else
             {
@@ -43,13 +45,14 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void AddCastMembersToList(IEnumerable<GnApiProgramsSchema.castTypeMember> castList, string apiLevel)
         {
-            if (castList != null && castList.Count() > 0)
+            var castTypeMembers = castList.ToList();
+            if (castTypeMembers.Any())
             {
                 if (CastMembers == null)
                     CastMembers = new List<GnApiProgramsSchema.castTypeMember>();
 
-                Log.Debug($"Number of Cast Members at {apiLevel} Level: {castList.Count()}");
-                foreach (var cast in castList) CastMembers.Add(cast);
+                Log.Debug($"Number of Cast Members at {apiLevel} Level: {castTypeMembers.Count()}");
+                foreach (var cast in castTypeMembers) CastMembers.Add(cast);
             }
             else
             {
@@ -60,14 +63,15 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void AddCrewMembersToList(IEnumerable<GnApiProgramsSchema.crewTypeMember> crewList, string apiLevel)
         {
-            if (crewList != null && crewList.Count() > 0)
+            var crewTypeMembers = crewList.ToList();
+            if (crewTypeMembers.Any())
             {
                 if (CrewMembers == null)
                     CrewMembers = new List<GnApiProgramsSchema.crewTypeMember>();
 
-                Log.Debug($"Number of Crew Members at {apiLevel} Level: {crewList.Count()}");
+                Log.Debug($"Number of Crew Members at {apiLevel} Level: {crewTypeMembers.Count()}");
 
-                foreach (var crew in crewList) CrewMembers.Add(crew);
+                foreach (var crew in crewTypeMembers) CrewMembers.Add(crew);
             }
             else
             {
@@ -78,7 +82,7 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void AddProgramTitlesToList(GnApiProgramsSchema.programsProgramTitles programTitles, string apiLevel)
         {
-            if (programTitles.title != null && programTitles.title.Count() > 0)
+            if (programTitles.title != null && programTitles.title.Any())
             {
                 if (ProgramTitles == null)
                     ProgramTitles = new List<GnApiProgramsSchema.titleDescType>();
@@ -96,14 +100,15 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void AddGenresToList(IEnumerable<GnApiProgramsSchema.programsProgramGenre> genres, string apiLevel)
         {
-            if (genres != null && genres.Count() > 0)
+            var programsProgramGenres = genres.ToList();
+            if (programsProgramGenres.Any())
             {
                 if (GenresList == null)
                     GenresList = new List<GnApiProgramsSchema.programsProgramGenre>();
 
-                Log.Debug($"Number of Genres at {apiLevel} Level: {genres.Count()}");
+                Log.Debug($"Number of Genres at {apiLevel} Level: {programsProgramGenres.Count()}");
 
-                foreach (var genre in genres) GenresList.Add(genre);
+                foreach (var genre in programsProgramGenres) GenresList.Add(genre);
             }
             else
             {

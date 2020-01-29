@@ -22,9 +22,9 @@ namespace SchTech.Entities.ConcreteTypes
         public string PreviewFileSize { get; set; }
         public string MovieChecksum { get; set; }
         public string PreviewCheckSum { get; set; }
-        public bool IsSdContent { get; set; }
+        private bool IsSdContent { get; set; }
         public bool PackageIsAOneOffSpecial { get; set; }
-        public bool PackageHasPreviewAsset { get; set; }
+        public bool PackageHasPreviewAsset { get; private set; }
         public bool HasPackagesToProcess { get; set; }
         public FileInfo CurrentPackage { get; set; }
         public string CurrentWorkingDirectory { get; private set; }
@@ -80,15 +80,14 @@ namespace SchTech.Entities.ConcreteTypes
                     EnrichedAdi = XmlSerializer.Read(adiData);
                 }
 
-                if (AdiFile != null)
-                {
-                    Log.Info("ADI Loaded correctly and will continue processing.");
-                    AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
-                    Log.Info($"Asset Version Major: {AdiVersionMajor}");
-                    return true;
-                }
+                if (AdiFile == null)
+                    throw new Exception("Adi file is null check namespaces and adi document structure?");
 
-                throw new Exception("Adi file is null check namespaces and adi document structure?");
+                Log.Info("ADI Loaded correctly and will continue processing.");
+                AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
+                Log.Info($"Asset Version Major: {AdiVersionMajor}");
+                return true;
+
             }
             catch (Exception adfEx)
             {
@@ -110,7 +109,7 @@ namespace SchTech.Entities.ConcreteTypes
                 Log.Info("Package Contains a Preview Asset.");
         }
 
-        public bool CheckIfTvodAsset()
+        public static bool CheckIfTvodAsset()
         {
             var first = AdiFile.Asset.Asset?.FirstOrDefault();
 
@@ -123,22 +122,22 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void CheckSetSdPackage(bool isupdate)
         {
-            if (!isupdate)
-            {
-                var adiAssetAssetMetadata = AdiFile.Asset.Asset?.FirstOrDefault()
-                    ?.Metadata;
+            if (isupdate)
+                return;
 
-                if (adiAssetAssetMetadata != null)
-                    IsSdContent = (adiAssetAssetMetadata.App_Data)
-                                  .FirstOrDefault(c => c.Name == "HDContent")
-                                  ?.Value.ToLower() != "y";
+            var adiAssetAssetMetadata = AdiFile.Asset.Asset?.FirstOrDefault()
+                ?.Metadata;
 
-                if (IsSdContent && !Convert.ToBoolean(ADIWF_Config.AllowSDContentIngest))
-                    throw new InvalidOperationException(
-                        $"SD Content Detected, Configuration disallows SD Content from Ingest; Failing ingest for {TitlPaidValue}");
+            if (adiAssetAssetMetadata != null)
+                IsSdContent = (adiAssetAssetMetadata.App_Data)
+                              .FirstOrDefault(c => c.Name == "HDContent")
+                              ?.Value.ToLower() != "y";
 
-                Log.Info("Content is marked as SD Content, Configuration allows SD content for ingest.");
-            }
+            if (IsSdContent && !Convert.ToBoolean(ADIWF_Config.AllowSDContentIngest))
+                throw new InvalidOperationException(
+                    $"SD Content Detected, Configuration disallows SD Content from Ingest; Failing ingest for {TitlPaidValue}");
+
+            Log.Info("Content is marked as SD Content, Configuration allows SD content for ingest.");
         }
 
         public bool GetGracenoteMappingData()

@@ -42,8 +42,8 @@ namespace ADIWFE_TestLegacyGo
 
             try
             {
-                var xmlSerializer = new ConfigSerializationHelper();
-                return xmlSerializer.LoadConfigurationFile(Settings.Default.XmlConfigFile);
+                //var ConfigSerializationHelper = new ConfigSerializationHelper();
+                return ConfigSerializationHelper.LoadConfigurationFile(Settings.Default.XmlConfigFile);
             }
             catch (Exception lacEx)
             {
