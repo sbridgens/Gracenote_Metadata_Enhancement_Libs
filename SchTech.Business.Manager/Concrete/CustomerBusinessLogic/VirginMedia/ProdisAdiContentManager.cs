@@ -58,11 +58,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             AdiDataValidator = new EnhancementDataValidator();
         }
 
+        public List<GnApiProgramsSchema.programsProgramSeason> SeasonInfo { get; set; }
+
         private EnrichmentDataLists EnrichmentDataLists { get; set; }
 
         private EnhancementDataValidator AdiDataValidator { get; }
-
-        public List<GnApiProgramsSchema.programsProgramSeason> SeasonInfo { get; set; }
 
         private bool IdmbDataInserted { get; set; }
 
@@ -96,15 +96,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             //
             var seasonData = apiData?.seasons?.FirstOrDefault(s => s.seasonId == seasonId);
 
-            if (seasonData != null)
-            {
-                //Season Asset List
-                EnrichmentDataLists.AddProgramAssetsToList(seasonData.assets, "Season");
-                //Season Cast List
-                EnrichmentDataLists.AddCastMembersToList(seasonData.cast, "Season");
-                //Season Crew List
-                EnrichmentDataLists.AddCrewMembersToList(seasonData.crew, "Season");
-            }
+            if (seasonData == null)
+                return;
+            //Season Asset List
+            EnrichmentDataLists.AddProgramAssetsToList(seasonData.assets, "Season");
+            //Season Cast List
+            EnrichmentDataLists.AddCastMembersToList(seasonData.cast, "Season");
+            //Season Crew List
+            EnrichmentDataLists.AddCrewMembersToList(seasonData.crew, "Season");
         }
 
         public List<GnApiProgramsSchema.assetType> ReturnAssetList()
@@ -112,7 +111,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return EnrichmentDataLists.ProgramAssets;
         }
 
-        public bool AddTitleMetadataApp_DataNode(string nodeName, string nodeValue)
+        private static bool AddTitleMetadataApp_DataNode(string nodeName, string nodeValue)
         {
             try
             {
@@ -143,7 +142,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool AddAssetMetadataApp_DataNode(string assetId, string nodeName, string nodeValue)
+        public static bool AddAssetMetadataApp_DataNode(string assetId, string nodeName, string nodeValue)
         {
             try
             {
@@ -184,7 +183,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool SetAdiAssetContentField(string assetClass, string assetFileName)
+        public static bool SetAdiAssetContentField(string assetClass, string assetFileName)
         {
             var contentFile = EnrichmentWorkflowEntities.AdiFile
                 .Asset.Asset
@@ -199,35 +198,35 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return true;
         }
 
-        public int GetVersionMajor()
+        public static int GetVersionMajor()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
         }
 
-        public int GetVersionMinor()
+        public static int GetVersionMinor()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor;
         }
 
-        public string GetProviderId()
+        public static string GetProviderId()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Provider_ID;
         }
 
-        public string GetAssetPaid(string assetType)
+        public static string GetAssetPaid(string assetType)
         {
             return EnrichmentWorkflowEntities.AdiFile.Asset.Asset
                 .Where(asset => asset.Metadata.AMS.Asset_Class.Equals(assetType))
                 .Select(asset => asset.Metadata.AMS.Asset_ID.ToString()).FirstOrDefault();
         }
 
-        public string GetLicenceEndData()
+        public static string GetLicenceEndData()
         {
             return EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data
                 .FirstOrDefault(l => l.Name.Equals("Licensing_Window_End"))?.Value;
         }
 
-        public bool CopyPreviouslyEnrichedAssetDataToAdi()
+        public static bool CopyPreviouslyEnrichedAssetDataToAdi()
         {
             try
             {
@@ -261,7 +260,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool RemoveMovieContentFromUpdate()
+        public static bool RemoveMovieContentFromUpdate()
         {
             try
             {
@@ -308,7 +307,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool UpdateAllVersionMajorValues(int newVersionMajor)
+        public static bool UpdateAllVersionMajorValues(int newVersionMajor)
         {
             try
             {
@@ -350,7 +349,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         }
 
-        public void CheckAndAddBlockPlatformData()
+        public static void CheckAndAddBlockPlatformData()
         {
             try
             {
@@ -390,7 +389,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool InsertProgramLayerData(string tmsid, string seriesId)
+        public static bool InsertProgramLayerData(string tmsid, string seriesId)
         {
             try
             {
@@ -409,7 +408,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool InsertSeriesLayerData(string seriesTmsId, string seriesId)
+        public static bool InsertSeriesLayerData(string seriesTmsId, string seriesId)
         {
             try
             {
@@ -563,7 +562,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                var desc = AdiDataValidator.CheckAndReturnDescriptionData(descriptions);
+                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions);
 
                 if (!string.IsNullOrEmpty(desc))
                 {
@@ -630,7 +629,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         /// <param name="episodeTitle"></param>
         /// <param name="tmsid"></param>
         /// <returns></returns>
-        public bool InsertEpisodeData(string tmsid, string episodeOrdinalValue, string episodeTitle)
+        public static bool InsertEpisodeData(string tmsid, string episodeOrdinalValue, string episodeTitle)
         {
             try
             {
@@ -699,27 +698,28 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AddTitleMetadataApp_DataNode("Series_Name",
                     $"Season {episodeSeason}");
 
+                //if (SeasonInfo != null && SeasonInfo.Any())
+                if (!SeasonInfo.Any())
+                    return true;
 
-                if (SeasonInfo != null && SeasonInfo.Any())
+
+                var seasonData = SeasonInfo.FirstOrDefault(i => i.seasonId == seasonId.ToString());
+
+                if (seasonData?.totalSeasonEpisodes != "0")
+                    AddTitleMetadataApp_DataNode("Series_NumberOfItems",
+                        seasonData?.totalSeasonEpisodes);
+
+                if (seasonData?.descriptions != null)
                 {
-                    var seasonData = SeasonInfo.FirstOrDefault(i => i.seasonId == seasonId.ToString());
-
-                    if (seasonData?.totalSeasonEpisodes != "0")
-                        AddTitleMetadataApp_DataNode("Series_NumberOfItems",
-                            seasonData?.totalSeasonEpisodes);
-
-                    if (seasonData?.descriptions != null)
-                    {
-                        AddTitleMetadataApp_DataNode("Series_Summary_Short",
-                            seasonData.descriptions?.desc
-                                .FirstOrDefault(d => Convert.ToInt32(d.size) == 250 ||
-                                                     Convert.ToInt32(d.size) >= 100)
-                                ?.Value);
-                    }
-                    else
-                    {
-                        Log.Warn("Season Description data not available?");
-                    }
+                    AddTitleMetadataApp_DataNode("Series_Summary_Short",
+                        seasonData.descriptions?.desc
+                            .FirstOrDefault(d => Convert.ToInt32(d.size) == 250 ||
+                                                 Convert.ToInt32(d.size) >= 100)
+                            ?.Value);
+                }
+                else
+                {
+                    Log.Warn("Season Description data not available?");
                 }
 
 
@@ -749,7 +749,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                        AddTitleMetadataApp_DataNode("Show_Name", showName) &&
                        AddTitleMetadataApp_DataNode(
                            "Show_Summary_Short",
-                           AdiDataValidator.CheckAndReturnDescriptionData(
+                           EnhancementDataValidator.CheckAndReturnDescriptionData(
                                descriptions,
                                true));
             }
@@ -799,12 +799,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        private bool ValidateYear(string year)
+        private static bool ValidateYear(string year)
         {
             return year.Length == 4;
         }
 
-        public bool InsertProductionYears(
+        public static bool InsertProductionYears(
             DateTime? seriesPremiere,
             DateTime? seasonPremiere,
             DateTime? seriesFinale,
@@ -858,26 +858,25 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                if (externalLinks.Count > 0 && IdmbDataInserted == false)
-                {
-                    var links = externalLinks;
-                    Log.Info("Adding IMDb_ID data.");
-                    AddTitleMetadataApp_DataNode("IMDb_ID", links.FirstOrDefault()?.id);
-
-                    if (!hasMovieInfo)
-                    {
-                        Log.Info("Adding Show_IMDb_ID data.");
-                        AddTitleMetadataApp_DataNode("Show_IMDb_ID",
-                            links.Any()
-                                ? links.Last().id
-                                : links.FirstOrDefault()?.id);
-                    }
-
-                    IdmbDataInserted = true;
+                if (externalLinks.Count <= 0 && IdmbDataInserted)
                     return true;
+
+                var links = externalLinks;
+                Log.Info("Adding IMDb_ID data.");
+                AddTitleMetadataApp_DataNode("IMDb_ID", links.FirstOrDefault()?.id);
+
+                if (!hasMovieInfo)
+                {
+                    Log.Info("Adding Show_IMDb_ID data.");
+                    AddTitleMetadataApp_DataNode("Show_IMDb_ID",
+                        links.Any()
+                            ? links.Last().id
+                            : links.FirstOrDefault()?.id);
                 }
 
+                IdmbDataInserted = true;
                 return true;
+
             }
             catch (Exception iidEx)
             {
@@ -891,12 +890,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        private string GetImageName(string imageUri, string imageMapping)
+        private static string GetImageName(string imageUri, string imageMapping)
         {
             return imageUri.Replace(imageUri, $"{imageMapping}_{imageUri}");
         }
 
-        public bool InsertImageData(
+        public static bool InsertImageData(
             string titlPaid,
             string imageName,
             string imageMapping,
@@ -954,7 +953,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool UpdateImageData(
+        public static bool UpdateImageData(
             string imageQualifier,
             string titlPaid,
             string imageName,
@@ -989,7 +988,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool SetQamUpdateContent()
+        public void SetQamUpdateContent()
         {
             try
             {
@@ -1000,12 +999,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     throw new Exception("Error retrieving previously Enriched movie section for QAM Update.");
                 movieAsset.Content = new ADIAssetAssetContent { Value = MovieContent };
 
-                return true;
             }
             catch (Exception squcex)
             {
                 Log.Error($"Error Encountered Setting QAM Update content field: {squcex.Message}");
-                return false;
             }
         }
     }

@@ -212,8 +212,8 @@ namespace ADIWFE_TestLegacyGo
             try
             {
                 Success = WorkflowManager.ImageSelectionLogic() &&
-                          WorkflowManager.RemoveDerivedFromAsset() &&
-                          WorkflowManager.FinalisePackageData() &&
+                          GoWorkflowManager.RemoveDerivedFromAsset() &&
+                          GoWorkflowManager.FinalisePackageData() &&
                           WorkflowManager.SaveAdiFile() &&
                           WorkflowManager.PackageEnrichedAsset() &&
                           WorkflowManager.DeliverEnrichedAsset();

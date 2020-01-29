@@ -13,7 +13,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnhancementDataValidator));
 
-        public string AdiYearValue { get; set; }
+        public string AdiYearValue { get; private set; }
 
         public static bool ValidateVersionMajor(int? dbVersionMajor, bool isTvod = false)
         {
@@ -44,12 +44,10 @@ namespace SchTech.Business.Manager.Concrete.Validation
                     Log.Error($"Package for PAID: {paid} already exists, duplicate ingest detected! Failing Enhancement.");
                     return false;
                 }
-                else
-                {
-                    Log.Error(
-                        $"Package for PAID: {paid} detected as an update but does not have a higher Version Major! Failing Enhancement.");
-                    return false;
-                }
+
+                Log.Error(
+                    $"Package for PAID: {paid} detected as an update but does not have a higher Version Major! Failing Enhancement.");
+                return false;
 
             }
 
@@ -63,7 +61,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
             return programData.progType.ToLower().Contains("special") || programData.holiday != null;
         }
 
-        public string CheckAndReturnDescriptionData(
+        public static string CheckAndReturnDescriptionData(
             GnApiProgramsSchema.programsProgramDescriptions programDescriptions, bool isSeason = false)
         {
             if (!programDescriptions.desc.Any())

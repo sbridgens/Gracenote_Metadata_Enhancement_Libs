@@ -11,8 +11,8 @@ namespace SchTech.Business.Manager.Concrete.Validation
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnhancementDataValidator));
 
-        public bool IsQamAsset { get; set; }
-        public string NewTitlPaid { get; set; }
+        public bool IsQamAsset { get; private set; }
+        public string NewTitlPaid { get; private set; }
         public string ValidatePaidValue(string adiPaid)
         {
             if (adiPaid.Length == 20)

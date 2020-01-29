@@ -9,8 +9,6 @@ namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
 
         FileInfo PreviewAsset { get; set; }
 
-        void LogError(string functionName, string message, Exception ex);
-
         bool CheckAndCleanOrphanedData();
 
         bool AvailableDriveSpace();
