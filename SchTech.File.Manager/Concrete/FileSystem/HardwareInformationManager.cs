@@ -12,7 +12,7 @@ namespace SchTech.File.Manager.Concrete.FileSystem
         /// <summary>
         ///     Initialize Log4net
         /// </summary>
-        private readonly ILog log = LogManager.GetLogger(typeof(HardwareInformationManager));
+        private readonly ILog _log = LogManager.GetLogger(typeof(HardwareInformationManager));
 
         // Flag: Has Dispose already been called?
         private bool _disposed;
@@ -62,7 +62,7 @@ namespace SchTech.File.Manager.Concrete.FileSystem
                     var freespace = Convert.ToInt32(drive.TotalFreeSpace / BytesInGb);
                     var totalsize = Convert.ToInt32(drive.TotalSize / BytesInGb);
 
-                    log.Info($"\nDrive: {drive.Name} ({drive.DriveType}, {drive.DriveFormat})\n" +
+                    _log.Info($"\nDrive: {drive.Name} ({drive.DriveType}, {drive.DriveFormat})\n" +
                              $"  Used space:\t{(drive.TotalSize - drive.TotalFreeSpace) / BytesInMb} " +
                              $"MB\t{usedSpace} GB\n" +
                              $"  Free space:\t{drive.TotalFreeSpace / BytesInMb} MB\t{freespace} GB\n" +
@@ -78,7 +78,7 @@ namespace SchTech.File.Manager.Concrete.FileSystem
             }
             catch (Exception gdsEx)
             {
-                log.Error($"[GetDriveSpace]\t{gdsEx.Message}");
+                _log.Error($"[GetDriveSpace]\t{gdsEx.Message}");
                 return false;
             }
         }
