@@ -27,7 +27,7 @@ namespace SchTech.File.Manager.Concrete.FileSystem
             if (string.IsNullOrEmpty(fileName))
                 return string.Empty;
             var fsizeInfo = new FileInfo(fileName);
-           
+
             Log.Info($"Filesize retrieved for {fileName}: {fsizeInfo.Length}");
             return fsizeInfo.Length.ToString();
         }

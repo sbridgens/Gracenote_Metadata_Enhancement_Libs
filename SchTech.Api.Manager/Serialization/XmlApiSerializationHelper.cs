@@ -6,11 +6,11 @@ namespace SchTech.Api.Manager.Serialization
 {
     public class XmlApiSerializationHelper<T>
     {
-        public Type ApiType;
+        private readonly Type _apiType;
 
         public XmlApiSerializationHelper()
         {
-            ApiType = typeof(T);
+            _apiType = typeof(T);
         }
 
         public T Read(string fileContent)
@@ -18,7 +18,7 @@ namespace SchTech.Api.Manager.Serialization
             T result;
             using (TextReader textReader = new StringReader(fileContent))
             {
-                var deserializer = new XmlSerializer(ApiType);
+                var deserializer = new XmlSerializer(_apiType);
                 result = (T)deserializer.Deserialize(textReader);
             }
 

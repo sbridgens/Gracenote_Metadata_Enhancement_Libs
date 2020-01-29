@@ -244,7 +244,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                             App_Data = assetSection.Metadata.App_Data
                         }
                     }))
-                    if(assetData.Metadata != null)
+                    if (assetData.Metadata != null)
                         EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetData);
 
                 return true;

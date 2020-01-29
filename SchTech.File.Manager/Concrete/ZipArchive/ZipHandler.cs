@@ -38,7 +38,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                 {
                     ValidatePackageEntries(archive);
                     ProcessArchive(archive, extractAdiOnly, IsUpdatePackage);
-                   
+
                     if (extractAdiOnly && AdiExtracted)
                     {
                         OperationsSuccessful = true;
@@ -121,7 +121,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         private void ExtractEntry(ZipArchiveEntry archiveEntry, string entryType)
         {
             var entrySize = archiveEntry.Length;
-            var outputFile = IsLegacyGoPackage 
+            var outputFile = IsLegacyGoPackage
                            ? Path.Combine(OutputDirectory, archiveEntry.FullName)
                            : Path.Combine(OutputDirectory, archiveEntry.Name);
 
@@ -135,7 +135,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
             EntryFileInfo = new FileInfo(outputFile);
             CheckWorkingDirectory();
-            
+
             archiveEntry.ExtractToFile(outputFile);
 
             if (ValidateExtraction(entrySize))
@@ -165,7 +165,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         /// </summary>
         /// <param name="archive"></param>
         /// <param name="bAdiOnly"></param>
-        private void ProcessArchive(System.IO.Compression.ZipArchive archive, bool bAdiOnly,bool bIsUpdate)
+        private void ProcessArchive(System.IO.Compression.ZipArchive archive, bool bAdiOnly, bool bIsUpdate)
         {
             foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
             {
@@ -173,7 +173,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                 {
                     if (entry.Name.ToLower().Contains("adi"))
                     {
-                        ExtractEntry(entry,"adi");
+                        ExtractEntry(entry, "adi");
                     }
                     else
                     {
@@ -212,9 +212,9 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                 }
             }
 
-           
+
         }
-    
+
 
         private void CheckWorkingDirectory()
         {

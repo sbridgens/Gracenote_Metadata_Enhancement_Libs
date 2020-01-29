@@ -24,12 +24,10 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
 
             if (MovieEpisodeProgramData?.externalLinks != null)
-                foreach (var link in MovieEpisodeProgramData.externalLinks)
-                    externalLinks.Add(link);
-
+                externalLinks.AddRange(MovieEpisodeProgramData.externalLinks);
+            
             if (ShowSeriesSeasonProgramData?.externalLinks != null)
-                foreach (var link in ShowSeriesSeasonProgramData.externalLinks)
-                    externalLinks.Add(link);
+                externalLinks.AddRange(ShowSeriesSeasonProgramData.externalLinks);
 
             return externalLinks;
         }
@@ -88,7 +86,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
             return Convert.ToInt32(num) > 0
                 ? num.ToString()
-                : (num == 0 
+                : (num == 0
                     ? "100001"
                     : num.ToString());
         }
@@ -142,21 +140,6 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
         public string GetEpisodeSeason()
         {
             return MovieEpisodeProgramData.episodeInfo.season;
-        }
-
-        public string GetFirstSeasonId()
-        {
-            return ShowSeriesSeasonProgramData.seasons.FirstOrDefault(s => s.seasonId != null)?.seasonId;
-        }
-
-        public string GetLastSeasonId()
-        {
-            return ShowSeriesSeasonProgramData.seasons.LastOrDefault(s => s.seasonId != null)?.seasonId;
-        }
-
-        public GnApiProgramsSchema.programsProgramEpisodeInfo GetEpisodeInfo()
-        {
-            return MovieEpisodeProgramData.episodeInfo;
         }
 
         public List<GnApiProgramsSchema.programsProgramSeason> GetSeasonInfo()

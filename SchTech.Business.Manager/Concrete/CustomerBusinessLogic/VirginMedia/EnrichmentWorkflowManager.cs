@@ -237,7 +237,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 IsPackageAnUpdate = true;
                 return true;
             }
-            
+
             if (IsPackageAnUpdate && adiMajor == null)
                 Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
             if (!IsPackageAnUpdate && adiMajor == null)
@@ -260,7 +260,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 .FirstOrDefault();
         }
 
-        private DateTime? GetAvailability(string typeRequired, 
+        private DateTime? GetAvailability(string typeRequired,
             GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping mapdata)
         {
             DateTime? availableDateTime = null;
@@ -310,11 +310,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         .FirstOrDefault(),
 
                     GN_programMappingId = mapData?.programMappingId,
-                    GN_creationDate = mapData?.creationDate != null 
+                    GN_creationDate = mapData?.creationDate != null
                         ? Convert.ToDateTime(mapData.creationDate)
                         : DateTime.Now,
                     GN_updateId = mapData?.updateId,
-                    GN_Availability_Start = GetAvailability("start",mapData),
+                    GN_Availability_Start = GetAvailability("start", mapData),
                     GN_Availability_End = GetAvailability("end", mapData)
                 };
 
@@ -378,7 +378,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         true,
                         false);
 
-                    if(!IsPackageAnUpdate)
+                    if (!IsPackageAnUpdate)
                     {
                         //Update content adi movie value with ts file name
                         AdiContentManager.SetAdiAssetContentField("movie",
@@ -398,11 +398,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                             ZipHandler.ExtractedPreview.Name);
                         PreviewAsset = ZipHandler.ExtractedPreview;
                     }
-                    
-                   
+
+
 
                     //seed adi data if main ingest
-                    return !IsPackageAnUpdate ? SeedAdiData(): SetInitialUpdateData();
+                    return !IsPackageAnUpdate ? SeedAdiData() : SetInitialUpdateData();
                 }
 
                 return SetInitialUpdateData();
@@ -422,7 +422,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 var isMapped = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue) != null;
 
-               
+
                 if (!isMapped && !IsPackageAnUpdate)
                 {
                     Log.Info("Seeding Adi Data to the database");
@@ -590,7 +590,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     AdiContentManager.InsertEpisodeData(
                         WorkflowEntities.GraceNoteTmsId,
-                        episodeOrdinalValue: ApiManager.GetEpisodeOrdinalValue(), 
+                        episodeOrdinalValue: ApiManager.GetEpisodeOrdinalValue(),
                         episodeTitle: ApiManager.GetEpisodeTitle()
                         );
 
@@ -607,7 +607,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                     //Insert Layer data for Program Layer
                     AdiContentManager.InsertProgramLayerData(
-                        WorkflowEntities.GraceNoteTmsId, 
+                        WorkflowEntities.GraceNoteTmsId,
                         seriesId: ApiManager.GetSeriesId()
                         ) &&
 
@@ -636,7 +636,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                     //Insert required IMDB Data
                     AdiContentManager.InsertIdmbData(
-                        externalLinks: ApiManager.ExternalLinks(), 
+                        externalLinks: ApiManager.ExternalLinks(),
                         hasMovieInfo: HasMovieInfo()
                         );
             }
@@ -736,10 +736,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AdiContentManager.SeasonInfo = ApiManager.GetSeasonInfo();
                 //Insert IMDB Data
                 return AdiContentManager.InsertIdmbData(
-                           ApiManager.ExternalLinks(), 
+                           ApiManager.ExternalLinks(),
                            HasMovieInfo()
                            ) &&
-                       
+
                        //Insert the TITL Series Layerdata
                        AdiContentManager.InsertSeriesLayerData(
                            ApiManager.ShowSeriesSeasonProgramData.connectorId,
@@ -748,15 +748,15 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                        //Insert the TITL Show Data
                        AdiContentManager.InsertShowData(
-                           showId: ApiManager.GetShowId(), 
+                           showId: ApiManager.GetShowId(),
                            showName: ApiManager.GetShowName(),
                            totalSeasons: ApiManager.GetNumberOfSeasons(),
                            descriptions: ApiManager.ShowSeriesSeasonProgramData.descriptions
                            ) &&
-                      
+
                        //Insert the TITLE Series Genres
                        AdiContentManager.InsertSeriesGenreData() &&
-                       
+
                        //Insert the Series ID information
                        AdiContentManager.InsertSeriesData(
                            ApiManager.GetGnSeriesId(),
@@ -815,7 +815,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     continue;
 
                 //prevent duplicate processing
-                if (string.IsNullOrEmpty(currentProgramType) || 
+                if (string.IsNullOrEmpty(currentProgramType) ||
                     configLookup.Image_Mapping == currentImage)
                     continue;
 
@@ -894,7 +894,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 //<App_Data App="VOD" Name="DeriveFromAsset" Value="ASST0000000001506105" />
                 foreach (var asset in from asset in EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                                      let dfa = asset.Metadata.App_Data.FirstOrDefault(d => 
+                                      let dfa = asset.Metadata.App_Data.FirstOrDefault(d =>
                                               d.Name.ToLower() == "derivefromasset"
                                       )
                                       where dfa != null
@@ -1002,7 +1002,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private bool SetInitialUpdateData()
         {
             try
-            { 
+            {
                 //Get the correct stored adi data
                 AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
                 if (AdiData.EnrichedAdi == null)
@@ -1087,7 +1087,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 var adiString = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
 
-                if(AdiData == null)
+                if (AdiData == null)
                     AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
 
                 if (!IsPackageAnUpdate)
@@ -1122,7 +1122,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     ? $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageFile.Name}"
                     : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}";
 
-                if(System.IO.File.Exists(destination))
+                if (System.IO.File.Exists(destination))
                     System.IO.File.Delete(destination);
 
                 if (FailedToMap)
@@ -1155,7 +1155,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                     System.IO.File.Move(source, destination);
                 }
-              
+
 
                 if (System.IO.File.Exists(destination))
                     Log.Info("Move to failed directory successful.");

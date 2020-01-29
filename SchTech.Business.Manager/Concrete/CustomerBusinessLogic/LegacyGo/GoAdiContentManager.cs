@@ -184,7 +184,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             }
         }
 
-        
+
         public int GetVersionMajor()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
@@ -223,7 +223,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                             App_Data = assetSection.Metadata.App_Data
                         }
                     }))
-                    if(assetData.Metadata != null)
+                    if (assetData.Metadata != null)
                         EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetData);
 
                 return true;

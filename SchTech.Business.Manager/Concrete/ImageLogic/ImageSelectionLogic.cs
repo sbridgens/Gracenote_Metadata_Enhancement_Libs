@@ -18,24 +18,23 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         ///     Initialize log4net
         /// </summary>
         private readonly ILog _log = LogManager.GetLogger(typeof(ImageSelectionLogic));
-
         private List<GnApiProgramsSchema.assetType> ApiAssetSortedList { get; set; }
         private string IdentifierType { get; set; }
         private List<string> AssetTier { get; set; }
         private string IdentifierId { get; set; }
+        private bool IsLandscape { get; set; }
         private bool IsSquare { get; set; }
+
+
         public List<GnApiProgramsSchema.assetType> ApiAssetList { get; set; }
         public List<Image_Category> ConfigImageCategories { get; set; }
         public Dictionary<string, string> DbImagesForAsset { get; set; }
         public GN_Mapping_Data CurrentMappingData { get; set; }
-        public bool DownloadImageRequired { get; set; }
+        public bool DownloadImageRequired { get; private set; }
         public ImageMapping ImageMapping { get; set; }
-        public string ConfigProgramType { get; set; }
-        public string ImageQualifier { get; set; }
-        public bool IsLandscape { get; set; }
+        public string ImageQualifier { get; private set; }
         public string DbImages { get; set; }
         public bool IsUpdate { get; set; }
-        public int SeasonId { get; set; }
 
         /// <summary>
         ///     Downloads the image from the configured image url and the image path found in the api
@@ -43,21 +42,21 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <param name="sourceImage"></param>
         /// <param name="destinationImage"></param>
         /// <returns></returns>
-        public bool DownloadImage(string sourceImage, string destinationImage)
+        public void DownloadImage(string sourceImage, string destinationImage)
         {
             try
             {
-                var downloadUrl = $"{ADIWF_Config.MediaCloud}/{sourceImage}";
+                using (var webClient = new WebClientManager())
+                {
+                    var downloadUrl = $"{ADIWF_Config.MediaCloud}/{sourceImage}";
 
-                var webClient = new WebClientManager();
-                webClient.DownloadWebBasedFile(
-                    downloadUrl, 
-                    false,
-                    destinationImage);
+                    webClient.DownloadWebBasedFile(
+                        downloadUrl,
+                        false,
+                        destinationImage);
 
-                _log.Info($"Successfully Downloaded Image: {sourceImage} as {destinationImage}");
-
-                return true;
+                    _log.Info($"Successfully Downloaded Image: {sourceImage} as {destinationImage}");
+                }
             }
             catch (Exception diEx)
             {
@@ -65,11 +64,10 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 if (diEx.InnerException != null)
                     _log.Error($"[DownloadImage] Inner Exception: {diEx.InnerException.Message}");
 
-                return false;
             }
         }
 
-        private string ImageTrim(string imageUrl)
+        private static string ImageTrim(string imageUrl)
         {
             var cleanString = imageUrl.TrimStart();
             return cleanString.TrimEnd();
@@ -83,20 +81,16 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         /// <param name="imageTypeRequired"></param>
         /// <param name="currentImageUri"></param>
         /// <returns></returns>
-        private bool HasAsset(Dictionary<string, string> keyValuePairs, string imageTypeRequired, string currentImageUri)
+        private static bool HasAsset(Dictionary<string, string> keyValuePairs, string imageTypeRequired, string currentImageUri)
         {
             return (from item in keyValuePairs
-                let assetKey = ImageTrim(item.Key)
-                let assetValue = ImageTrim(item.Value)
-                where imageTypeRequired.Equals(assetKey) &&
-                      currentImageUri.Equals(assetValue)
-                select assetKey).Any();
+                    let assetKey = ImageTrim(item.Key)
+                    let assetValue = ImageTrim(item.Value)
+                    where imageTypeRequired.Equals(assetKey) &&
+                          currentImageUri.Equals(assetValue)
+                    select assetKey).Any();
         }
 
-        /// <summary>
-        ///     Sorts the Image list in order of Landscape or Portrait dependant on the flag taken from the
-        ///     flags islandscape in the db
-        /// </summary>
         private void SortAssets()
         {
             ApiAssetSortedList = new List<GnApiProgramsSchema.assetType>();
@@ -125,12 +119,6 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 AssetTier.Add("");
         }
 
-        /// <summary>
-        ///     Future method to detect if the file is portait or landscape
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
         private void ImageAspect(string width, string height)
         {
             var w = Convert.ToInt32(width);
@@ -179,7 +167,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
 
         private bool MatchIdentifier(
-            IEnumerable<GnApiProgramsSchema.identifierType> identifiers, 
+            IEnumerable<GnApiProgramsSchema.identifierType> identifiers,
             string imageName
         )
         {
@@ -192,7 +180,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 {
                     IdentifierId = idArr.id.FirstOrDefault();
                     IdentifierType = idArr.type;
-                    _log.Debug($"Image: {imageName} - Identifier ID: {IdentifierId}" +
+                    _log.Debug($"Image: {imageName} - Identifier Type: {IdentifierType} " +
+                               $"Identifier ID: {IdentifierId}" +
                                $" matches Config value: {confIdentifier.Id}");
                     return true;
                 }
@@ -200,7 +189,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
 
             _log.Debug($"Image: {imageName} - No matching identifier present for image, " +
-                      $"no identifier rules applied.");
+                      "no identifier rules applied.");
 
             return false;
         }
@@ -273,26 +262,33 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                     DownloadImageRequired = true;
                     SortAssets();
                     int logged;
-
+                    //iterate the db config for images
                     foreach (var category in ConfigImageCategories)
                     {
                         logged = 0;
+                        //Iterate each image category based on asset tier
                         foreach (var imageTier in category.ImageTier)
                         {
                             // Populate asset list based on Tier
                             UpdateAssetList(imageTier);
                             UpdateCategoryList(ConfigImageCategories);
+
+                            //iterate each image inside the sorted api asset list
                             foreach (var image in ApiAssetSortedList)
                             {
                                 ImageAspect(image.width, image.height);
 
+                                //validate the image category is a match with the config
+                                //and that the image is not flagged as expired on the api
                                 if (image.category != category.CategoryName &&
                                     !string.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
                                     continue;
 
+                                //Check if the images contain identifiers
                                 if (image.identifiers.Any())
                                 {
                                     logged = 1;
+                                    //Check the identifiers match the config.
                                     if (!MatchIdentifier(image.identifiers, image.assetId))
                                     {
                                         continue;
@@ -305,6 +301,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                     logged++;
                                 }
 
+                                //Validate the current image can be used for ingest.
                                 if (!PassesImageLogic(category, image, imageTier, image.tier, IsLandscape))
                                     continue;
 
@@ -313,9 +310,11 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                                 _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
+                                //check if the image is flagged as a requires trimming in config
                                 var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
                                     .Select(r => r.TrimImage).FirstOrDefault());
 
+                                //if requires trimming then append the trim=true to the image uri
                                 var imageUri = requiresTrim
                                     ? $"{image.URI}?trim=true"
                                     : image.URI;
@@ -339,27 +338,26 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                                 _log.Debug("Retrieved images for update package from db");
 
+                                //if this is an update get the db images and validate if the image matches 
+                                //or has been updated, if there is no match download else return false as the image matches
                                 if (!HasAsset(DbImagesForAsset, imageTypeRequired, image.URI))
                                 {
                                     var match = Regex.Match(CurrentMappingData.GN_Images,
                                         $"(?m){imageTypeRequired}:.*?.jpg");
 
-                                    if (match.Success || match.Value == "")
-                                    {
-                                        if (string.IsNullOrEmpty(match.Value))
-                                            CurrentMappingData.GN_Images =
-                                                CurrentMappingData.GN_Images.Replace(match.Value,
-                                                    $"{imageTypeRequired}: {image.URI}");
+                                    if (!match.Success || match.Value != "")
+                                        return imageUri;
 
-                                        _log.Info(
-                                            $"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
+                                    if (string.IsNullOrEmpty(match.Value))
+                                        CurrentMappingData.GN_Images =
+                                            CurrentMappingData.GN_Images.Replace(match.Value,
+                                                $"{imageTypeRequired}: {image.URI}");
 
-                                        UpdateDbImages(match.Value, imageTypeRequired, image.URI);
+                                    _log.Info($"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
 
+                                    UpdateDbImages(match.Value, imageTypeRequired, image.URI);
 
-                                        _log.Info(
-                                            $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
-                                    }
+                                    _log.Info($"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
                                 }
                                 else
                                 {

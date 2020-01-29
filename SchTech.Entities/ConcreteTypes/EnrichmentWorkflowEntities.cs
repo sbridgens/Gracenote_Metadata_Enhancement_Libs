@@ -31,7 +31,7 @@ namespace SchTech.Entities.ConcreteTypes
 
         public string TitlPaidValue { get; set; }
 
-        public  bool IsQamAsset { get; set; }
+        public bool IsQamAsset { get; set; }
         public string OnapiProviderid { get; set; }
 
         public string GracenoteMappingData { get; private set; }

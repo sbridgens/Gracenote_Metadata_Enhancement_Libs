@@ -74,7 +74,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                                      $" where Paid: {paid} & Row ID: {gnMappingData.Id}");
 
 
-            
+
             return true;
         }
 

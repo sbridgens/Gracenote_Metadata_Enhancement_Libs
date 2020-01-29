@@ -1,4 +1,5 @@
-﻿using SchTech.Core.DataAccess.EntityFramework;
+﻿using SchTech.Configuration.Manager.Schema.ADIWFE;
+using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 using SchTech.Entities.ConcreteTypes;
@@ -8,7 +9,6 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using SchTech.Configuration.Manager.Schema.ADIWFE;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {
@@ -100,7 +100,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     if (cea_ex.InnerException != null)
                         EfStaticMethods.Log.Error($"Inner Exception: {cea_ex.InnerException.Message}");
                 }
-                
+
             }
 
             ExpiryProcessing = false;

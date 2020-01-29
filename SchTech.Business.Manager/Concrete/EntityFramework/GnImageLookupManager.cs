@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {
-    public class GnImageLookupManager : IGnImageLookupService
+    public sealed class GnImageLookupManager : IGnImageLookupService
     {
         private readonly IGnImageLookupDal _gnImageLookupDal;
 
