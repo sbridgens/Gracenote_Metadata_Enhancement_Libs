@@ -55,11 +55,11 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                             OperationsSuccessful = true;
                     }
                 }
-                catch (Exception EIFA_Ex)
+                catch (Exception eifaEx)
                 {
-                    Log.Error($"Error Encountered during extraction of entries from zip package: {EIFA_Ex.Message}");
+                    Log.Error($"Error Encountered during extraction of entries from zip package: {eifaEx.Message}");
 
-                    if (EIFA_Ex.InnerException != null) Log.Error($"Inner Exception: {EIFA_Ex.InnerException.Message}");
+                    if (eifaEx.InnerException != null) Log.Error($"Inner Exception: {eifaEx.InnerException.Message}");
 
                     OperationsSuccessful = false;
                 }
@@ -92,11 +92,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
         private ZipArchiveEntry ReturnLargestEntry(ZipArchiveEntry zipEntry)
         {
-            if (zipEntry.Archive != null)
-                foreach (var entry in zipEntry.Archive.Entries.OrderByDescending(e => e.Length))
-                    return entry;
-
-            return null;
+            return zipEntry.Archive?.Entries.OrderByDescending(e => e.Length).FirstOrDefault();
         }
 
         private bool ValidateExtraction(long entrySize)
@@ -138,25 +134,26 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
             archiveEntry.ExtractToFile(outputFile);
 
-            if (ValidateExtraction(entrySize))
-                switch (entryType)
-                {
-                    case "adi":
-                        ExtractedAdiFile = EntryFileInfo;
-                        Log.Info($"ADI.xml Successfully extracted to: {outputFile}");
-                        AdiExtracted = true;
-                        break;
-                    case "movie":
-                        ExtractedMovieAsset = EntryFileInfo;
-                        Log.Info($"Successfully extracted {archiveEntry.Name} to {outputFile}");
-                        MovieAssetExtracted = true;
-                        break;
-                    case "preview":
-                        ExtractedPreview = EntryFileInfo;
-                        Log.Info($"Successfully extracted {archiveEntry.Name} to {outputFile}");
-                        PreviewExtracted = true;
-                        break;
-                }
+            if (!ValidateExtraction(entrySize))
+                return;
+            switch (entryType)
+            {
+                case "adi":
+                    ExtractedAdiFile = EntryFileInfo;
+                    Log.Info($"ADI.xml Successfully extracted to: {outputFile}");
+                    AdiExtracted = true;
+                    break;
+                case "movie":
+                    ExtractedMovieAsset = EntryFileInfo;
+                    Log.Info($"Successfully extracted {archiveEntry.Name} to {outputFile}");
+                    MovieAssetExtracted = true;
+                    break;
+                case "preview":
+                    ExtractedPreview = EntryFileInfo;
+                    Log.Info($"Successfully extracted {archiveEntry.Name} to {outputFile}");
+                    PreviewExtracted = true;
+                    break;
+            }
         }
 
 
@@ -171,14 +168,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             {
                 if (IsLegacyGoPackage)
                 {
-                    if (entry.Name.ToLower().Contains("adi"))
-                    {
-                        ExtractEntry(entry, "adi");
-                    }
-                    else
-                    {
-                        ExtractEntry(entry, "movie");
-                    }
+                    ExtractEntry(entry, entry.Name.ToLower().Contains("adi") ? "adi" : "movie");
                 }
                 else
                 {
@@ -196,11 +186,12 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                             Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
                             ExtractEntry(entry, "movie");
                         }
-                        if (!PreviewExtracted && entry.FullName.Contains("preview/"))
-                        {
-                            Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
-                            ExtractEntry(entry, "preview");
-                        }
+
+                        if (PreviewExtracted || !entry.FullName.Contains("preview/"))
+                            continue;
+
+                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
+                        ExtractEntry(entry, "preview");
 
                     }
                     else if (PreviewOnly && entry.FullName.Contains("preview/") && !PreviewExtracted)
@@ -233,18 +224,17 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                 IsUpdatePackage = true;
             }
 
-            if (archive.Entries.FirstOrDefault(p => p.FullName.ToLower().Contains("preview/")) != null)
+            if (archive.Entries.FirstOrDefault(p => p.FullName.ToLower().Contains("preview/")) == null)
+                return;
+            Log.Info("Package contains a Preview file.");
+
+            if (IsTvod && IsUpdatePackage)
             {
-                Log.Info("Package contains a Preview file.");
-
-                if (IsTvod && IsUpdatePackage)
-                {
-                    Log.Info("TVOD Update package contains a Preview asset for inclusion");
-                    PreviewOnly = true;
-                }
-
-                HasPreviewAsset = true;
+                Log.Info("TVOD Update package contains a Preview asset for inclusion");
+                PreviewOnly = true;
             }
+
+            HasPreviewAsset = true;
         }
 
         #region IDisposable
