@@ -179,27 +179,33 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
 
         private bool MatchIdentifier(
-            IEnumerable<GnApiProgramsSchema.identifierType> identifiers
+            IEnumerable<GnApiProgramsSchema.identifierType> identifiers, 
+            string imageName
         )
         {
-            if (!ImageMapping.ImageIdentifier.Any())
-                return false;
-
             foreach (var idArr in identifiers)
-                foreach (var confIdentifier in ImageMapping.ImageIdentifier
-                    .Where(confIdentifier => idArr.type == confIdentifier.Type))
+            {
+                foreach (var confIdentifier in ImageMapping.ImageIdentifier.Where(
+                    confIdentifier => idArr != null &&
+                                      idArr.type == confIdentifier.Type &&
+                                      idArr.id.FirstOrDefault() == confIdentifier.Id))
                 {
-                    if (idArr.id.FirstOrDefault() == confIdentifier.Id)
-                    {
-                        IdentifierId = idArr.id.FirstOrDefault();
-                        return true;
-                    }
-
+                    IdentifierId = idArr.id.FirstOrDefault();
                     IdentifierType = idArr.type;
+                    _log.Debug($"Image: {imageName} - Identifier ID: {IdentifierId}" +
+                               $" matches Config value: {confIdentifier.Id}");
+                    return true;
                 }
+            }
 
-            return true;
+
+            _log.Debug($"Image: {imageName} - No matching identifier present for image, " +
+                      $"no identifier rules applied.");
+
+            return false;
         }
+
+
 
         /// <summary>
         ///     Image logic rules, this is processed in order and can be updated/detracted from dependent on
@@ -214,19 +220,15 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         private bool PassesImageLogic(Image_Category imageCategory, GnApiProgramsSchema.assetType image,
             string configTier, string imageTier, bool isLandscape)
         {
-            //no image tier for movies so ensure the value matches config tier string.empty
             if (imageTier == null)
                 imageTier = "";
 
-            return imageCategory.AllowedAspects.Aspect
-                       .Any(a =>
-                           a.AspectHeight == image.height &&
-                           a.AspectWidth == image.width
-                       ) &&
+            return imageCategory.AllowedAspects.Aspect.Any(
+                       a => a.AspectHeight == image.height &&
+                            a.AspectWidth == image.width) &&
                    configTier == imageTier &&
                    IsLandscape == isLandscape &&
-                   !IsSquare &&
-                   !image.identifiers.Any();
+                   !IsSquare;
         }
 
         private void SetDbImages(string imageTypeRequired, string uri)
@@ -250,14 +252,14 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
         }
 
-        private void LogIdentifierLogic(int identifiersCount, string imageName)
-        {
-            if (!string.IsNullOrEmpty(IdentifierType))
-                _log.Info($"Image: {imageName} - Image Identifier TYPE Match: {IdentifierType} matches Config value");
-            if (!string.IsNullOrEmpty(IdentifierId))
-                _log.Info($"Image: {imageName} - Image Identifier ID: {IdentifierId} matches Config value");
-            else if (identifiersCount == 0) _log.Info("No Identifier config found for current image Type.");
-        }
+        //private void LogIdentifierLogic(int identifiersCount, string imageName)
+        //{
+        //    if (!string.IsNullOrEmpty(IdentifierType))
+        //        _log.Info($"Image: {imageName} - Image Identifier TYPE Match: {IdentifierType} matches Config value");
+        //    if (!string.IsNullOrEmpty(IdentifierId))
+        //        _log.Info($"Image: {imageName} - Image Identifier ID: {IdentifierId} matches Config value");
+        //    else if (identifiersCount == 0) _log.Info("No Identifier config found for current image Type.");
+        //}
 
 
         public string GetGracenoteImage(string imageTypeRequired, string programType, string paid, int seasonId = 0)
@@ -270,8 +272,11 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 {
                     DownloadImageRequired = true;
                     SortAssets();
+                    int logged;
 
                     foreach (var category in ConfigImageCategories)
+                    {
+                        logged = 0;
                         foreach (var imageTier in category.ImageTier)
                         {
                             // Populate asset list based on Tier
@@ -285,12 +290,26 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                     !string.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
                                     continue;
 
-                                if (!MatchIdentifier(image.identifiers) &&
-                                    !PassesImageLogic(category, image, imageTier, image.tier, IsLandscape))
+                                if (image.identifiers.Any())
+                                {
+                                    logged = 1;
+                                    if (!MatchIdentifier(image.identifiers, image.assetId))
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else if (logged == 0)
+                                {
+                                    _log.Debug($"No Identifier config found for current image Type -" +
+                                               $" {imageTypeRequired}");
+                                    logged++;
+                                }
+
+                                if (!PassesImageLogic(category, image, imageTier, image.tier, IsLandscape))
                                     continue;
 
 
-                                LogIdentifierLogic(image.identifiers.Count(), image.assetId);
+                                //LogIdentifierLogic(image.identifiers.Count(), image.assetId);
 
                                 _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
@@ -351,6 +370,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 return imageUri;
                             }
                         }
+                    }
                 }
             }
             catch (Exception ggiEx)

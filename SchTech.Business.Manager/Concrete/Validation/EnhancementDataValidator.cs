@@ -15,7 +15,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
         public string AdiYearValue { get; set; }
 
-        public static bool ValidateVersionMajor(int? dbVersionMajor, bool isTvod)
+        public static bool ValidateVersionMajor(int? dbVersionMajor, bool isTvod=false)
         {
             var adiVersionMajor = EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
             var paid = EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;

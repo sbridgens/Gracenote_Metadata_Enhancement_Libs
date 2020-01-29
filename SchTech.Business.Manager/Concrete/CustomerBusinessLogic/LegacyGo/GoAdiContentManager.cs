@@ -9,14 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
+namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 {
-    public class ProdisAdiContentManager
+    public class GoAdiContentManager
     {
         /// <summary>
         ///     Initialize Log4net
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ProdisAdiContentManager));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(GoAdiContentManager));
 
         private readonly List<string> _adiNodesToRemove = new List<string>
         {
@@ -53,7 +53,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             "Writer"
         };
 
-        public ProdisAdiContentManager()
+        public GoAdiContentManager()
         {
             AdiDataValidator = new EnhancementDataValidator();
         }
@@ -184,21 +184,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool SetAdiAssetContentField(string assetClass, string assetFileName)
-        {
-            var contentFile = EnrichmentWorkflowEntities.AdiFile
-                .Asset.Asset
-                .FirstOrDefault(asset => $"{assetClass}".Equals(asset.Metadata.AMS.Asset_Class));
-
-            if (contentFile == null)
-                return false;
-
-            contentFile.Content.Value = assetFileName;
-
-            Log.Info($"Successfully Set Content Value for Asset Type: {assetClass} to {assetFileName}");
-            return true;
-        }
-
+        
         public int GetVersionMajor()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
@@ -212,13 +198,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         public string GetProviderId()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Provider_ID;
-        }
-
-        public string GetAssetPaid(string assetType)
-        {
-            return EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                .Where(asset => asset.Metadata.AMS.Asset_Class.Equals(assetType))
-                .Select(asset => asset.Metadata.AMS.Asset_ID.ToString()).FirstOrDefault();
         }
 
         public string GetLicenceEndData()
@@ -989,24 +968,5 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool SetQamUpdateContent()
-        {
-            try
-            {
-                var movieAsset =
-                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
-                        c.Metadata.AMS.Asset_Class == "movie");
-                if (movieAsset == null)
-                    throw new Exception("Error retrieving previously Enriched movie section for QAM Update.");
-                movieAsset.Content = new ADIAssetAssetContent { Value = MovieContent };
-
-                return true;
-            }
-            catch (Exception squcex)
-            {
-                Log.Error($"Error Encountered Setting QAM Update content field: {squcex.Message}");
-                return false;
-            }
-        }
     }
 }

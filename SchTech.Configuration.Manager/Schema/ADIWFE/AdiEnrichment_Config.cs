@@ -12,6 +12,15 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
     //    [XmlAttribute(AttributeName = "extradata3")]
     //    public static string Extradata3 { get; set; }
     //}
+    [XmlRoot(ElementName = "LegacyGoAllowedProviders")]
+    public class LegacyGoAllowedProviders
+    {
+        [XmlAttribute(AttributeName = "GoProviders")]
+        public static string GoProviders { get; set; }
+
+        [XmlAttribute(AttributeName = "MoveNonLegacyToDirectory")]
+        public static string MoveNonLegacyToDirectory { get; set; }
+    }
 
     [XmlRoot(ElementName = "Block_Platform")]
     public class Block_Platform
@@ -88,6 +97,9 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         //public static ExtraDataConfig ExtraDataConfig { get; set; }
         [XmlElement(ElementName = "Block_Platform")]
         public static Block_Platform Block_Platform { get; set; }
+
+        [XmlElement(ElementName = "LegacyGoAllowedProviders")]
+        public static LegacyGoAllowedProviders LegacyGoAllowedProviders { get; set; }
 
         [XmlElement(ElementName = "Prefix_Show_ID_Value")]
         public static string Prefix_Show_ID_Value { get; set; }

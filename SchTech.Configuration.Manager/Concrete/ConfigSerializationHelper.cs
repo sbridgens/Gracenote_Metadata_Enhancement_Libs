@@ -29,6 +29,11 @@ namespace SchTech.Configuration.Manager.Concrete
                                 Block_Platform.Providers = ele.Attribute("providers")?.Value;
                                 Block_Platform.BlockPlatformValue = ele.Attribute("BlockPlatformValue")?.Value;
                                 break;
+                            case "LegacyGoAllowedProviders":
+                                LegacyGoAllowedProviders.GoProviders = ele.Attribute("GoProviders")?.Value;
+                                LegacyGoAllowedProviders.MoveNonLegacyToDirectory =
+                                    ele.Attribute("MoveNonLegacyToDirectory")?.Value;
+                                break;
                             default:
                                 pinf.SetValue(pinf.Name, ele.Value);
 

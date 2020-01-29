@@ -19,6 +19,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         public bool OperationsSuccessful { get; set; }
         public bool HasPreviewAsset { get; set; }
         public bool IsUpdatePackage { get; set; }
+        public bool IsLegacyGoPackage { get; set; }
         public bool IsTvod { get; set; }
         public FileInfo ExtractedAdiFile { get; set; }
         public FileInfo ExtractedMovieAsset { get; set; }
@@ -37,7 +38,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                 {
                     ValidatePackageEntries(archive);
                     ProcessArchive(archive, extractAdiOnly, IsUpdatePackage);
-
+                   
                     if (extractAdiOnly && AdiExtracted)
                     {
                         OperationsSuccessful = true;
@@ -103,13 +104,38 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             return EntryFileInfo.Length == entrySize;
         }
 
+        private bool ExtractEntirePackage(string archive)
+        {
+            try
+            {
+                ZipFile.ExtractToDirectory(archive, OutputDirectory);
+                return true;
+            }
+            catch (Exception eepEx)
+            {
+                Log.Error($"Error encountered unpacking source archive: {archive} with exception: {eepEx.Message}");
+                return false;
+            }
+        }
 
         private void ExtractEntry(ZipArchiveEntry archiveEntry, string entryType)
         {
             var entrySize = archiveEntry.Length;
-            var outputFile = Path.Combine(OutputDirectory, archiveEntry.Name);
+            var outputFile = IsLegacyGoPackage 
+                           ? Path.Combine(OutputDirectory, archiveEntry.FullName)
+                           : Path.Combine(OutputDirectory, archiveEntry.Name);
+
+
+            if (IsLegacyGoPackage && !Directory.Exists(Path.GetDirectoryName(outputFile)))
+            {
+                var dir = Path.GetDirectoryName(outputFile);
+                if (dir != null)
+                    Directory.CreateDirectory(dir);
+            }
+
             EntryFileInfo = new FileInfo(outputFile);
             CheckWorkingDirectory();
+            
             archiveEntry.ExtractToFile(outputFile);
 
             if (ValidateExtraction(entrySize))
@@ -143,32 +169,46 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         {
             foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
             {
-                if (!AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
+                if (IsLegacyGoPackage)
                 {
-                    Log.Info("Extracting ADI File from archive.");
-                    ExtractEntry(entry, "adi");
-                }
-                if (bAdiOnly)
-                    continue;
-                if (!bIsUpdate)
-                {
-                    if (!MovieAssetExtracted && entry.FullName.Contains("media/"))
+                    if (entry.Name.ToLower().Contains("adi"))
                     {
-                        Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
+                        ExtractEntry(entry,"adi");
+                    }
+                    else
+                    {
                         ExtractEntry(entry, "movie");
                     }
-                    if (!PreviewExtracted && entry.FullName.Contains("preview/"))
+                }
+                else
+                {
+                    if (!AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
+                    {
+                        Log.Info("Extracting ADI File from archive.");
+                        ExtractEntry(entry, "adi");
+                    }
+                    if (bAdiOnly)
+                        continue;
+                    if (!bIsUpdate)
+                    {
+                        if (!MovieAssetExtracted && entry.FullName.Contains("media/"))
+                        {
+                            Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
+                            ExtractEntry(entry, "movie");
+                        }
+                        if (!PreviewExtracted && entry.FullName.Contains("preview/"))
+                        {
+                            Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
+                            ExtractEntry(entry, "preview");
+                        }
+
+                    }
+                    else if (PreviewOnly && entry.FullName.Contains("preview/") && !PreviewExtracted)
                     {
                         Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
                         ExtractEntry(entry, "preview");
-                    }
 
-                }
-                else if (PreviewOnly && entry.FullName.Contains("preview/") && !PreviewExtracted)
-                {
-                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
-                        ExtractEntry(entry, "preview");
-                    
+                    }
                 }
             }
 
