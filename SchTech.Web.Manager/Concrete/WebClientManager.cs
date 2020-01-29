@@ -16,16 +16,65 @@ namespace SchTech.Web.Manager.Concrete
         private static readonly ILog Log =
             LogManager.GetLogger(typeof(WebClientManager));
 
+        #region Properties
+
+        public HttpWebResponse WebClientResponse { get; set; }
+        public HttpWebRequest WebClientRequest { get; set; }
+        public StreamReader StreamReader { get; set; }
+        public string WebUserAgentString { get; set; }
+        public bool SuccessfulWebRequest { get; set; }
+        public string WebErrorMessage { get; set; }
+        public int RequestStatusCode { get; set; }
+        private int WebRetries { get; set; }
+
+        private readonly CookieContainer _cJar;
+
+        #endregion
+
+        #region IDisposableFunctions
+
+        public bool IsDisposed { get; set; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (IsDisposed)
+                return;
+
+            if (disposing)
+            {
+                // Free any other managed objects here.
+                //
+            }
+
+            // Free any unmanaged objects here.
+            //
+            IsDisposed = true;
+        }
+
+        ~WebClientManager()
+        {
+            Dispose(false);
+        }
+
+        #endregion
+
         public WebClientManager()
         {
-            cJar = new CookieContainer();
+            _cJar = new CookieContainer();
         }
 
         public string HttpGetRequest(string url, bool followRedirect = true)
         {
             RequestStatusCode = 0;
             WebClientRequest = (HttpWebRequest)WebRequest.Create(url);
-            WebClientRequest.CookieContainer = cJar;
+            WebClientRequest.CookieContainer = _cJar;
             WebClientRequest.UserAgent = WebUserAgentString;
             WebClientRequest.Accept = "*/*";
             WebClientRequest.KeepAlive = false;
@@ -33,33 +82,32 @@ namespace SchTech.Web.Manager.Concrete
 
             if (followRedirect) WebClientRequest.AllowAutoRedirect = false;
 
-            if (CheckWebResponse())
-            {
-                if (followRedirect && (RequestStatusCode == (int)HttpStatusCode.Moved ||
-                                       RequestStatusCode == (int)HttpStatusCode.Found))
-                    while (WebClientResponse.StatusCode == HttpStatusCode.Found ||
-                           WebClientResponse.StatusCode == HttpStatusCode.Moved)
-                    {
-                        WebClientResponse.Close();
-                        WebClientRequest = (HttpWebRequest)WebRequest.Create(WebClientResponse.Headers["Location"]);
-                        WebClientRequest.AllowAutoRedirect = false;
-                        WebClientRequest.CookieContainer = cJar;
-                        WebClientResponse = (HttpWebResponse)WebClientRequest.GetResponse();
-                    }
+            if (!CheckWebResponse())
+                throw new Exception("Exception during http get call - status code: " +
+                                    $"{(int) WebClientResponse.StatusCode}, " +
+                                    $"status string: {WebClientResponse.StatusCode} " +
+                                    $"{WebClientResponse.StatusDescription}");
 
-                StreamReader = new StreamReader(WebClientResponse.GetResponseStream()
-                                                ?? throw new InvalidOperationException());
+            if (followRedirect && (RequestStatusCode == (int)HttpStatusCode.Moved ||
+                                   RequestStatusCode == (int)HttpStatusCode.Found))
+                while (WebClientResponse.StatusCode == HttpStatusCode.Found ||
+                       WebClientResponse.StatusCode == HttpStatusCode.Moved)
+                {
+                    WebClientResponse.Close();
+                    WebClientRequest = (HttpWebRequest)WebRequest.Create(WebClientResponse.Headers["Location"]);
+                    WebClientRequest.AllowAutoRedirect = false;
+                    WebClientRequest.CookieContainer = _cJar;
+                    WebClientResponse = (HttpWebResponse)WebClientRequest.GetResponse();
+                }
 
-                RequestStatusCode = (int)WebClientResponse.StatusCode;
-                var responseData = StreamReader.ReadToEnd();
+            StreamReader = new StreamReader(WebClientResponse.GetResponseStream()
+                                            ?? throw new InvalidOperationException());
 
-                return responseData;
-            }
+            RequestStatusCode = (int)WebClientResponse.StatusCode;
+            var responseData = StreamReader.ReadToEnd();
 
-            throw new Exception("Exception during http get call - status code: " +
-                                $"{(int)WebClientResponse.StatusCode}, " +
-                                $"status string: {WebClientResponse.StatusCode} " +
-                                $"{WebClientResponse.StatusDescription}");
+            return responseData;
+
         }
 
         public bool DownloadWebBasedFile(string fileUrl, bool useOriginalFileName = true, string newFileName = null,
@@ -69,11 +117,12 @@ namespace SchTech.Web.Manager.Concrete
             {
                 var uri = new Uri(fileUrl);
 
-                string fileName = useOriginalFileName && string.IsNullOrEmpty(newFileName)
-                    ? fileName = $"{localSaveDirectory}\\{Path.GetFileName(uri.LocalPath)}"
+                var fileName = useOriginalFileName && string.IsNullOrEmpty(newFileName)
+                    ? $"{localSaveDirectory}\\{Path.GetFileName(uri.LocalPath)}"
                     : newFileName;
 
-                client.DownloadFile(uri, fileName);
+                if (fileName != null)
+                    client.DownloadFile(uri, fileName);
             }
 
             return true;
@@ -82,7 +131,7 @@ namespace SchTech.Web.Manager.Concrete
         public string HttpPostRequest(string url, string post, bool followRedirect = true, string refer = "")
         {
             WebClientRequest = (HttpWebRequest)WebRequest.Create(url);
-            WebClientRequest.CookieContainer = cJar;
+            WebClientRequest.CookieContainer = _cJar;
             WebClientRequest.UserAgent = WebUserAgentString;
             WebClientRequest.KeepAlive = false;
             WebClientRequest.Method = "POST";
@@ -109,7 +158,7 @@ namespace SchTech.Web.Manager.Concrete
                     WebClientResponse.Close();
                     WebClientRequest = (HttpWebRequest)WebRequest.Create(WebClientResponse.Headers["Location"]);
                     WebClientRequest.AllowAutoRedirect = false;
-                    WebClientRequest.CookieContainer = cJar;
+                    WebClientRequest.CookieContainer = _cJar;
                     WebClientResponse = (HttpWebResponse)WebClientRequest.GetResponse();
                 }
 
@@ -147,13 +196,11 @@ namespace SchTech.Web.Manager.Concrete
                 {
                     WebRequestRetries();
                 }
-                else
-                {
-                    Log.Error($"Http Get Exception: {cwrException.Message}");
-                    if (cwrException.InnerException != null)
-                        Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
-                    SuccessfulWebRequest = false;
-                }
+
+                Log.Error($"Http Get Exception: {cwrException.Message}");
+                if (cwrException.InnerException != null)
+                    Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
+                SuccessfulWebRequest = false;
             }
 
             return SuccessfulWebRequest;
@@ -167,57 +214,9 @@ namespace SchTech.Web.Manager.Concrete
 
                 Log.Info($"HTTP Get Retry: {r} of {WebRetries}");
                 CheckWebResponse();
+                WebRetries++;
             }
         }
 
-        #region Properties
-
-        public int RequestStatusCode { get; set; }
-        public string WebErrorMessage { get; set; }
-        public HttpWebResponse WebClientResponse { get; set; }
-        public HttpWebRequest WebClientRequest { get; set; }
-        public StreamReader StreamReader { get; set; }
-        public string WebUserAgentString { get; set; }
-        public bool SuccessfulWebRequest { get; set; }
-
-        private readonly int WebRetries = 5;
-
-        private readonly CookieContainer cJar;
-
-        #endregion
-
-        #region IDisposableFunctions
-
-        public bool IsDisposed { get; set; }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        // Protected implementation of Dispose pattern.
-        protected virtual void Dispose(bool disposing)
-        {
-            if (IsDisposed)
-                return;
-
-            if (disposing)
-            {
-                // Free any other managed objects here.
-                //
-            }
-
-            // Free any unmanaged objects here.
-            //
-            IsDisposed = true;
-        }
-
-        ~WebClientManager()
-        {
-            Dispose(false);
-        }
-
-        #endregion
     }
 }
