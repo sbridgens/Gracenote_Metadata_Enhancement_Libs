@@ -43,7 +43,7 @@ namespace ADIWFE_TestClient
             try
             {
                 var xmlSerializer = new ConfigSerializationHelper();
-                return xmlSerializer.LoadConfigurationFile(Settings.Default.XmlConfigFile);
+                return ConfigSerializationHelper.LoadConfigurationFile(Settings.Default.XmlConfigFile);
             }
             catch (Exception lacEx)
             {

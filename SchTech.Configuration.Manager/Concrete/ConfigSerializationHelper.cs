@@ -6,7 +6,7 @@ namespace SchTech.Configuration.Manager.Concrete
 {
     public class ConfigSerializationHelper
     {
-        public bool LoadConfigurationFile(string configFile)
+        public static bool LoadConfigurationFile(string configFile)
         {
             var configLoaded = true;
 
