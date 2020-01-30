@@ -7,7 +7,9 @@ using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 {
@@ -192,6 +194,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor;
         }
 
+        public static string GetProvider()
+        {
+            return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Provider;
+        }
+
         public static string GetProviderId()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Provider_ID;
@@ -324,6 +331,59 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(hasPoster);
             return true;
 
+        }
+
+        public static bool ValidatePackageCanIngest()
+        {
+            try
+            {
+                var hasBlockPlatform = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(
+                    b => b.Metadata.AMS.Asset_Class == "movie"
+                )?.Metadata.App_Data.Where(
+                    bp => bp.Name.ToLower() == "block_platform");
+
+                return hasBlockPlatform != null && hasBlockPlatform.Any();
+            }
+            catch (Exception vpciEx)
+            {
+                Log.Error($"[ValidatePackageIsLegacyGo]: Error validating if package has Block_OTT: {vpciEx.Message}");
+                if (vpciEx.InnerException != null)
+                    Log.Error("[ValidatePackageIsLegacyGo] Inner Exception: " +
+                              $"{vpciEx.InnerException.Message}");
+                return false;
+            }
+        }
+
+        public static bool ValidatePackageIsLegacyGo(FileInfo packageInfo)
+        {
+            try
+            {
+                var providers = LegacyGoAllowedProviders.GoProviders
+                    .Split(',')
+                    .ToList();
+                var currentProvider = GoAdiContentManager.GetProvider();
+
+                var isValid = providers.FirstOrDefault(p => p.Trim(' ').Contains(currentProvider));
+
+                if (!string.IsNullOrEmpty(isValid))
+                    return true;
+
+                Log.Error($"Package for Provider: {currentProvider} is not a Legacy Go Package");
+                Log.Warn($"Moving non legacy go package to configured \"MoveNonLegacyToDirectory\" location: {LegacyGoAllowedProviders.MoveNonLegacyToDirectory}");
+                System.IO.File.Move(packageInfo.FullName,
+                    Path.Combine(LegacyGoAllowedProviders.MoveNonLegacyToDirectory,packageInfo.Name));
+                Log.Info($"Successfully Moved ingest package to: {LegacyGoAllowedProviders.MoveNonLegacyToDirectory}");
+                return false;
+
+            }
+            catch (Exception vpilgEx)
+            {
+                Log.Error($"[ValidatePackageIsLegacyGo]: Error validating if package is a legacy go ingest: {vpilgEx.Message}");
+                if (vpilgEx.InnerException != null)
+                    Log.Error("[ValidatePackageIsLegacyGo] Inner Exception: " +
+                              $"{vpilgEx.InnerException.Message}");
+                return false;
+            }
         }
 
         public static void CheckAndAddBlockPlatformData()
@@ -862,6 +922,26 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 if (iidEx.InnerException != null)
                     Log.Error("[InsertIdmbData] Inner Exception: " +
                               $"{iidEx.InnerException.Message}");
+                return false;
+            }
+        }
+
+        public bool InsertCategoryValue(string mappingValue)
+        {
+            try
+            {
+                if(!string.IsNullOrEmpty(mappingValue))
+                    return AddTitleMetadataApp_DataNode("Category", mappingValue);
+                throw new Exception("Category Value was Null?");
+            }
+            catch (Exception icvEx)
+            {
+                Log.Error("[InsertCategoryValue] Error Setting Category Value: " +
+                          $": {icvEx.Message}");
+
+                if (icvEx.InnerException != null)
+                    Log.Error("[InsertCategoryValue] Inner Exception: " +
+                              $"{icvEx.InnerException.Message}");
                 return false;
             }
         }

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="ConcreteTypes\AdiWorkQueueItem.cs" />
     <Compile Include="ConcreteTypes\Adi_Data.cs" />
+    <Compile Include="ConcreteTypes\CategoryMapping.cs" />
     <Compile Include="ConcreteTypes\EnrichmentDataLists.cs" />
     <Compile Include="ConcreteTypes\EnrichmentWorkflowEntities.cs" />
     <Compile Include="ConcreteTypes\GN_Mapping_Data.cs" />

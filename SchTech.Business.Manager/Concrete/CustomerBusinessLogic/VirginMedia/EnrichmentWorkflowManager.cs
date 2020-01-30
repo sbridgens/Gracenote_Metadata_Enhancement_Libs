@@ -35,6 +35,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private readonly IGnImageLookupService _gnImageLookupService;
 
         private readonly IGnMappingDataService _gnMappingDataService;
+
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         private ProdisAdiContentManager AdiContentManager { get; }
         private GN_Mapping_Data GnMappingData { get; set; }
@@ -137,7 +138,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 IsPackageAnUpdate = ZipHandler.IsUpdatePackage;
 
-                WorkflowEntities.CheckSetSdPackage(IsPackageAnUpdate);
+                if (!WorkflowEntities.CheckSetSdPackage(IsPackageAnUpdate))
+                    return false;
+
                 IsTvodPackage = EnrichmentWorkflowEntities.CheckIfTvodAsset();
                 ZipHandler.IsTvod = IsTvodPackage;
                 WorkflowEntities.CheckIfAssetContainsPreview();
@@ -146,6 +149,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 HasPoster = AdiContentManager.CheckAndRemovePosterSection();
 
                 return true;
+
             }
             catch (Exception ex)
             {
@@ -615,7 +619,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         );
 
                 }
-
+                
                 return
                     //Get and add GN Program Data
                     _gnMappingDataService.AddGraceNoteProgramData(

@@ -28,6 +28,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
         public virtual Microsoft.EntityFrameworkCore.DbSet<Adi_Data> Adi_Data { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<GN_ImageLookup> GN_ImageLookup { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<GN_Mapping_Data> GN_Mapping_Data { get; set; }
+        public virtual Microsoft.EntityFrameworkCore.DbSet<CategoryMapping> CategoryMapping { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -44,6 +45,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
             modelBuilder.Configurations.Add(new AdiEnrichmentMap());
             modelBuilder.Configurations.Add(new GnImageLookupMap());
             modelBuilder.Configurations.Add(new GnMappingDataMap());
+            modelBuilder.Configurations.Add(new CategoryMappingMap());
         }
 
         /// <summary>

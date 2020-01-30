@@ -157,7 +157,8 @@ namespace ADIWFE_TestLegacyGo
                         $"Error encountered processing package: {IngestFile.AdiPackage.Name}",
                         pqiEx);
 
-                    WorkflowManager.ProcessFailedPackage(IngestFile.AdiPackage);
+                    if(!WorkflowManager.NonLegacyGoPackage)
+                        WorkflowManager.ProcessFailedPackage(IngestFile.AdiPackage);
                     Log.Info($"############### Processing FAILED! for item: {IngestFile.AdiPackage.Name} ###############\r\n");
 
                 }

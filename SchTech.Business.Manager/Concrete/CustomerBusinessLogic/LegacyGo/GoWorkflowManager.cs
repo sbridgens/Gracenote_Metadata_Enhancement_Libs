@@ -18,6 +18,7 @@ using SchTech.Queue.Manager.Concrete;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
@@ -34,6 +35,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
         private readonly IGnImageLookupService _gnImageLookupService;
 
         private readonly IGnMappingDataService _gnMappingDataService;
+
+        private readonly ICategoryMappingService _categoryMappingService;
+
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         private GoAdiContentManager AdiContentManager { get; }
         private GN_Mapping_Data GnMappingData { get; set; }
@@ -45,6 +49,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
         private bool InsertSuccess { get; set; }
         private Adi_Data AdiData { get; set; }
         public bool FailedToMap { get; set; }
+        public bool NonLegacyGoPackage { get; set; }
 
         private bool HasPoster { get; set; }
 
@@ -56,6 +61,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
             _gnImageLookupService = new GnImageLookupManager(new EfGnImageLookupDal());
             _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
+            _categoryMappingService = new CategoryMappingManager(new EfCategoryMappingDal());
             GnMappingData = new GN_Mapping_Data();
         }
 
@@ -109,7 +115,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 WorkflowEntities.SetCurrentWorkingDirectory();
                 if (Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
                     FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
-                var adiValidation = new AdiXmlValidator();
+               
 
                 if (!ZipHandler.ExtractItemFromArchive(
                     WorkflowEntities.CurrentPackage.FullName,
@@ -117,16 +123,34 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     return false;
 
 
+
                 Log.Info("Validating ADI XML is well formed");
                 if (!WorkflowEntities.SerializeAdiFile(false))
                     return false;
 
+                //validate if this package can continue as a legacy go item
+                if (GoAdiContentManager.ValidatePackageCanIngest())
+                {
+                    Log.Error($"Package has a BLOCK_OTT flag, rejecting ingest");
+                    return false;
+                }
+
+                if (!GoAdiContentManager.ValidatePackageIsLegacyGo(adiPackageInfo))
+                {
+                    NonLegacyGoPackage = true;
+                    return false;
+                }
+
+
                 Log.Info("XML well formed, Retrieving PAID Value from ADI to use in Gracenote Mapping Lookup");
+
                 WorkflowEntities.TitlPaidValue =
                     EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
 
                 HasPoster = GoAdiContentManager.CheckAndRemovePosterSection();
 
+                var adiValidation = new AdiXmlValidator();
+                
 
                 WorkflowEntities.OnapiProviderid =
                     adiValidation.ValidatePaidValue(WorkflowEntities.TitlPaidValue);
@@ -136,6 +160,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 WorkflowEntities.IsQamAsset = adiValidation.IsQamAsset;
 
                 IsPackageAnUpdate = ZipHandler.IsUpdatePackage;
+
 
 
                 return true;
@@ -148,6 +173,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 return false;
             }
         }
+
 
         public bool CallAndParseGnMappingData()
         {
@@ -556,6 +582,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             }
         }
 
+        private string GetCategoryValue()
+        {
+            return _categoryMappingService.Get(
+                c => c.ProviderName == GoAdiContentManager.GetProvider()).CategoryValue;
+        }
+
+
         public bool SetAdiMovieEpisodeMetadata()
         {
             try
@@ -573,6 +606,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 }
 
                 return
+                    //Get and insert Legacy Go Category
+                    AdiContentManager.InsertCategoryValue(GetCategoryValue()) &&
                     //Get and add GN Program Data
                     _gnMappingDataService.AddGraceNoteProgramData(
                         paid: WorkflowEntities.TitlPaidValue,

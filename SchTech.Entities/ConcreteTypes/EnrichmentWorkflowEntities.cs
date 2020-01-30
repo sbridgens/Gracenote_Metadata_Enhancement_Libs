@@ -28,9 +28,7 @@ namespace SchTech.Entities.ConcreteTypes
         public bool HasPackagesToProcess { get; set; }
         public FileInfo CurrentPackage { get; set; }
         public string CurrentWorkingDirectory { get; private set; }
-
         public string TitlPaidValue { get; set; }
-
         public bool IsQamAsset { get; set; }
         public string OnapiProviderid { get; set; }
 
@@ -99,7 +97,6 @@ namespace SchTech.Entities.ConcreteTypes
             }
         }
 
-
         public void CheckIfAssetContainsPreview()
         {
             PackageHasPreviewAsset = AdiFile.Asset.Asset.Any(e => e.Metadata.AMS.Asset_Class != null &&
@@ -120,16 +117,17 @@ namespace SchTech.Entities.ConcreteTypes
             return true;
         }
 
-        public void CheckSetSdPackage(bool isupdate)
+        public bool CheckSetSdPackage(bool isupdate)
         {
             if (isupdate)
-                return;
+                return true;
 
             var adiAssetAssetMetadata = AdiFile.Asset.Asset?.FirstOrDefault()
                 ?.Metadata;
 
             if (adiAssetAssetMetadata != null)
                 IsSdContent = (adiAssetAssetMetadata.App_Data)
+
                               .FirstOrDefault(c => c.Name == "HDContent")
                               ?.Value.ToLower() != "y";
 
@@ -137,7 +135,10 @@ namespace SchTech.Entities.ConcreteTypes
                 throw new InvalidOperationException(
                     $"SD Content Detected, Configuration disallows SD Content from Ingest; Failing ingest for {TitlPaidValue}");
 
+
             Log.Info("Content is marked as SD Content, Configuration allows SD content for ingest.");
+
+            return IsSdContent;
         }
 
         public bool GetGracenoteMappingData()

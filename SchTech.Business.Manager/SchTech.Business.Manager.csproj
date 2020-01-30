@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Abstract\EnrichmentWorkflow\IEnrichmentWorkflowService.cs" />
     <Compile Include="Abstract\EntityFramework\IAdiEnrichmentService.cs" />
+    <Compile Include="Abstract\EntityFramework\ICategoryMappingService.cs" />
     <Compile Include="Abstract\EntityFramework\IGnImageLookupService.cs" />
     <Compile Include="Abstract\EntityFramework\IGnMappingDataService.cs" />
     <Compile Include="Concrete\CustomerBusinessLogic\LegacyGo\GoWorkflowManager.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="Concrete\CustomerBusinessLogic\VirginMedia\EnrichmentWorkflowManager.cs" />
     <Compile Include="Concrete\CustomerBusinessLogic\VirginMedia\ProdisAdiContentManager.cs" />
     <Compile Include="Concrete\EntityFramework\AdiEnrichmentManager.cs" />
+    <Compile Include="Concrete\EntityFramework\CategoryMappingManager.cs" />
     <Compile Include="Concrete\EntityFramework\GnImageLookupManager.cs" />
     <Compile Include="Concrete\EntityFramework\GnMappingDataManager.cs" />
     <Compile Include="Concrete\ImageLogic\ImageSelectionLogic.cs" />
