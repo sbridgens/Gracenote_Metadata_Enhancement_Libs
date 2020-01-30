@@ -49,6 +49,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private bool InsertSuccess { get; set; }
         private bool FailedToMap { get; set; }
         private Adi_Data AdiData { get; set; }
+        private bool HasPoster { get; set; }
 
         public EnrichmentWorkflowManager()
         {
@@ -140,6 +141,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 IsTvodPackage = EnrichmentWorkflowEntities.CheckIfTvodAsset();
                 ZipHandler.IsTvod = IsTvodPackage;
                 WorkflowEntities.CheckIfAssetContainsPreview();
+
+
+                HasPoster = AdiContentManager.CheckAndRemovePosterSection();
 
                 return true;
             }
@@ -377,6 +381,24 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     WorkflowEntities.CurrentWorkingDirectory,
                     true,
                     false);
+
+                if (HasPoster)
+                {
+                    var patterns = new[] { ".jpg", ".jpeg", ".gif", ".png", ".bmp" };
+
+                    var files = Directory
+                        .GetFiles(WorkflowEntities.CurrentWorkingDirectory)
+                        .Where(file => patterns.Any(file.ToLower().EndsWith))
+                        .ToList();
+
+                    if (files.Any())
+                    {
+                        foreach (var f in files)
+                        {
+                            System.IO.File.Delete(f);
+                        }
+                    }
+                }
 
                 if (!IsPackageAnUpdate)
                 {
