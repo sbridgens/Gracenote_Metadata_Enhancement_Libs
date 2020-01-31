@@ -128,13 +128,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 if (!WorkflowEntities.SerializeAdiFile(false))
                     return false;
 
-                //validate if this package can continue as a legacy go item
-                if (GoAdiContentManager.ValidatePackageCanIngest())
-                {
-                    Log.Error($"Package has a BLOCK_OTT flag, rejecting ingest");
-                    return false;
-                }
-
+                
                 if (!GoAdiContentManager.ValidatePackageIsLegacyGo(adiPackageInfo))
                 {
                     NonLegacyGoPackage = true;

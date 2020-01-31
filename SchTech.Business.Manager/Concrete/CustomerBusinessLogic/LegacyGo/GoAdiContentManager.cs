@@ -333,7 +333,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
         }
 
-        public static bool ValidatePackageCanIngest()
+        private static bool ValidatePackageCanIngest()
         {
             try
             {
@@ -368,6 +368,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 if (!string.IsNullOrEmpty(isValid))
                     return true;
 
+                if (ValidatePackageCanIngest())
+                    return true;
                 Log.Error($"Package for Provider: {currentProvider} is not a Legacy Go Package");
                 Log.Warn($"Moving non legacy go package to configured \"MoveNonLegacyToDirectory\" location: {LegacyGoAllowedProviders.MoveNonLegacyToDirectory}");
                 System.IO.File.Move(packageInfo.FullName,
