@@ -1081,7 +1081,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                              $"{ADIWF_Config.UpdatesFailedDirectory}");
                     System.IO.File.Move(source, destination);
                 }
-                else
+                if(!NonLegacyGoPackage)
                 {
                     Log.Info($"Moving Package: {packageFile} to Failed directory: " +
                              $"{ADIWF_Config.FailedDirectory}");
@@ -1090,7 +1090,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 }
 
 
-                if (System.IO.File.Exists(destination))
+                if (System.IO.File.Exists(destination) && !NonLegacyGoPackage)
                     Log.Info("Move to failed directory successful.");
 
                 FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);

@@ -67,7 +67,7 @@ namespace SchTech.File.Manager.Concrete.FileSystem
                     "*.*", SearchOption.AllDirectories))
                     System.IO.File.Delete(file);
 
-                foreach (var dir in Directory.GetDirectories(outputDirectory))
+                foreach (var dir in Directory.GetDirectories(outputDirectory,"*", SearchOption.AllDirectories))
                     Directory.Delete(dir);
 
                 Directory.Delete(outputDirectory);
