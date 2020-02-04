@@ -9,7 +9,7 @@ namespace SchTech.Business.Manager.Abstract.EnrichmentWorkflow
 
         FileInfo PreviewAsset { get; set; }
 
-        bool CheckAndCleanOrphanedData();
+        bool CheckAndCleanOrphanedData(bool timeElapsed);
 
         bool AvailableDriveSpace();
 

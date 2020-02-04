@@ -24,6 +24,7 @@ namespace ADIWFE_TestClient
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
         private WorkQueueItem IngestFile { get; set; }
+        private bool TimerElapsed { get; set; }
         public bool IsInCleanup => false;
 
         private bool Success { get; set; }
@@ -53,7 +54,13 @@ namespace ADIWFE_TestClient
         }
         public void Cleanup()
         {
-            AdiEnrichmentDal.CleanAdiDataWithNoMapping();
+            if (!IsInCleanup)
+            {
+                AdiEnrichmentDal.CleanAdiDataWithNoMapping(TimerElapsed);
+            }
+
+
+            TimerElapsed = false;
         }
 
         /// <summary>
@@ -64,13 +71,24 @@ namespace ADIWFE_TestClient
         /// <param name="e"></param>
         private void ElapsedTime(object src, ElapsedEventArgs e)
         {
-            if (!EfAdiEnrichmentDal.ExpiryProcessing)
-                AdiEnrichmentDal.CleanAdiDataWithNoMapping();
-            //mark as false here as we have tidied up and need to ensure we are not always true.
-            else if (!IsInCleanup)
+            if (!IsInCleanup)
+            {
+                Cleanup();
+                TimerElapsed = false;
+            }
+            else if (EfAdiEnrichmentDal.ExpiryProcessing && !IsInCleanup)
+            {
                 Log.Info("Cleanup timer elapsed however the service is still flagged as processing.");
-            else if (IsInCleanup) Log.Info("Cleanup timer elapsed however the service is currently in a cleanup task.");
+                TimerElapsed = true;
+            }
+
+            else if (!EfAdiEnrichmentDal.ExpiryProcessing && IsInCleanup)
+            {
+                Log.Info("Cleanup timer elapsed however the service is currently in a cleanup task.");
+                TimerElapsed = true;
+            }
         }
+
 
         private void InitialiseTimer()
         {

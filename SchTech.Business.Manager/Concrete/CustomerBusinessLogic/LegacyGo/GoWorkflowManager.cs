@@ -73,14 +73,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                           $" {ex.InnerException.Message}");
         }
 
-        public bool CheckAndCleanOrphanedData()
+        public bool CheckAndCleanOrphanedData(bool timerElapsed)
         {
             try
             {
                 Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
                 if (_adiDataService == null)
                     _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
-                return _adiDataService.CleanAdiDataWithNoMapping() &&
+                return _adiDataService.CleanAdiDataWithNoMapping(timerElapsed) &&
                        _gnMappingDataService.CleanMappingDataWithNoAdi();
             }
             catch (Exception e)
@@ -105,7 +105,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             pollController.StartPollingOperations(ADIWF_Config.InputDirectory, "*.zip");
             WorkflowEntities.HasPackagesToProcess = pollController.HasFilesToProcess;
         }
-
+        
         public bool ObtainAndParseAdiFile(FileInfo adiPackageInfo)
         {
             try
@@ -167,8 +167,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 return false;
             }
         }
-
-
+        
         public bool CallAndParseGnMappingData()
         {
             try
@@ -300,17 +299,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
         {
             try
             {
-                if (IsPackageAnUpdate)
-                    return UpdateGnMappingData();
-
                 var mapData = GetGnMappingData();
+                var gnpaid = mapData?.link.Where(i => i.idType.Equals("PAID"))
+                    .Select(r => r.Value)
+                    .FirstOrDefault();
+
+                var gnexists =
+                    _gnMappingDataService.Get(p => p.GN_Paid == gnpaid);
+
+                if (IsPackageAnUpdate || gnexists != null)
+                    return UpdateGnMappingData();
 
                 var data = new GN_Mapping_Data
                 {
                     GN_TMSID = WorkflowEntities.GraceNoteTmsId,
-                    GN_Paid = mapData?.link.Where(i => i.idType.Equals("PAID"))
-                        .Select(r => r.Value)
-                        .FirstOrDefault(),
+                    GN_Paid = gnpaid,
 
                     GN_RootID = mapData?.id.Where(t => t.type.Equals("rootId"))
                         .Select(r => r.Value)
@@ -333,7 +336,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     GN_Availability_Start = GetAvailability("start", mapData),
                     GN_Availability_End = GetAvailability("end", mapData)
                 };
-
                 GnMappingData = _gnMappingDataService.Add(data);
                 Log.Info($"Gracenote Mapping data seeded to the database with Row Id: {GnMappingData.Id}");
 
@@ -578,8 +580,17 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
         private string GetCategoryValue()
         {
-            return _categoryMappingService.Get(
-                c => c.ProviderName == GoAdiContentManager.GetProvider()).CategoryValue;
+            try
+            {
+                var provider = GoAdiContentManager.GetProvider();
+                return _categoryMappingService.Get(
+                    c => c.ProviderName == provider).CategoryValue;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            
         }
 
 
@@ -599,51 +610,58 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
                 }
 
-                return
-                    //Get and insert Legacy Go Category
-                    AdiContentManager.InsertCategoryValue(GetCategoryValue()) &&
-                    //Get and add GN Program Data
-                    _gnMappingDataService.AddGraceNoteProgramData(
-                        paid: WorkflowEntities.TitlPaidValue,
-                        seriesTitle: ApiManager.GetSeriesTitle(),
-                        episodeTitle: ApiManager.GetEpisodeTitle(),
-                        programDatas: ApiManager.MovieEpisodeProgramData
+                var catValue = GetCategoryValue();
+
+                //Get and insert Legacy Go Category
+                if (!string.IsNullOrEmpty(catValue))
+                    return
+                        AdiContentManager.InsertCategoryValue(catValue) &&
+                        //Get and add GN Program Data
+                        _gnMappingDataService.AddGraceNoteProgramData(
+                            paid: WorkflowEntities.TitlPaidValue,
+                            seriesTitle: ApiManager.GetSeriesTitle(),
+                            episodeTitle: ApiManager.GetEpisodeTitle(),
+                            programDatas: ApiManager.MovieEpisodeProgramData
                         ) &&
 
-                    //Insert Layer data for Program Layer
-                    GoAdiContentManager.InsertProgramLayerData(
-                        WorkflowEntities.GraceNoteTmsId,
-                        seriesId: ApiManager.GetSeriesId()
+                        //Insert Layer data for Program Layer
+                        GoAdiContentManager.InsertProgramLayerData(
+                            WorkflowEntities.GraceNoteTmsId,
+                            seriesId: ApiManager.GetSeriesId()
                         ) &&
 
-                    //Insert Crew Actor Data
-                    AdiContentManager.InsertActorData() &&
+                        //Insert Crew Actor Data
+                        AdiContentManager.InsertActorData() &&
 
-                    //Insert Support Crew Data
-                    AdiContentManager.InsertCrewData() &&
+                        //Insert Support Crew Data
+                        AdiContentManager.InsertCrewData() &&
 
-                    //Insert Program Title Data
-                    AdiContentManager.InsertTitleData(IsMoviePackage) &&
+                        //Insert Program Title Data
+                        AdiContentManager.InsertTitleData(IsMoviePackage) &&
 
-                    //Add Correct description summaries
-                    AdiContentManager.InsertDescriptionData(
-                        descriptions: ApiManager.MovieEpisodeProgramData.descriptions
+                        //Add Correct description summaries
+                        AdiContentManager.InsertDescriptionData(
+                            descriptions: ApiManager.MovieEpisodeProgramData.descriptions
                         ) &&
 
-                    //Insert the Year data based on air date
-                    AdiContentManager.InsertYearData(
-                        airDate: ApiManager.MovieEpisodeProgramData.origAirDate,
-                        movieInfo: ApiManager.MovieEpisodeProgramData?.movieInfo
+                        //Insert the Year data based on air date
+                        AdiContentManager.InsertYearData(
+                            airDate: ApiManager.MovieEpisodeProgramData.origAirDate,
+                            movieInfo: ApiManager.MovieEpisodeProgramData?.movieInfo
                         ) &&
 
-                    //Insert Program Genres and Genre Id's
-                    AdiContentManager.InsertGenreData() &&
+                        //Insert Program Genres and Genre Id's
+                        AdiContentManager.InsertGenreData() &&
 
-                    //Insert required IMDB Data
-                    AdiContentManager.InsertIdmbData(
-                        externalLinks: ApiManager.ExternalLinks(),
-                        hasMovieInfo: HasMovieInfo()
+                        //Insert required IMDB Data
+                        AdiContentManager.InsertIdmbData(
+                            externalLinks: ApiManager.ExternalLinks(),
+                            hasMovieInfo: HasMovieInfo()
                         );
+
+                Log.Error($"A correct Category Mapping for Provider: {GoAdiContentManager.GetProvider()} was not found, failing ingest.");
+                return false;
+
             }
             catch (Exception ex)
             {
@@ -1074,6 +1092,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
                 if (System.IO.File.Exists(destination))
                     Log.Info("Move to failed directory successful.");
+
+                FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
             }
             catch (Exception pfpex)
             {

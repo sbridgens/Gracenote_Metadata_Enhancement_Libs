@@ -44,5 +44,5 @@ using log4net.Config;
 [assembly: AssemblyFileVersion("1.0.1.<#= this.RevisionNumber #>")]
 [assembly: XmlConfigurator(ConfigFile = "Config\\log4net.config")]
 <#+
-    int RevisionNumber = (int)(DateTime.UtcNow - new DateTime(2010,1,1)).TotalDays;
+    int RevisionNumber = (int)(DateTime.UtcNow - new DateTime(2020,1,1)).TotalSeconds % 1000;
 #>

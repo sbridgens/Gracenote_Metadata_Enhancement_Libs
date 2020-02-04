@@ -71,14 +71,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                           $" {ex.InnerException.Message}");
         }
 
-        public bool CheckAndCleanOrphanedData()
+        public bool CheckAndCleanOrphanedData(bool timerElapsed)
         {
             try
             {
                 Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
                 if (_adiDataService == null)
                     _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
-                return _adiDataService.CleanAdiDataWithNoMapping() &&
+                return _adiDataService.CleanAdiDataWithNoMapping(timerElapsed) &&
                        _gnMappingDataService.CleanMappingDataWithNoAdi();
             }
             catch (Exception e)
@@ -1183,6 +1183,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 if (System.IO.File.Exists(destination))
                     Log.Info("Move to failed directory successful.");
+                
+                FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
             }
             catch (Exception pfpex)
             {

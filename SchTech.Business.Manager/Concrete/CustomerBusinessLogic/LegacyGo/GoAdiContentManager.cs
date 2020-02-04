@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 {
@@ -333,7 +332,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
         }
 
-        private static bool ValidatePackageCanIngest()
+        private static bool ValidateBlockOtt()
         {
             try
             {
@@ -365,11 +364,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
                 var isValid = providers.FirstOrDefault(p => p.Trim(' ').Contains(currentProvider));
 
-                if (!string.IsNullOrEmpty(isValid))
+                if (!ValidateBlockOtt() && !string.IsNullOrEmpty(isValid))
                     return true;
 
-                if (ValidatePackageCanIngest())
-                    return true;
                 Log.Error($"Package for Provider: {currentProvider} is not a Legacy Go Package");
                 Log.Warn($"Moving non legacy go package to configured \"MoveNonLegacyToDirectory\" location: {LegacyGoAllowedProviders.MoveNonLegacyToDirectory}");
                 System.IO.File.Move(packageInfo.FullName,

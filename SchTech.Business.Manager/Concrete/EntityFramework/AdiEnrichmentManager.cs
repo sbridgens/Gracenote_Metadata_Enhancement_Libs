@@ -37,9 +37,9 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _adiDataDal.Delete(adiData);
         }
 
-        public bool CleanAdiDataWithNoMapping()
+        public bool CleanAdiDataWithNoMapping(bool timerElapsed)
         {
-            return _adiDataDal.CleanAdiDataWithNoMapping();
+            return _adiDataDal.CleanAdiDataWithNoMapping(timerElapsed);
         }
 
         public Adi_Data Update(Adi_Data adiData)

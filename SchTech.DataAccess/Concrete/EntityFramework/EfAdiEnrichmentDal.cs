@@ -18,16 +18,18 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
         public static bool IsWorkflowProcessing { get; set; }
 
+        private bool IsOrphanCleanupRunning { get; set; }
+
         private ADI_EnrichmentContext CurrentContext { get; set; }
 
-        public bool CleanAdiDataWithNoMapping()
+        public bool CleanAdiDataWithNoMapping(bool timerElapsed)
         {
             try
             {
-                if (!IsWorkflowProcessing)
+                if (!IsWorkflowProcessing && !IsOrphanCleanupRunning)
                     CheckAndClearOrphanedData();
-                if (!ExpiryProcessing)
-                    Task.Run(ClearExpiredAssets);
+                if (!ExpiryProcessing && timerElapsed)
+                    Task.Run((Action) ClearExpiredAssets);
 
                 return true;
             }
@@ -120,6 +122,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
         private void CheckAndClearOrphanedData()
         {
+            IsOrphanCleanupRunning = true;
+
             using (CurrentContext = new ADI_EnrichmentContext())
             {
                 try
@@ -226,7 +230,13 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     if (capoEx.InnerException != null)
                         EfStaticMethods.Log.Error($"Inner Exception: {capoEx.InnerException.Message}");
                 }
+                finally
+                {
+                    IsOrphanCleanupRunning = false;
+                }
             }
+
+            IsOrphanCleanupRunning = false;
         }
     }
 }
