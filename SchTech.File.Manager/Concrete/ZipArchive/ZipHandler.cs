@@ -89,30 +89,13 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
             return OperationsSuccessful;
         }
-
-        private ZipArchiveEntry ReturnLargestEntry(ZipArchiveEntry zipEntry)
-        {
-            return zipEntry.Archive?.Entries.OrderByDescending(e => e.Length).FirstOrDefault();
-        }
+        
 
         private bool ValidateExtraction(long entrySize)
         {
             return EntryFileInfo.Length == entrySize;
         }
-
-        private bool ExtractEntirePackage(string archive)
-        {
-            try
-            {
-                ZipFile.ExtractToDirectory(archive, OutputDirectory);
-                return true;
-            }
-            catch (Exception eepEx)
-            {
-                Log.Error($"Error encountered unpacking source archive: {archive} with exception: {eepEx.Message}");
-                return false;
-            }
-        }
+        
 
         private void ExtractEntry(ZipArchiveEntry archiveEntry, string entryType)
         {
@@ -162,12 +145,16 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         /// </summary>
         /// <param name="archive"></param>
         /// <param name="bAdiOnly"></param>
+        /// <param name="bIsUpdate"></param>
         private void ProcessArchive(System.IO.Compression.ZipArchive archive, bool bAdiOnly, bool bIsUpdate)
         {
             foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
             {
                 if (IsLegacyGoPackage)
                 {
+                    if(AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
+                        continue;
+
                     ExtractEntry(entry, entry.Name.ToLower().Contains("adi") ? "adi" : "movie");
                 }
                 else
@@ -202,8 +189,6 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                     }
                 }
             }
-
-
         }
 
 
@@ -240,7 +225,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         #region IDisposable
 
         // Flag: Has Dispose already been called?
-        private bool disposed;
+        private bool _disposed;
 
         public void Dispose()
         {
@@ -251,7 +236,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            if (_disposed)
                 return;
 
             if (disposing)
@@ -262,7 +247,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
             // Free any unmanaged objects here.
             //
-            disposed = true;
+            _disposed = true;
         }
 
         ~ZipHandler()

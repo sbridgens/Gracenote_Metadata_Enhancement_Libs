@@ -113,6 +113,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 WorkflowEntities.SetCurrentWorkingDirectory();
                 if (Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
                     FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
+
+                Directory.CreateDirectory(WorkflowEntities.CurrentWorkingDirectory);
+
                 var adiValidation = new AdiXmlValidator();
 
                 if (!ZipHandler.ExtractItemFromArchive(

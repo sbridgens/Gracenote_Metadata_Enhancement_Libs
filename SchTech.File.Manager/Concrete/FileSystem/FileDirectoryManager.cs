@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Xml.Linq;
 using static System.Security.Cryptography.MD5;
 
@@ -69,10 +70,17 @@ namespace SchTech.File.Manager.Concrete.FileSystem
 
                 foreach (var dir in Directory.GetDirectories(outputDirectory,"*", SearchOption.AllDirectories))
                     Directory.Delete(dir);
-
-                Directory.Delete(outputDirectory);
-                Log.Info($"Temp Directory {outputDirectory} Successfully removed.");
-                Directory.CreateDirectory(outputDirectory);
+                
+                for (var d = 0; d <= 5; d++)
+                {
+                    if (!RemoveDirectory(outputDirectory))
+                    {
+                        Log.Info($"Temp Directory {outputDirectory} Successfully removed.");
+                        break;
+                    }
+                    Log.Info("Working directory failed to delete retrying.");
+                    Thread.Sleep(2000);
+                }
             }
             catch (Exception delex)
             {
@@ -80,6 +88,14 @@ namespace SchTech.File.Manager.Concrete.FileSystem
                 if (Log.IsDebugEnabled)
                     Log.Debug($"STACK TRACE: {delex.StackTrace}");
             }
+        }
+
+        private static bool RemoveDirectory(string outputdir)
+        {
+            if(Directory.Exists(outputdir))
+                Directory.Delete(outputdir);
+
+            return Directory.Exists(outputdir);
         }
     }
 }

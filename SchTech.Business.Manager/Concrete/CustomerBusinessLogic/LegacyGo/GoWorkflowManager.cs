@@ -18,7 +18,6 @@ using SchTech.Queue.Manager.Concrete;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Configuration;
 
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
@@ -115,7 +114,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 WorkflowEntities.SetCurrentWorkingDirectory();
                 if (Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
                     FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
-               
+
+
+                Directory.CreateDirectory(WorkflowEntities.CurrentWorkingDirectory);
 
                 if (!ZipHandler.ExtractItemFromArchive(
                     WorkflowEntities.CurrentPackage.FullName,
