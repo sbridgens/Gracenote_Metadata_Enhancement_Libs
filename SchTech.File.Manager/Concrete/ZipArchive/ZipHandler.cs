@@ -103,19 +103,23 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             var outputFile = IsLegacyGoPackage
                            ? Path.Combine(OutputDirectory, archiveEntry.FullName)
                            : Path.Combine(OutputDirectory, archiveEntry.Name);
-
-
+            
             if (IsLegacyGoPackage && !Directory.Exists(Path.GetDirectoryName(outputFile)))
             {
                 var dir = Path.GetDirectoryName(outputFile);
+
                 if (dir != null)
+                {
                     Directory.CreateDirectory(dir);
+
+                    Log.Info($"Created Legacy go Output Directory: {dir}");
+                }
             }
 
             EntryFileInfo = new FileInfo(outputFile);
             CheckWorkingDirectory();
 
-            archiveEntry.ExtractToFile(outputFile);
+            archiveEntry.ExtractToFile(outputFile, true);
 
             if (!ValidateExtraction(entrySize))
                 return;
@@ -150,11 +154,8 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         {
             foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
             {
-                if (IsLegacyGoPackage)
+                if (IsLegacyGoPackage && !entry.FullName.EndsWith("/"))
                 {
-                    if(AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
-                        continue;
-
                     ExtractEntry(entry, entry.Name.ToLower().Contains("adi") ? "adi" : "movie");
                 }
                 else
