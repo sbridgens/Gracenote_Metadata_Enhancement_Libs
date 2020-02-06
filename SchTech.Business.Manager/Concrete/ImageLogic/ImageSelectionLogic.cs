@@ -7,6 +7,7 @@ using SchTech.Web.Manager.Concrete;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SchTech.DataAccess.Concrete.EntityFramework;
@@ -347,8 +348,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 //or has been updated, if there is no match download else return false as the image matches
                                 if (!HasAsset(DbImagesForAsset, imageTypeRequired, image.URI))
                                 {
-
-                                    Match match = Regex.Match(CurrentMappingData.GN_Images, $"(?m){imageTypeRequired}:.*?.jpg");
+                                    var imageExtension = Path.GetExtension(image.URI);
+                                    Match match = Regex.Match(CurrentMappingData.GN_Images, $"(?m){imageTypeRequired}:.*?{imageExtension}");
                                     //if "" then the image doesnt exist in the db so grab it.
                                     if (match.Success || match.Value == "")
                                     {
