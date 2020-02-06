@@ -8,6 +8,7 @@ using SchTech.File.Manager.Concrete.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SchTech.Business.Manager.Concrete.ImageLogic;
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 {
@@ -890,11 +891,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        private static string GetImageName(string imageUri, string imageMapping)
-        {
-            return imageUri.Replace(imageUri, $"{imageMapping}_{imageUri}");
-        }
-
         public static bool InsertImageData(
             string titlPaid,
             string imageName,
@@ -916,7 +912,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     {
                         Content = new ADIAssetAssetContent
                         {
-                            Value = GetImageName(imageName, imageMapping)
+                            Value = ImageSelectionLogic.GetImageName(imageName, imageMapping)
                         },
                         Metadata = new ADIAssetAssetMetadata
                         {
@@ -970,7 +966,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (adiObject == null)
                     throw new Exception($"Error retrieving ADI data for image: {paid}");
 
-                adiObject.Content.Value = GetImageName(imageName, imageMapping);
+                adiObject.Content.Value = ImageSelectionLogic.GetImageName(imageName, imageMapping);
                 var cSum = adiObject.Metadata.App_Data.FirstOrDefault(c => c.Name == "Content_CheckSum");
                 var fSize = adiObject.Metadata.App_Data.FirstOrDefault(s => s.Name == "Content_FileSize");
                 var aRatio = adiObject.Metadata.App_Data.FirstOrDefault(a => a.Name == "Image_Aspect_Ratio");

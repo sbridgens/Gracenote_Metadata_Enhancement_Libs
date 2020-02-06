@@ -141,8 +141,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 IsPackageAnUpdate = ZipHandler.IsUpdatePackage;
 
-                if (!WorkflowEntities.CheckSetSdPackage(IsPackageAnUpdate))
-                    return false;
+                WorkflowEntities.CheckSetSdPackage(IsPackageAnUpdate);
 
                 IsTvodPackage = EnrichmentWorkflowEntities.CheckIfTvodAsset();
                 ZipHandler.IsTvod = IsTvodPackage;

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace SchTech.Business.Manager.Concrete.ImageLogic
 {
@@ -157,6 +158,10 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             }
         }
 
+        public static string GetImageName(string imageUri, string imageMapping)
+        {
+            return imageUri.Replace(imageUri, $"{imageMapping}_{imageUri.Replace("?trim=true", "")}");
+        }
 
         private void UpdateCategoryList(List<Image_Category> imageCategories)
         {
@@ -225,7 +230,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             var gnimages = CurrentMappingData.GN_Images;
 
 
-            DbImages = string.IsNullOrEmpty(gnimages)
+            DbImages = String.IsNullOrEmpty(gnimages)
                 ? $"{imageTypeRequired}: {uri}"
                 : $"{gnimages}, {imageTypeRequired}: {uri}";
         }
@@ -235,7 +240,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             if (DbImages == null)
                 DbImages = CurrentMappingData.GN_Images;
 
-            DbImages = string.IsNullOrEmpty(matchValue)
+            DbImages = String.IsNullOrEmpty(matchValue)
                 ? $"{DbImages}, {imageTypeRequired}: {uri}"
                 : DbImages.Replace(matchValue, $"{imageTypeRequired}: {uri}");
 
@@ -281,7 +286,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 //validate the image category is a match with the config
                                 //and that the image is not flagged as expired on the api
                                 if (image.category != category.CategoryName &&
-                                    !string.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
+                                    !String.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
                                     continue;
 
                                 //Check if the images contain identifiers
@@ -342,22 +347,25 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 //or has been updated, if there is no match download else return false as the image matches
                                 if (!HasAsset(DbImagesForAsset, imageTypeRequired, image.URI))
                                 {
-                                    var match = Regex.Match(CurrentMappingData.GN_Images,
-                                        $"(?m){imageTypeRequired}:.*?.jpg");
 
-                                    if (!match.Success || match.Value != "")
-                                        return imageUri;
+                                    Match match = Regex.Match(CurrentMappingData.GN_Images, $"(?m){imageTypeRequired}:.*?.jpg");
+                                    //if "" then the image doesnt exist in the db so grab it.
+                                    if (match.Success || match.Value == "")
+                                    {
+                                        //New image required so update the db and set the uri ready for download.
+                                        string newUri = $"{imageTypeRequired}: {image.URI}";
 
-                                    if (string.IsNullOrEmpty(match.Value))
-                                        CurrentMappingData.GN_Images =
-                                            CurrentMappingData.GN_Images.Replace(match.Value,
-                                                $"{imageTypeRequired}: {image.URI}");
+                                        _log.Debug($"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
+                                        //Added this check in to ensure images are updated if missing or changed.
+                                        CurrentMappingData.GN_Images = match.Value == ""
+                                            ? CurrentMappingData.GN_Images = $"{CurrentMappingData.GN_Images}, {imageTypeRequired}: {image.URI}"
+                                            : CurrentMappingData.GN_Images = CurrentMappingData.GN_Images.Replace(match.Value, newUri);
 
-                                    _log.Info($"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
+                                        //update DbImages list, this will be saved by calling class.
+                                        UpdateDbImages(match.Value, imageTypeRequired, image.URI);
 
-                                    UpdateDbImages(match.Value, imageTypeRequired, image.URI);
-
-                                    _log.Info($"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                        _log.Info($"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                    }
                                 }
                                 else
                                 {
