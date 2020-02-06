@@ -996,11 +996,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
         private string GetImageName(string imageUri, string imageMapping)
         {
-            var baseImage = imageUri.Replace("?trim=true", "");
-            var originalFileName = Path.GetFileNameWithoutExtension(baseImage);
+            var imageName = imageUri.Replace("?trim=true", "");
+            var originalFileName = Path.GetFileNameWithoutExtension(imageName);
 
             var newFileName = originalFileName.Replace(originalFileName,
-                $"{imageMapping}_{originalFileName}{Path.GetExtension(baseImage)}");
+                $"{imageMapping}_{originalFileName}{Path.GetExtension(imageName)}");
+
             return Path.Combine(WorkflowEntities.CurrentWorkingDirectory, newFileName);
         }
 

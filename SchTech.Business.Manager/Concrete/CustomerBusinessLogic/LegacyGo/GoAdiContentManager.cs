@@ -947,7 +947,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
         private static string GetImageName(string imageUri, string imageMapping)
         {
-            return imageUri.Replace(imageUri, $"{imageMapping}_{imageUri}");
+            return imageUri.Replace(imageUri, $"{imageMapping}_{imageUri.Replace("?trim=true", "")}");
         }
 
         public static bool InsertImageData(
