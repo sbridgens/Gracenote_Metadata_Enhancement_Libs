@@ -44,7 +44,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
         private string DeliveryPackage { get; set; }
         public bool IsPackageAnUpdate { get; set; }
         private ZipHandler ZipHandler { get; set; }
-        public bool IsMoviePackage { get; set; }
         private bool InsertSuccess { get; set; }
         private Adi_Data AdiData { get; set; }
         public bool FailedToMap { get; set; }
@@ -506,19 +505,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 GnMappingData.GN_connectorId = WorkflowEntities.GraceNoteConnectorId;
                 _gnMappingDataService.Update(GnMappingData);
 
-                if (ApiManager.MovieEpisodeProgramData?.movieInfo != null)
-                {
-                    Log.Info("Package is a Movie asset.");
-                    IsMoviePackage = true;
-                }
-
-                if (ApiManager.MovieEpisodeProgramData?.holiday != null)
-                {
-                    Log.Info("Program is a Holiday Special of type: " +
-                             $"{ApiManager.MovieEpisodeProgramData.holiday.Value}" +
-                             $" and ID: {ApiManager.MovieEpisodeProgramData.holiday.holidayId}");
-                    WorkflowEntities.PackageIsAOneOffSpecial = true;
-                }
+               ProgramTypes.SetProgramType(
+                   ApiManager.MovieEpisodeProgramData.progType, 
+                   ApiManager.MovieEpisodeProgramData.subType);
 
                 //set default vars for workflow
                 AdiContentManager.InitialiseAndSeedObjectLists(ApiManager.MovieEpisodeProgramData,
@@ -601,7 +590,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             {
                 AdiContentManager.RemoveDefaultAdiNodes();
 
-                if (!IsMoviePackage)
+                if (!EnrichmentWorkflowEntities.IsMoviePackage)
                 {
                     GoAdiContentManager.InsertEpisodeData(
                         WorkflowEntities.GraceNoteTmsId,
@@ -638,7 +627,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                         AdiContentManager.InsertCrewData() &&
 
                         //Insert Program Title Data
-                        AdiContentManager.InsertTitleData(IsMoviePackage) &&
+                        AdiContentManager.InsertTitleData(EnrichmentWorkflowEntities.IsMoviePackage) &&
 
                         //Add Correct description summaries
                         AdiContentManager.InsertDescriptionData(
@@ -758,12 +747,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     mappingData.ProgramType.SingleOrDefault(p => p == ApiManager.MovieEpisodeProgramData.progType);
 
                 // Ensure we don't use series or show assets for movies
-                if (IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_series_") ||
-                    IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_show_"))
+                if (EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_series_") ||
+                    EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_show_"))
                     continue;
 
                 //prevent duplicate processing
-                if (string.IsNullOrEmpty(currentProgramType) ||
+                if (string.IsNullOrEmpty(currentProgramType) || 
                     configLookup.Image_Mapping == currentImage)
                     continue;
 
@@ -782,8 +771,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     isl.CurrentMappingData.Id
                 );
 
-                var imageUri = isl.GetGracenoteImage(configLookup.Image_Lookup, currentProgramType,
-                    WorkflowEntities.TitlPaidValue, WorkflowEntities.SeasonId);
+                var imageUri = isl.GetGracenoteImage(
+                    configLookup.Image_Lookup, 
+                    currentProgramType,
+                    WorkflowEntities.TitlPaidValue, 
+                    WorkflowEntities.SeasonId);
 
                 if (string.IsNullOrEmpty(imageUri))
                     continue;
@@ -823,6 +815,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                         FileDirectoryManager.GetFileSize(localImage),
                         Path.GetExtension(localImage),
                         isl.ImageQualifier,
+                        configLookup.Image_Lookup,
                         isl.GetFileAspectRatio(localImage)
                     );
                     //update image data in db and adi

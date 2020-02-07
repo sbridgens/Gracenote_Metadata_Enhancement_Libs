@@ -533,19 +533,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 GnMappingData.GN_connectorId = WorkflowEntities.GraceNoteConnectorId;
                 _gnMappingDataService.Update(GnMappingData);
 
-                if (ApiManager.MovieEpisodeProgramData?.movieInfo != null)
-                {
-                    Log.Info("Package is a Movie asset.");
-                    IsMoviePackage = true;
-                }
-
-                if (ApiManager.MovieEpisodeProgramData?.holiday != null)
-                {
-                    Log.Info("Program is a Holiday Special of type: " +
-                             $"{ApiManager.MovieEpisodeProgramData.holiday.Value}" +
-                             $" and ID: {ApiManager.MovieEpisodeProgramData.holiday.holidayId}");
-                    WorkflowEntities.PackageIsAOneOffSpecial = true;
-                }
+                ProgramTypes.SetProgramType(
+                    ApiManager.MovieEpisodeProgramData.progType,
+                    ApiManager.MovieEpisodeProgramData.subType);
 
                 //set default vars for workflow
                 AdiContentManager.InitialiseAndSeedObjectLists(ApiManager.MovieEpisodeProgramData,
@@ -860,8 +850,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     isl.CurrentMappingData.Id
                 );
 
-                var imageUri = isl.GetGracenoteImage(configLookup.Image_Lookup, currentProgramType,
-                    WorkflowEntities.TitlPaidValue, WorkflowEntities.SeasonId);
+                var imageUri = isl.GetGracenoteImage(
+                    configLookup.Image_Lookup, 
+                    currentProgramType,
+                    WorkflowEntities.TitlPaidValue, 
+                    WorkflowEntities.SeasonId);
 
                 if (string.IsNullOrEmpty(imageUri))
                     continue;
@@ -901,6 +894,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         FileDirectoryManager.GetFileSize(localImage),
                         Path.GetExtension(localImage),
                         isl.ImageQualifier,
+                        configLookup.Image_Lookup,
                         isl.GetFileAspectRatio(localImage)
                     );
                     //update image data in db and adi

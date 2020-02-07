@@ -45,6 +45,9 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetEpisodeTitle()
         {
+            if (MovieEpisodeProgramData.movieInfo != null)
+                return null;
+
             return MovieEpisodeProgramData.episodeInfo?
                        .title != null
                 ? MovieEpisodeProgramData.episodeInfo?.title.Value
@@ -55,6 +58,10 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetSeriesTitle()
         {
+            var tets = MovieEpisodeProgramData.progType;
+            if (MovieEpisodeProgramData.movieInfo != null)
+                return null;
+
             return MovieEpisodeProgramData
                 .titles
                 .title

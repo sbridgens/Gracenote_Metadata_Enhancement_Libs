@@ -17,19 +17,37 @@ namespace SchTech.Entities.ConcreteTypes
 
         private XmlSerializationManager<ADI> XmlSerializer { get; set; }
         public static ADI AdiFile { get; private set; }
+
         public static ADI EnrichedAdi { get; set; }
+
         public string MovieFileSize { get; set; }
+
         public string PreviewFileSize { get; set; }
+
         public string MovieChecksum { get; set; }
+
         public string PreviewCheckSum { get; set; }
+
         private bool IsSdContent { get; set; }
-        public bool PackageIsAOneOffSpecial { get; set; }
+
+        public static bool PackageIsAOneOffSpecial { get; set; }
+
+        public static bool IsMoviePackage { get; set; }
+
+        public static bool IsEpisodeSeries { get; set; }
+
         public bool PackageHasPreviewAsset { get; private set; }
+
         public bool HasPackagesToProcess { get; set; }
+
         public FileInfo CurrentPackage { get; set; }
+
         public string CurrentWorkingDirectory { get; private set; }
+
         public string TitlPaidValue { get; set; }
+        
         public bool IsQamAsset { get; set; }
+
         public string OnapiProviderid { get; set; }
 
         public string GracenoteMappingData { get; private set; }
@@ -49,8 +67,6 @@ namespace SchTech.Entities.ConcreteTypes
         public int AdiVersionMajor { get; private set; }
 
         public int SeasonId { get; set; }
-
-        public bool IsMoviePackage { get; set; }
 
         public bool IsDateTime(string txtDate) => DateTime.TryParse(txtDate, out _);
 

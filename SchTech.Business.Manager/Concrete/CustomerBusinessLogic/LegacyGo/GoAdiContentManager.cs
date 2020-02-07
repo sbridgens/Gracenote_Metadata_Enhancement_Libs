@@ -954,6 +954,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             string contentFileSize,
             string encodingType,
             string imageQualifier,
+            string imageLookupName,
             string imageAspectRatio
         )
         {
@@ -992,7 +993,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 AddAssetMetadataApp_DataNode(paid, "Content_CheckSum", contentCheckSum);
                 AddAssetMetadataApp_DataNode(paid, "Content_FileSize", contentFileSize);
                 AddAssetMetadataApp_DataNode(paid, "Encoding_Type", encodingType);
-                AddAssetMetadataApp_DataNode(paid, "Image_Qualifier", imageQualifier);
+                AddAssetMetadataApp_DataNode(paid, "Image_Qualifier", imageLookupName);
                 AddAssetMetadataApp_DataNode(paid, "Image_Aspect_Ratio", imageAspectRatio);
 
                 return true;

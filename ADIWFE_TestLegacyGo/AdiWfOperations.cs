@@ -8,6 +8,7 @@ using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
 using System;
 using System.Timers;
+using SchTech.Entities.ConcreteTypes;
 
 namespace ADIWFE_TestLegacyGo
 {
@@ -160,7 +161,7 @@ namespace ADIWFE_TestLegacyGo
                     if (!Success)
                         throw new Exception(
                             "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
-                    if (!WorkflowManager.IsMoviePackage)
+                    if (!EnrichmentWorkflowEntities.IsMoviePackage)
                         ProcessSeriesEpisodePackage();
 
 

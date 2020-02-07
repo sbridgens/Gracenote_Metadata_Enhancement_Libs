@@ -85,6 +85,10 @@
       <Project>{45D7D10A-D8B6-4381-995B-44F8E2E3D500}</Project>
       <Name>SchTech.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SchTech.Entities\SchTech.Entities.csproj">
+      <Project>{FBEC6C57-4653-415B-86C0-31545F92E285}</Project>
+      <Name>SchTech.Entities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SchTech.File.Manager\SchTech.File.Manager.csproj">
       <Project>{F39AE7F9-3F7D-4942-BB7E-F6DB58255042}</Project>
       <Name>SchTech.File.Manager</Name>
