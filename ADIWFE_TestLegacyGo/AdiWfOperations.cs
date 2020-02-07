@@ -236,7 +236,7 @@ namespace ADIWFE_TestLegacyGo
                           GoWorkflowManager.RemoveDerivedFromAsset() &&
                           GoWorkflowManager.FinalisePackageData() &&
                           WorkflowManager.SaveAdiFile() &&
-                          WorkflowManager.PackageEnrichedAsset() &&
+                          WorkflowManager.PackageEnrichedAsset(IngestFile.AdiPackage) &&
                           WorkflowManager.DeliverEnrichedAsset();
             }
             catch (Exception aptex)

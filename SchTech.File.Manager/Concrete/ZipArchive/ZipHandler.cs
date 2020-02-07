@@ -9,6 +9,8 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 {
     public class ZipHandler : IDisposable, IAdiArchiveInterface
     {
+        #region Properties
+
         private static readonly ILog Log = LogManager.GetLogger(typeof(ZipHandler));
         private FileInfo EntryFileInfo { get; set; }
         private string OutputDirectory { get; set; }
@@ -25,6 +27,19 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         public FileInfo ExtractedMovieAsset { get; set; }
         public FileInfo ExtractedPreview { get; set; }
 
+        #endregion Properties
+
+
+        private void CheckWorkingDirectory()
+        {
+            if (Directory.Exists(OutputDirectory))
+                return;
+
+            Log.Info($"Creating Working Directory: {OutputDirectory}");
+            Directory.CreateDirectory(OutputDirectory);
+        }
+
+
         public bool ExtractItemFromArchive(string sourceArchive, string outputDirectory, bool extractAll,
             bool extractAdiOnly)
         {
@@ -39,7 +54,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                     ValidatePackageEntries(archive);
                     ProcessArchive(archive, extractAdiOnly, IsUpdatePackage);
 
-                    if (extractAdiOnly && AdiExtracted)
+                    if (extractAdiOnly || IsLegacyGoPackage && AdiExtracted)
                     {
                         OperationsSuccessful = true;
                     }
@@ -68,34 +83,84 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             return OperationsSuccessful;
         }
 
-        public bool CreateArchive(string sourceDirectory, string destinationArchive)
+
+
+        private void ValidatePackageEntries(System.IO.Compression.ZipArchive archive)
         {
-            try
+            if (archive.Entries.FirstOrDefault(e => e.FullName.ToLower().Contains("media/")) == null)
             {
-                Log.Info($"Packaging Source directory: {sourceDirectory} to Zip Archive: {destinationArchive}");
-                ZipFile.CreateFromDirectory(sourceDirectory, destinationArchive, CompressionLevel.Fastest, false);
-                Log.Info($"Zip Archive: {destinationArchive} created Successfully.");
-
-                OperationsSuccessful = true;
-            }
-            catch (Exception createZipEx)
-            {
-                Log.Error($"Failed to Create Zip package: {destinationArchive} - {createZipEx.Message}");
-
-                if (createZipEx.InnerException != null)
-                    Log.Error($"Inner Exception: {createZipEx.InnerException.Message}");
-                OperationsSuccessful = false;
+                Log.Info("No Media Directory Initially Marking Package as an update");
+                IsUpdatePackage = true;
             }
 
-            return OperationsSuccessful;
-        }
-        
+            if (archive.Entries.FirstOrDefault(p => p.FullName.ToLower().Contains("preview/")) == null)
+                return;
+            Log.Info("Package contains a Preview file.");
 
-        private bool ValidateExtraction(long entrySize)
-        {
-            return EntryFileInfo.Length == entrySize;
+            if (IsTvod && IsUpdatePackage)
+            {
+                Log.Info("TVOD Update package contains a Preview asset for inclusion");
+                PreviewOnly = true;
+            }
+
+            HasPreviewAsset = true;
         }
-        
+
+        /// <summary>
+        ///     Function to iterate archive and trigger extraction of a required file(s)
+        /// </summary>
+        /// <param name="archive"></param>
+        /// <param name="bAdiOnly"></param>
+        /// <param name="bIsUpdate"></param>
+        private void ProcessArchive(System.IO.Compression.ZipArchive archive, bool bAdiOnly, bool bIsUpdate)
+        {
+            foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
+            {
+                if (AdiExtracted && IsLegacyGoPackage)
+                {
+                    bAdiOnly = true;
+                    break;
+                }
+
+                if (!AdiExtracted && IsLegacyGoPackage && entry.Name.ToLower().Equals("adi.xml"))
+                {
+                    Log.Info("Legacy go Package - Extracting ADI.xml Only");
+                    ExtractEntry(entry, "adi");
+                }
+                else
+                {
+                    if (!AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
+                    {
+                        Log.Info("Extracting ADI File from archive.");
+                        ExtractEntry(entry, "adi");
+                    }
+                    if (bAdiOnly)
+                        continue;
+                    if (!bIsUpdate)
+                    {
+                        if (!MovieAssetExtracted && entry.FullName.Contains("media/"))
+                        {
+                            Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
+                            ExtractEntry(entry, "movie");
+                        }
+
+                        if (PreviewExtracted || !entry.FullName.Contains("preview/"))
+                            continue;
+
+                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
+                        ExtractEntry(entry, "preview");
+
+                    }
+                    else if (PreviewOnly && entry.FullName.Contains("preview/") && !PreviewExtracted)
+                    {
+                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
+                        ExtractEntry(entry, "preview");
+
+                    }
+                }
+            }
+        }
+
 
         private void ExtractEntry(ZipArchiveEntry archiveEntry, string entryType)
         {
@@ -144,84 +209,111 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         }
 
 
-        /// <summary>
-        ///     Function to iterate archive and trigger extraction of a required file(s)
-        /// </summary>
-        /// <param name="archive"></param>
-        /// <param name="bAdiOnly"></param>
-        /// <param name="bIsUpdate"></param>
-        private void ProcessArchive(System.IO.Compression.ZipArchive archive, bool bAdiOnly, bool bIsUpdate)
+        private bool ValidateExtraction(long entrySize)
         {
-            foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
+            return EntryFileInfo.Length == entrySize;
+        }
+
+
+        public static void DeletePostFromPackage(string sourceArchive)
+        {
+            try
             {
-                if (IsLegacyGoPackage && !entry.FullName.EndsWith("/"))
+                var patterns = new[] { ".jpg", ".jpeg", ".gif", ".png", ".bmp" };
+
+                using (var zipArchive = ZipFile.Open(sourceArchive, ZipArchiveMode.Update))
                 {
-                    ExtractEntry(entry, entry.Name.ToLower().Contains("adi") ? "adi" : "movie");
-                }
-                else
-                {
-                    if (!AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
+                    foreach (var entry in zipArchive.Entries)
                     {
-                        Log.Info("Extracting ADI File from archive.");
-                        ExtractEntry(entry, "adi");
-                    }
-                    if (bAdiOnly)
-                        continue;
-                    if (!bIsUpdate)
-                    {
-                        if (!MovieAssetExtracted && entry.FullName.Contains("media/"))
+                        foreach (var ext in patterns)
                         {
-                            Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
-                            ExtractEntry(entry, "movie");
+                            if (!Path.GetExtension(entry.Name).Equals(ext))
+                                continue;
+
+                            var archiveFile = zipArchive.GetEntry(entry.Name);
+                            archiveFile?.Delete();
+                        }
+                    }
+                }
+
+            }
+            catch (Exception deletePosterEx)
+            {
+                Log.Error($"Failed to Deleting Poster from Archive: {sourceArchive} - {deletePosterEx.Message}");
+
+                if (deletePosterEx.InnerException != null)
+                    Log.Error($"Inner Exception: {deletePosterEx.InnerException.Message}");
+
+            }
+        }
+
+
+        public bool CreateLegacyGoPackage(string sourceArchive, string sourceDirectory)
+        {
+            try
+            {
+                using (var zipArchive = ZipFile.Open(sourceArchive, ZipArchiveMode.Update))
+                {
+                    foreach (var file in Directory.EnumerateFiles(
+                        sourceDirectory,
+                        "*.*",
+                        searchOption: SearchOption.TopDirectoryOnly))
+                    {
+                        var fileInfo = new FileInfo(file);
+                        Log.Info($"Adding File: {fileInfo.Name} to Package");
+
+                        if (fileInfo.Name.ToLower().Equals("adi.xml"))
+                        {
+                            var archiveFile = zipArchive.GetEntry(fileInfo.Name);
+                            archiveFile?.Delete();
                         }
 
-                        if (PreviewExtracted || !entry.FullName.Contains("preview/"))
-                            continue;
+                        zipArchive.CreateEntryFromFile(fileInfo.FullName, fileInfo.Name);
 
-                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
-                        ExtractEntry(entry, "preview");
-
+                        Log.Info($"Successfully Added  File: {fileInfo.Name} to Package");
                     }
-                    else if (PreviewOnly && entry.FullName.Contains("preview/") && !PreviewExtracted)
-                    {
-                        Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
-                        ExtractEntry(entry, "preview");
 
-                    }
+                    Log.Info("Updating Package entries.");
                 }
+
+                Log.Info("Packaging Successfully completed.");
+                return true;
+
             }
-        }
-
-
-        private void CheckWorkingDirectory()
-        {
-            if (Directory.Exists(OutputDirectory))
-                return;
-
-            Log.Info($"Creating Working Directory: {OutputDirectory}");
-            Directory.CreateDirectory(OutputDirectory);
-        }
-
-        private void ValidatePackageEntries(System.IO.Compression.ZipArchive archive)
-        {
-            if (archive.Entries.FirstOrDefault(e => e.FullName.ToLower().Contains("media/")) == null)
+            catch (Exception createGoEx)
             {
-                Log.Info("No Media Directory Initially Marking Package as an update");
-                IsUpdatePackage = true;
+                Log.Error($"Failed to Packaging Legacy Go deliverable: {sourceArchive} - {createGoEx.Message}");
+
+                if (createGoEx.InnerException != null)
+                    Log.Error($"Inner Exception: {createGoEx.InnerException.Message}");
+
+                return false;
             }
-
-            if (archive.Entries.FirstOrDefault(p => p.FullName.ToLower().Contains("preview/")) == null)
-                return;
-            Log.Info("Package contains a Preview file.");
-
-            if (IsTvod && IsUpdatePackage)
-            {
-                Log.Info("TVOD Update package contains a Preview asset for inclusion");
-                PreviewOnly = true;
-            }
-
-            HasPreviewAsset = true;
         }
+
+
+        public bool CreateArchive(string sourceDirectory, string destinationArchive)
+        {
+            try
+            {
+                Log.Info($"Packaging Source directory: {sourceDirectory} to Zip Archive: {destinationArchive}");
+                ZipFile.CreateFromDirectory(sourceDirectory, destinationArchive, CompressionLevel.Fastest, false);
+                Log.Info($"Zip Archive: {destinationArchive} created Successfully.");
+
+                OperationsSuccessful = true;
+            }
+            catch (Exception createZipEx)
+            {
+                Log.Error($"Failed to Create Zip package: {destinationArchive} - {createZipEx.Message}");
+
+                if (createZipEx.InnerException != null)
+                    Log.Error($"Inner Exception: {createZipEx.InnerException.Message}");
+                OperationsSuccessful = false;
+            }
+
+            return OperationsSuccessful;
+        }
+
 
         #region IDisposable
 

@@ -389,7 +389,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     return SetInitialUpdateData();
 
 
-                Log.Info("Extracting Media from Package");
+                Log.Info("Extracting Required Items from Package");
 
                 //Legacy Go Package Flagged here to enable entire unpack
                 ZipHandler.IsLegacyGoPackage = true;
@@ -400,20 +400,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
                 if (HasPoster)
                 {
-                    var patterns = new[] { ".jpg", ".jpeg", ".gif", ".png", ".bmp" };
+                    ZipHandler.DeletePostFromPackage(WorkflowEntities.CurrentPackage.FullName);
+                    //var patterns = new[] { ".jpg", ".jpeg", ".gif", ".png", ".bmp" };
 
-                    var files = Directory
-                        .GetFiles(WorkflowEntities.CurrentWorkingDirectory)
-                        .Where(file => patterns.Any(file.ToLower().EndsWith))
-                        .ToList();
+                    //var files = Directory
+                    //    .GetFiles(WorkflowEntities.CurrentWorkingDirectory)
+                    //    .Where(file => patterns.Any(file.ToLower().EndsWith))
+                    //    .ToList();
 
-                    if (files.Any())
-                    {
-                        foreach (var f in files)
-                        {
-                            System.IO.File.Delete(f);
-                        }
-                    }
+                    //if (files.Any())
+                    //{
+                    //    foreach (var f in files)
+                    //    {
+                    //        System.IO.File.Delete(f);
+                    //    }
+                    //}
                 }
 
                 if (!IsPackageAnUpdate)
@@ -875,18 +876,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             return true;
         }
 
-        public bool PackageEnrichedAsset()
+        public bool PackageEnrichedAsset(FileInfo sourceArchive)
         {
             try
             {
-                DeliveryPackage = Path.Combine(ADIWF_Config.TempWorkingDirectory,
-                    $"{Path.GetFileNameWithoutExtension(WorkflowEntities.CurrentPackage.Name)}.zip");
+                DeliveryPackage = sourceArchive.FullName;
 
-                if (System.IO.File.Exists(DeliveryPackage))
-                    System.IO.File.Delete(DeliveryPackage);
-
-                return ZipHandler.CreateArchive(WorkflowEntities.CurrentWorkingDirectory,
-                    DeliveryPackage);
+                return ZipHandler.CreateLegacyGoPackage(sourceArchive.FullName, WorkflowEntities.CurrentWorkingDirectory);
             }
             catch (Exception ex)
             {
