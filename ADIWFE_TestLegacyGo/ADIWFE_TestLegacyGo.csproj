@@ -56,17 +56,11 @@
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="SchTech.Api.Manager">
-      <HintPath>..\SchTech.Api.Manager\bin\Release\SchTech.Api.Manager.dll</HintPath>
-    </Reference>
     <Reference Include="SchTech.Configuration.Manager">
-      <HintPath>..\SchTech.Configuration.Manager\bin\Release\SchTech.Configuration.Manager.dll</HintPath>
+      <HintPath>..\SchTech.Configuration.Manager\bin\x64\Debug\SchTech.Configuration.Manager.dll</HintPath>
     </Reference>
     <Reference Include="SchTech.DataAccess">
-      <HintPath>..\SchTech.DataAccess\bin\Release\SchTech.DataAccess.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Web.Manager">
-      <HintPath>..\SchTech.Web.Manager\bin\Release\SchTech.Web.Manager.dll</HintPath>
+      <HintPath>..\SchTech.DataAccess\bin\x64\Debug\SchTech.DataAccess.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
