@@ -247,21 +247,20 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             }
         }
 
-
+       
         public bool CreateLegacyGoPackage(string sourceArchive, string sourceDirectory)
         {
             try
             {
-                using (var zipArchive = ZipFile.Open(sourceArchive, ZipArchiveMode.Update))
+                foreach (var file in Directory.EnumerateFiles(
+                    sourceDirectory,
+                    "*.*",
+                    searchOption: SearchOption.TopDirectoryOnly))
                 {
-                    foreach (var file in Directory.EnumerateFiles(
-                        sourceDirectory,
-                        "*.*",
-                        searchOption: SearchOption.TopDirectoryOnly))
+                    var fileInfo = new FileInfo(file);
+                    Log.Info($"Adding File: {fileInfo.Name} to Package");
+                    using (var zipArchive = ZipFile.Open(sourceArchive, ZipArchiveMode.Update))
                     {
-                        var fileInfo = new FileInfo(file);
-                        Log.Info($"Adding File: {fileInfo.Name} to Package");
-
                         if (fileInfo.Name.ToLower().Equals("adi.xml"))
                         {
                             var archiveFile = zipArchive.GetEntry(fileInfo.Name);
@@ -272,10 +271,9 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
                         Log.Info($"Successfully Added  File: {fileInfo.Name} to Package");
                     }
-
                     Log.Info("Updating Package entries.");
                 }
-
+                
                 Log.Info("Packaging Successfully completed.");
                 return true;
 
