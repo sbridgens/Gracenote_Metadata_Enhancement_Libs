@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {
@@ -21,16 +22,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         private bool IsOrphanCleanupRunning { get; set; }
 
         private ADI_EnrichmentContext CurrentContext { get; set; }
-
+        
         public bool CleanAdiDataWithNoMapping(bool timerElapsed)
         {
             try
             {
                 if (!IsWorkflowProcessing && !IsOrphanCleanupRunning)
                     CheckAndClearOrphanedData();
-                if (!ExpiryProcessing && timerElapsed)
-                    Task.Run((Action) ClearExpiredAssets);
 
+                if (!ExpiryProcessing && timerElapsed)
+                    Task.Run((Action)ClearExpiredAssets);
                 return true;
             }
             catch (SqlException sqlEx)
@@ -54,7 +55,6 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         private void ClearExpiredAssets()
         {
             ExpiryProcessing = true;
-            var expiryCount = 0;
 
             using (CurrentContext = new ADI_EnrichmentContext())
             {
@@ -63,26 +63,23 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     EfStaticMethods.Log.Info("Checking for expired data in the adi db");
                     var checkWindow = Convert.ToInt32(ADIWF_Config.MinusExpiredAssetWindowHours);
                     var expiredRows = CurrentContext.Adi_Data
-                        .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now.AddHours(-checkWindow)).ToList();
+                        .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now.AddHours(-checkWindow));
 
                     var mapData = new List<GN_Mapping_Data>();
 
                     foreach (var item in expiredRows)
                     {
-                        expiryCount++;
-
+                        EfStaticMethods.Log.Debug($"DB Row ID {item.Id} with PAID Value: {item.TitlPaid} has expired with License Window End Date: {item.Licensing_Window_End.Trim()} marked for removal.");
                         var adiPaid = EfStaticMethods.GetPaidLastValue(item.TitlPaid);
                         var gnMappingData = CurrentContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid.Contains(adiPaid));
                         if (gnMappingData == null)
                             continue;
-
-                        EfStaticMethods.Log.Debug($"DB Row ID {item.Id} with PAID Value: {item.TitlPaid} " +
-                                                  $"has expired with License Window End Date: {item.Licensing_Window_End.Trim()}, " +
-                                                  $"marked for removal.");
-
                         mapData.Add(gnMappingData);
                     }
 
+
+                    var rowCount = expiredRows.Count();
+                    
 
                     EfStaticMethods.Log.Info($"Number of expired assets for removal: {expiredRows.Count()}");
                     CurrentContext.Adi_Data.RemoveRange(expiredRows);
@@ -90,9 +87,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     CurrentContext.SaveChanges();
 
 
-                    EfStaticMethods.Log.Info(expiryCount == 0
+                    EfStaticMethods.Log.Info(rowCount == 0
                         ? "No expired data present."
-                        : $"Number of expired assets removed from database = {expiryCount}");
+                        : $"Number of expired assets removed from database = {rowCount}");
                 }
                 catch (Exception ceaEx)
                 {
@@ -134,11 +131,14 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     var stopWatch = new Stopwatch();
                     stopWatch.Start();
 
+
+
+
                     var adiNoMapped = CurrentContext.Adi_Data.Select(a => new
-                    {
-                        a.Id,
-                        a.TitlPaid
-                    }).ToList();
+                        {
+                            a.Id,
+                            a.TitlPaid
+                        }).ToList();
 
                     var mappedNoAdi = CurrentContext.GN_Mapping_Data.Select(m => new
                     {

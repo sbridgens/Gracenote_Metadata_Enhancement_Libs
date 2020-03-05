@@ -26,6 +26,7 @@ namespace ADIWFE_TestClient
         private WorkQueueItem IngestFile { get; set; }
         private bool TimerElapsed { get; set; }
         public bool IsInCleanup => false;
+        private bool HasCleanedExpired { get; set; }
 
         private bool Success { get; set; }
 
@@ -56,9 +57,14 @@ namespace ADIWFE_TestClient
         {
             if (!IsInCleanup)
             {
+                if (!HasCleanedExpired)
+                {
+                    HasCleanedExpired = true;
+                    TimerElapsed = true;
+                }
+
                 AdiEnrichmentDal.CleanAdiDataWithNoMapping(TimerElapsed);
             }
-
 
             TimerElapsed = false;
         }
@@ -92,6 +98,7 @@ namespace ADIWFE_TestClient
 
         private void InitialiseTimer()
         {
+            HasCleanedExpired = false;
             _timer = new Timer
             {
                 Interval = Convert.ToDouble(ADIWF_Config.ExpiredAssetCleanupIntervalHours) * 60 * 60 * 1000

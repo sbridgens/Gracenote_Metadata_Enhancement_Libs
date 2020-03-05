@@ -227,25 +227,183 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 .FirstOrDefault(l => l.Name.Equals("Licensing_Window_End"))?.Value;
         }
 
-        public static bool CopyPreviouslyEnrichedAssetDataToAdi()
+        //////Additional Safety net to ensure its not included.
+        //public static bool RemoveMovieContentFromUpdate()
+        //{
+        //    try
+        //    {
+        //        var movieAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+        //            .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "movie");
+        //        var previewAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+        //            .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
+
+        //        if (movieAsset != null)
+        //        {
+        //            var newMovie = new ADIAssetAsset
+        //            {
+        //                Metadata = new ADIAssetAssetMetadata
+        //                {
+        //                    AMS = new ADIAssetAssetMetadataAMS(),
+        //                    App_Data = new List<ADIAssetAssetMetadataApp_Data>()
+        //                }
+        //            };
+
+        //            newMovie.Metadata.AMS = movieAsset?.Metadata.AMS;
+        //            newMovie.Metadata.App_Data = movieAsset?.Metadata.App_Data;
+        //            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
+        //            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newMovie);
+        //        }
+
+        //        if (previewAsset == null)
+        //            return true;
+        //        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewAsset);
+        //        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
+
+
+        //        return true;
+        //    }
+        //    catch (Exception rmcfuEx)
+        //    {
+        //        Log.Error($"[RemoveMovieContentFromUpdate] Error during Removal of " +
+        //                  $"Movie Content section from Update {rmcfuEx.Message}");
+
+        //        if (rmcfuEx.InnerException != null)
+        //            Log.Error(
+        //                $"[RemoveMovieContentFromUpdate] Inner Exception: {rmcfuEx.InnerException.Message}");
+        //        return false;
+        //    }
+        //}
+
+
+        // CopyAssetSectionToAdi
+
+
+        public static bool CopyPreviouslyEnrichedAssetDataToAdi(bool hasPreviewAsset, bool hasPreviousUpdate)
         {
             try
             {
-                foreach (var assetData in EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset
-                    .Select(assetSection => new ADIAssetAsset
+                var enrichedDataHasImages =
+                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image");
+
+                //no enriched preview data, no preview asset supplied preview metadata included via incoming adi
+                if (!hasPreviewAsset && 
+                    EnrichmentWorkflowEntities.PackageHasPreviewMetadata && 
+                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.All(p => p.Metadata.AMS.Asset_Class != "preview"))
+                {
+                    Log.Info($"Incoming asset has preview metadata, No Preview asset supplied and " +
+                             $"Enriched data does not contain preview metadata! removing preview data from adi.xml");
+
+                    var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+                        .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewData);
+                }
+
+
+                foreach (var assetData in EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.ToList())
+                {
+                    if (assetData.Metadata.AMS.Asset_Class == "movie")
                     {
-                        Content = new ADIAssetAssetContent
+                        //ensure no existing movie data exists in supplied adi.xml
+                        if (EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+                            .Any(m => m.Metadata.AMS.Asset_Class == "movie"))
                         {
-                            Value = assetSection.Content.Value
-                        },
-                        Metadata = new ADIAssetAssetMetadata
-                        {
-                            AMS = assetSection.Metadata.AMS,
-                            App_Data = assetSection.Metadata.App_Data
+                            var movieAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+                                .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "movie");
+                            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
                         }
-                    }))
-                    if (assetData.Metadata != null)
-                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetData);
+
+                        //add without content node
+                        var assetSection = new ADIAssetAsset
+                        {
+                            Metadata = new ADIAssetAssetMetadata
+                            {
+                                AMS = assetData.Metadata.AMS,
+                                App_Data = assetData.Metadata.App_Data
+                            }
+                        };
+
+                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetSection);
+                    }
+                    if (assetData.Metadata.AMS.Asset_Class == "preview")
+                    {
+                        if (!hasPreviewAsset)
+                        {
+                            //enriched = preview, adi = no preview asset and no preview metadata
+                            if (EnrichmentWorkflowEntities.PackageHasPreviewMetadata)
+                            {
+                                var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+                                    .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
+                                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewData);
+                            }
+                        }
+                        else
+                        {
+                            if (EnrichmentWorkflowEntities.PackageHasPreviewMetadata)
+                            {
+                                Log.Info("Using supplied preview metadata as the update contains a physical asset plus preview metadata.");
+                                continue;
+                            }
+                        }
+                        var previewAsset = new ADIAssetAsset
+                        {
+                            Metadata = new ADIAssetAssetMetadata
+                            {
+                                AMS = assetData.Metadata.AMS,
+                                App_Data = assetData.Metadata.App_Data
+                            }
+                        };
+
+                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
+                    }
+                    if (assetData.Metadata.AMS.Asset_Class == "image")
+                    {
+                        var imageSection = new ADIAssetAsset
+                        {
+                            Content = new ADIAssetAssetContent
+                            {
+                                Value = assetData.Content.Value
+                            },
+                            Metadata = new ADIAssetAssetMetadata
+                            {
+                                AMS = assetData.Metadata.AMS,
+                                App_Data = assetData.Metadata.App_Data
+                            }
+                        };
+
+                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
+                    }
+                }
+
+                if (!enrichedDataHasImages)
+                {
+                    if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.All(u => u.Metadata.AMS.Asset_Class != "image"))
+                    {
+                        Log.Warn("We shouldn't be here! No image data found in the Enriched adi data or the Update Adi data?");
+                        return true;
+                    }
+
+                    Log.Info("Cloning image data from db UpdateAdi data.");
+
+                    foreach (var imageSection in
+                        from assetData in EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.ToList()
+                        where assetData.Metadata.AMS.Asset_Class == "image"
+                        select new ADIAssetAsset
+                        {
+                            Content = new ADIAssetAssetContent
+                            {
+                                Value = assetData.Content.Value
+                            },
+                            Metadata = new ADIAssetAssetMetadata
+                            {
+                                AMS = assetData.Metadata.AMS,
+                                App_Data = assetData.Metadata.App_Data
+                            }
+                        })
+                    {
+                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
+                    }
+
+                }
 
                 return true;
             }
@@ -261,52 +419,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public static bool RemoveMovieContentFromUpdate()
-        {
-            try
-            {
-                var movieAsset =
-                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
-                        c.Metadata.AMS.Asset_Class == "movie");
-                var previewAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
-                    c.Metadata.AMS.Asset_Class == "preview");
-
-                if (movieAsset != null)
-                {
-                    var newMovie = new ADIAssetAsset
-                    {
-                        Metadata = new ADIAssetAssetMetadata
-                        {
-                            AMS = new ADIAssetAssetMetadataAMS(),
-                            App_Data = new List<ADIAssetAssetMetadataApp_Data>()
-                        }
-                    };
-
-                    newMovie.Metadata.AMS = movieAsset?.Metadata.AMS;
-                    newMovie.Metadata.App_Data = movieAsset?.Metadata.App_Data;
-                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
-                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newMovie);
-                }
-
-                if (previewAsset == null)
-                    return true;
-                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewAsset);
-                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
-
-
-                return true;
-            }
-            catch (Exception rmcfuEx)
-            {
-                Log.Error($"[RemoveMovieContentFromUpdate] Error during Removal of " +
-                          $"Movie Content section from Update {rmcfuEx.Message}");
-
-                if (rmcfuEx.InnerException != null)
-                    Log.Error(
-                        $"[RemoveMovieContentFromUpdate] Inner Exception: {rmcfuEx.InnerException.Message}");
-                return false;
-            }
-        }
 
         public static bool UpdateAllVersionMajorValues(int newVersionMajor)
         {

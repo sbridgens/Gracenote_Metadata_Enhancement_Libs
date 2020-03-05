@@ -83,6 +83,7 @@ namespace ADIWFE_TestClient
         private void StartEnhancementEngine()
         {
             while (IsRunning)
+            {
                 try
                 {
                     EfAdiEnrichmentDal.IsWorkflowProcessing = false;
@@ -100,6 +101,7 @@ namespace ADIWFE_TestClient
                         "Error Encountered During Poll Workflow Operations",
                         saeEx);
                 }
+            }
         }
     }
 }

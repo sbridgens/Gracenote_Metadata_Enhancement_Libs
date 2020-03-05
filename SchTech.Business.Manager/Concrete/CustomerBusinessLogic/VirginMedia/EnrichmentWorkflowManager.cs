@@ -145,7 +145,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 IsTvodPackage = EnrichmentWorkflowEntities.CheckIfTvodAsset();
                 ZipHandler.IsTvod = IsTvodPackage;
-                WorkflowEntities.CheckIfAssetContainsPreview();
+                WorkflowEntities.CheckIfAssetContainsPreviewMetadata();
 
 
                 HasPoster = AdiContentManager.CheckAndRemovePosterSection();
@@ -232,11 +232,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
         public bool ValidatePackageIsUnique()
         {
-            var adiMajor = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue);
+            var adiData = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue);
 
-            if (IsPackageAnUpdate && adiMajor != null)
+            if (IsPackageAnUpdate && adiData != null)
             {
-                if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor, IsTvodPackage))
+                if (!EnhancementDataValidator.ValidateVersionMajor(adiData.VersionMajor, IsTvodPackage))
                     return false;
 
                 Log.Info("Package is confirmed as a valid Update Package");
@@ -244,11 +244,15 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 return true;
             }
 
-            if (IsPackageAnUpdate && adiMajor == null)
+            if (IsPackageAnUpdate && adiData == null)
                 Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
-            
-            if (IsPackageAnUpdate && adiMajor != null)
+
+            if (!IsPackageAnUpdate && adiData != null)
+            {
+                Log.Error($"Package with Paid: {WorkflowEntities.TitlPaidValue} Exists in the database, failing Ingest.");
                 return false;
+            }
+
             Log.Info($"Package with Paid: {WorkflowEntities.TitlPaidValue} " +
                      "confirmed as a unique package, continuing ingest operations.");
 
@@ -711,7 +715,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                if (!WorkflowEntities.PackageHasPreviewAsset)
+                if (!EnrichmentWorkflowEntities.PackageHasPreviewMetadata)
                     return true;
 
                 var paid = WorkflowEntities.TitlPaidValue.Replace("TITL", "PREV");
@@ -1026,8 +1030,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 //Get the correct stored adi data
                 AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
                 if (AdiData.EnrichedAdi == null)
-                    throw new Exception($"Previously Enriched ADI data for Paid: {WorkflowEntities.TitlPaidValue}" +
-                                        $" was not found in the database?");
+                    throw new Exception($"Previously Enriched ADI data for Paid: " +
+                                        $"{WorkflowEntities.TitlPaidValue} was not found in the database?");
 
                 //Serialize previously enriched Adi File to obtain Asset data
                 WorkflowEntities.SerializeAdiFile(true, AdiData.EnrichedAdi);
@@ -1048,19 +1052,29 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     var movieData = EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(m => m.Metadata.AMS.Asset_Class == "movie");
                     AdiContentManager.MovieContent = movieData?.Content.Value;
                     EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Remove(movieData);
+                    //Load the update adi ready for preview data checks
+                    if (AdiData.UpdateAdi != null)
+                        WorkflowEntities.SerializeAdiFile(true, AdiData.UpdateAdi, true);
                 }
 
-                ProdisAdiContentManager.RemoveMovieContentFromUpdate();
+                //ProdisAdiContentManager.RemoveMovieContentFromUpdate();
                 //Get original asset data and modify new adi.
-                if (!ProdisAdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi())
+                if (!ProdisAdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi(ZipHandler.HasPreviewAsset, AdiData.UpdateAdi != null))
                     return false;
+
+
                 //Update all version major values to correct value.
                 if (!ProdisAdiContentManager.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
                     return false;
 
 
+
                 _adiDataService.Update(AdiData);
                 Log.Info("Adi data updated in the database.");
+
+                //nullify updateadi data
+                if(AdiData.UpdateAdi != null)
+                    AdiData.UpdateAdi = null;
 
                 return true;
 

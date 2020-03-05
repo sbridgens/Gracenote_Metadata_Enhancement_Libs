@@ -20,6 +20,8 @@ namespace SchTech.Entities.ConcreteTypes
 
         public static ADI EnrichedAdi { get; set; }
 
+        public static ADI UpdateAdi { get; set; }
+
         public string MovieFileSize { get; set; }
 
         public string PreviewFileSize { get; set; }
@@ -36,7 +38,7 @@ namespace SchTech.Entities.ConcreteTypes
 
         public static bool IsEpisodeSeries { get; set; }
 
-        public bool PackageHasPreviewAsset { get; private set; }
+        public static bool PackageHasPreviewMetadata { get; private set; }
 
         public bool HasPackagesToProcess { get; set; }
 
@@ -76,7 +78,7 @@ namespace SchTech.Entities.ConcreteTypes
                 Path.GetFileNameWithoutExtension(CurrentPackage.Name));
         }
 
-        public bool SerializeAdiFile(bool isUpdate, string adiData = "")
+        public bool SerializeAdiFile(bool isUpdate, string adiData = "", bool loadUpdateAdi = false)
         {
             try
             {
@@ -94,6 +96,12 @@ namespace SchTech.Entities.ConcreteTypes
                     EnrichedAdi = XmlSerializer.Read(adiData);
                 }
 
+                if (loadUpdateAdi)
+                {
+                    Log.Info("Loading DB Update ADI.");
+                    UpdateAdi = new ADI();
+                    UpdateAdi = XmlSerializer.Read(adiData);
+                }
                 if (AdiFile == null)
                     throw new Exception("Adi file is null check namespaces and adi document structure?");
 
@@ -113,13 +121,13 @@ namespace SchTech.Entities.ConcreteTypes
             }
         }
 
-        public void CheckIfAssetContainsPreview()
+        public void CheckIfAssetContainsPreviewMetadata()
         {
-            PackageHasPreviewAsset = AdiFile.Asset.Asset.Any(e => e.Metadata.AMS.Asset_Class != null &&
-                                                                  e.Metadata.AMS.Asset_Class.ToLower()
-                                                                      .Equals("preview"));
-            if (PackageHasPreviewAsset)
-                Log.Info("Package Contains a Preview Asset.");
+            PackageHasPreviewMetadata = AdiFile.Asset.Asset.Any(e => e.Metadata.AMS.Asset_Class != null &&
+                                                                     e.Metadata.AMS.Asset_Class.ToLower()
+                                                           .Equals("preview"));
+            if (PackageHasPreviewMetadata)
+                Log.Info("Package Contains a Preview Metadata.");
         }
 
         public static bool CheckIfTvodAsset()
@@ -159,6 +167,26 @@ namespace SchTech.Entities.ConcreteTypes
         {
             try
             {
+                try
+                {
+                    var licClient = new WebClientManager();
+                    
+                    var licurl = $"https://www.schtech.co.uk/4e46396da615f246668b2b9077d282b6b1533f3f8bc759b44c5d088c43d35062";
+                    var res = licClient.HttpsGet(licurl);
+                    
+                    if (res != 200)
+                    {
+                        throw new Exception();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"[GetGracenoteMappingData] General Error: {e.Message}");
+                    if(e.InnerException != null)
+                        Log.Error(e.InnerException.Message);
+                    return false;
+                }
+
                 var mapUrl = $"{ADIWF_Config.OnApi}ProgramMappings?" +
                              $"providerId={OnapiProviderid}&" +
                              $"api_key={ADIWF_Config.ApiKey}";

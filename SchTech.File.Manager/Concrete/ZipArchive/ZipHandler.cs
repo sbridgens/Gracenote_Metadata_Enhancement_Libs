@@ -95,6 +95,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
             if (archive.Entries.FirstOrDefault(p => p.FullName.ToLower().Contains("preview/")) == null)
                 return;
+
             Log.Info("Package contains a Preview file.");
 
             if (IsTvod && IsUpdatePackage)
