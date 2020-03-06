@@ -379,7 +379,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.All(u => u.Metadata.AMS.Asset_Class != "image"))
                     {
                         Log.Warn("We shouldn't be here! No image data found in the Enriched adi data or the Update Adi data?");
-                        return true;
+                        return false;
                     }
 
                     Log.Info("Cloning image data from db UpdateAdi data.");
