@@ -70,38 +70,6 @@ namespace SchTech.Web.Manager.Concrete
             _cJar = new CookieContainer();
         }
         
-
-        public int HttpsGet(string url)
-        {
-            IPAddress[] addr = Dns.GetHostAddresses("www.schtech.co.uk");
-            foreach (var ip in addr)
-            {
-                if (ip.ToString() == "146.66.104.243")
-                {
-                    break;
-                }
-                else
-                {
-                    return 500;
-                }
-            }
-            
-            WebRequest request = WebRequest.Create(url);
-            request.Credentials = CredentialCache.DefaultCredentials;
-
-            WebResponse response = request.GetResponse();
-            RequestStatusCode = (int)((HttpWebResponse)response).StatusCode;
-            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-            using (Stream dataStream = response.GetResponseStream())
-            {
-                StreamReader reader = new StreamReader(dataStream);
-                string responseFromServer = reader.ReadToEnd();
-                response.Close();
-
-                return RequestStatusCode;
-            }
-        }
-
         public string HttpGetRequest(string url, bool followRedirect = true)
         {
             RequestStatusCode = 0;
