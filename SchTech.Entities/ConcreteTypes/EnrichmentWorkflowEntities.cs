@@ -167,26 +167,6 @@ namespace SchTech.Entities.ConcreteTypes
         {
             try
             {
-                try
-                {
-                    var licClient = new WebClientManager();
-                    
-                    var licurl = $"https://www.schtech.co.uk/4e46396da615f246668b2b9077d282b6b1533f3f8bc759b44c5d088c43d35062";
-                    var res = licClient.HttpsGet(licurl);
-                    
-                    if (res != 200)
-                    {
-                        throw new Exception();
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"[GetGracenoteMappingData] General Error: {e.Message}");
-                    if(e.InnerException != null)
-                        Log.Error(e.InnerException.Message);
-                    return false;
-                }
-
                 var mapUrl = $"{ADIWF_Config.OnApi}ProgramMappings?" +
                              $"providerId={OnapiProviderid}&" +
                              $"api_key={ADIWF_Config.ApiKey}";
