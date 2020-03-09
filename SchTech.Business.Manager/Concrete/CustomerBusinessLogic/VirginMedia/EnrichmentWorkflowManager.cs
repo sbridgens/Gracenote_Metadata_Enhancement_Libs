@@ -413,8 +413,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (!IsPackageAnUpdate)
                 {
                     //Update content adi movie value with ts file name
-                    ProdisAdiContentManager.SetAdiAssetContentField("movie",
-                        ZipHandler.ExtractedMovieAsset.Name);
+                    ProdisAdiContentManager.SetAdiAssetContentField("movie", ZipHandler.ExtractedMovieAsset.Name);
 
                     PrimaryAsset = ZipHandler.ExtractedMovieAsset;
                 }
@@ -426,13 +425,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (!ZipHandler.HasPreviewAsset)
                     return !IsPackageAnUpdate ? SeedAdiData() : SetInitialUpdateData();
 
-                //Update content adi preview value with ts file name
-                ProdisAdiContentManager.SetAdiAssetContentField("preview",
-                    ZipHandler.ExtractedPreview.Name);
-                PreviewAsset = ZipHandler.ExtractedPreview;
-
-
-
+                if(ZipHandler.HasPreviewAsset)
+                {
+                    //Update content adi preview value with ts file name
+                    ProdisAdiContentManager.SetAdiAssetContentField("preview", ZipHandler.ExtractedPreview.Name);
+                    PreviewAsset = ZipHandler.ExtractedPreview;
+                }
                 //seed adi data if main ingest
                 return !IsPackageAnUpdate ? SeedAdiData() : SetInitialUpdateData();
 

@@ -4,11 +4,6 @@ namespace SchTech.File.Manager.Abstract
 {
     public interface IAdiArchiveInterface
     {
-        bool OperationsSuccessful { get; set; }
-
-        bool HasPreviewAsset { get; set; }
-
-        bool IsUpdatePackage { get; set; }
 
         FileInfo ExtractedAdiFile { get; set; }
 

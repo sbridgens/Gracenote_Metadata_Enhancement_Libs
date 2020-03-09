@@ -19,10 +19,10 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         private bool PreviewExtracted { get; set; }
         private bool PreviewOnly { get; set; }
         public bool OperationsSuccessful { get; set; }
-        public bool HasPreviewAsset { get; set; }
-        public bool IsUpdatePackage { get; set; }
-        public bool IsLegacyGoPackage { get; set; }
-        public bool IsTvod { get; set; }
+        public static bool HasPreviewAsset { get; set; }
+        public static bool IsUpdatePackage { get; set; }
+        public static bool IsLegacyGoPackage { get; set; }
+        public static bool IsTvod { get; set; }
         public FileInfo ExtractedAdiFile { get; set; }
         public FileInfo ExtractedMovieAsset { get; set; }
         public FileInfo ExtractedPreview { get; set; }
