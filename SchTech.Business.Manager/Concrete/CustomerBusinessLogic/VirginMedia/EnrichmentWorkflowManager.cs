@@ -625,7 +625,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     //Insert Layer data for Program Layer
                     ProdisAdiContentManager.InsertProgramLayerData(
                         WorkflowEntities.GraceNoteTmsId,
-                        seriesId: ApiManager.GetSeriesId()
+                        rootId: ApiManager.MovieEpisodeProgramData.rootId
                         ) &&
 
                     //Insert Crew Actor Data

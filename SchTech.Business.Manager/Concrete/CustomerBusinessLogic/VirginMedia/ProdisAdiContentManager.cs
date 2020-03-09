@@ -463,12 +463,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public static bool InsertProgramLayerData(string tmsid, string seriesId)
+        public static bool InsertProgramLayerData(string tmsid, string rootId)
         {
             try
             {
                 return AddTitleMetadataApp_DataNode("GN_Layer1_TMSId", tmsid) &&
-                       AddTitleMetadataApp_DataNode("GN_Layer2_RootId", seriesId);
+                       AddTitleMetadataApp_DataNode("GN_Layer2_RootId", rootId);
             }
             catch (Exception ipldEx)
             {
