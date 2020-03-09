@@ -226,58 +226,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data
                 .FirstOrDefault(l => l.Name.Equals("Licensing_Window_End"))?.Value;
         }
-
-        //////Additional Safety net to ensure its not included.
-        //public static bool RemoveMovieContentFromUpdate()
-        //{
-        //    try
-        //    {
-        //        var movieAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-        //            .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "movie");
-        //        var previewAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-        //            .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
-
-        //        if (movieAsset != null)
-        //        {
-        //            var newMovie = new ADIAssetAsset
-        //            {
-        //                Metadata = new ADIAssetAssetMetadata
-        //                {
-        //                    AMS = new ADIAssetAssetMetadataAMS(),
-        //                    App_Data = new List<ADIAssetAssetMetadataApp_Data>()
-        //                }
-        //            };
-
-        //            newMovie.Metadata.AMS = movieAsset?.Metadata.AMS;
-        //            newMovie.Metadata.App_Data = movieAsset?.Metadata.App_Data;
-        //            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
-        //            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newMovie);
-        //        }
-
-        //        if (previewAsset == null)
-        //            return true;
-        //        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewAsset);
-        //        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
-
-
-        //        return true;
-        //    }
-        //    catch (Exception rmcfuEx)
-        //    {
-        //        Log.Error($"[RemoveMovieContentFromUpdate] Error during Removal of " +
-        //                  $"Movie Content section from Update {rmcfuEx.Message}");
-
-        //        if (rmcfuEx.InnerException != null)
-        //            Log.Error(
-        //                $"[RemoveMovieContentFromUpdate] Inner Exception: {rmcfuEx.InnerException.Message}");
-        //        return false;
-        //    }
-        //}
-
-
-        // CopyAssetSectionToAdi
-
-
+        
+        //Clone / Copy previous enrichment media data to current adi
         public static bool CopyPreviouslyEnrichedAssetDataToAdi(bool hasPreviewAsset, bool hasPreviousUpdate)
         {
             try
@@ -285,13 +235,20 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var enrichedDataHasImages =
                     EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image");
 
-                //no enriched preview data, no preview asset supplied preview metadata included via incoming adi
+                var enrichedDataHasPreview =
+                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.All(p =>
+                        p.Metadata.AMS.Asset_Class != "preview");
+
+                //no enriched preview data,
+                //no preview asset supplied preview metadata included via incoming adi
                 if (!hasPreviewAsset && 
                     EnrichmentWorkflowEntities.PackageHasPreviewMetadata && 
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.All(p => p.Metadata.AMS.Asset_Class != "preview"))
+                    !enrichedDataHasPreview)
                 {
-                    Log.Info($"Incoming asset has preview metadata, No Preview asset supplied and " +
-                             $"Enriched data does not contain preview metadata! removing preview data from adi.xml");
+                    Log.Info($"Incoming asset has preview metadata, " +
+                                    $"No Preview asset supplied and " +
+                                    $"Enriched data does not contain preview metadata! " +
+                                    $"removing preview data from adi.xml");
 
                     var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
                         .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
@@ -303,26 +260,26 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 {
                     if (assetData.Metadata.AMS.Asset_Class == "movie")
                     {
-                        //ensure no existing movie data exists in supplied adi.xml
-                        if (EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                            .Any(m => m.Metadata.AMS.Asset_Class == "movie"))
-                        {
-                            var movieAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                                .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "movie");
-                            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
-                        }
+                        var movieData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(
+                            m => m.Metadata.AMS.Asset_Class == "movie");
 
-                        //add without content node
-                        var assetSection = new ADIAssetAsset
+                        if(movieData != null)
                         {
-                            Metadata = new ADIAssetAssetMetadata
+                            //add without content node
+                            var assetSection = new ADIAssetAsset
                             {
-                                AMS = assetData.Metadata.AMS,
-                                App_Data = assetData.Metadata.App_Data
-                            }
-                        };
-
-                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetSection);
+                                Metadata = new ADIAssetAssetMetadata
+                                {
+                                    //ensure incoming ams is used to maintain pricing information!
+                                    AMS = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+                                        .FirstOrDefault(m => m.Metadata.AMS.Asset_Class == "movie")
+                                        ?.Metadata.AMS,
+                                    App_Data = assetData.Metadata.App_Data
+                                }
+                            };
+                            movieData.Content = null;
+                            movieData.Metadata = assetSection.Metadata;
+                        }
                     }
                     if (assetData.Metadata.AMS.Asset_Class == "preview")
                     {
@@ -333,7 +290,21 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                             {
                                 var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
                                     .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
-                                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewData);
+                                
+                                var previewAsset = new ADIAssetAsset
+                                {
+                                    Metadata = new ADIAssetAssetMetadata
+                                    {
+                                        AMS = assetData.Metadata.AMS,
+                                        App_Data = assetData.Metadata.App_Data
+                                    }
+                                };
+
+                                if (previewData != null)
+                                {
+                                    previewData.Content = null;
+                                    previewData.Metadata = previewAsset.Metadata;
+                                }
                             }
                         }
                         else
@@ -344,16 +315,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                                 continue;
                             }
                         }
-                        var previewAsset = new ADIAssetAsset
-                        {
-                            Metadata = new ADIAssetAssetMetadata
-                            {
-                                AMS = assetData.Metadata.AMS,
-                                App_Data = assetData.Metadata.App_Data
-                            }
-                        };
-
-                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
                     }
                     if (assetData.Metadata.AMS.Asset_Class == "image")
                     {

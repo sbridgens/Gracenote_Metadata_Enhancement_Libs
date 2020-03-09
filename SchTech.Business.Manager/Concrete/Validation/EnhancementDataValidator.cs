@@ -3,6 +3,7 @@ using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Entities.ConcreteTypes;
 using System;
 using System.Linq;
+using SchTech.File.Manager.Concrete.ZipArchive;
 
 namespace SchTech.Business.Manager.Concrete.Validation
 {
@@ -26,12 +27,12 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
                 if (adiVersionMajor > dbVersionMajor)
                 {
-                    if (EnrichmentWorkflowEntities.AdiFile.Asset.Asset?.FirstOrDefault()?.Content == null
-                        ||
-                        isTvod)
+                    if (EnrichmentWorkflowEntities.AdiFile.Asset.Asset?
+                            .FirstOrDefault()?.Content == null || isTvod)
                     {
-                        Log.Info("Confirmed that package with PAID: " +
-                                 $"{paid} is an update. ");
+                        Log.Info($"Confirmed that package with PAID: {paid} is an update. ");
+                        //ensure this is set for media unpack later in workflow
+                        ZipHandler.IsUpdatePackage = true;
 
                         return true;
                     }

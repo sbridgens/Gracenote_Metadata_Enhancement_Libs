@@ -62,12 +62,23 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                     {
                         OperationsSuccessful = true;
                     }
+
+                    if (IsUpdatePackage && AdiExtracted && HasPreviewAsset && PreviewExtracted)
+                    {
+                        OperationsSuccessful = true;
+                    }
                     else if (!extractAdiOnly && MovieAssetExtracted)
                     {
                         if (HasPreviewAsset && PreviewExtracted)
                             OperationsSuccessful = true;
                         else if (!HasPreviewAsset)
                             OperationsSuccessful = true;
+                    }
+                    else
+                    {
+                        Log.Info($"Metadata Update only, no media supplied.");
+                        HasPreviewAsset = false;
+                        OperationsSuccessful = true;
                     }
                 }
                 catch (Exception eifaEx)

@@ -90,7 +90,7 @@ namespace SchTech.Entities.ConcreteTypes
                     AdiFile = XmlSerializer.Read(
                         System.IO.File.ReadAllText(Path.Combine(CurrentWorkingDirectory, "ADI.xml")));
                 }
-                else
+                if(isUpdate && !loadUpdateAdi)
                 {
                     EnrichedAdi = new ADI();
                     EnrichedAdi = XmlSerializer.Read(adiData);
@@ -107,6 +107,7 @@ namespace SchTech.Entities.ConcreteTypes
 
                 Log.Info("ADI Loaded correctly and will continue processing.");
                 AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
+                
                 Log.Info($"Asset Version Major: {AdiVersionMajor}");
                 return true;
 

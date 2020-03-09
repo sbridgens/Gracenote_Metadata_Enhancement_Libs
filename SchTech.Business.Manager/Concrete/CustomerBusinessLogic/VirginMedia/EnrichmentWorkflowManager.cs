@@ -233,12 +233,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         public bool ValidatePackageIsUnique()
         {
             var adiData = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue);
+            if(adiData?.VersionMajor != null)
+                IsPackageAnUpdate = EnhancementDataValidator.ValidateVersionMajor(adiData.VersionMajor, IsTvodPackage);
 
             if (IsPackageAnUpdate && adiData != null)
             {
-                if (!EnhancementDataValidator.ValidateVersionMajor(adiData.VersionMajor, IsTvodPackage))
-                    return false;
-
                 Log.Info("Package is confirmed as a valid Update Package");
                 IsPackageAnUpdate = true;
                 return true;
@@ -716,22 +715,35 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (!EnrichmentWorkflowEntities.PackageHasPreviewMetadata)
                     return true;
 
-                var paid = WorkflowEntities.TitlPaidValue.Replace("TITL", "PREV");
+                var previewpaid = WorkflowEntities.TitlPaidValue.Replace("TITL", "PREV");
+                var checksum = FileDirectoryManager.GetFileHash(PreviewAsset.FullName);
+                var previewSize = FileDirectoryManager.GetFileSize(PreviewAsset.FullName);
+
+
+                AdiData.PreviewFile = PreviewAsset.Name;
+                AdiData.PreviewFilePaid = previewpaid;
+                AdiData.PreviewFileChecksum = checksum;
+                AdiData.PreviewFileSize = previewSize;
+                _adiDataService.Update(AdiData);
 
                 ProdisAdiContentManager.AddAssetMetadataApp_DataNode(
-                    paid,
+                    previewpaid,
                     "Content_CheckSum",
-                    FileDirectoryManager.GetFileHash(PreviewAsset.FullName)
+                    checksum
                 );
 
+
                 ProdisAdiContentManager.AddAssetMetadataApp_DataNode(
-                    paid,
+                    previewpaid,
                     "Content_FileSize",
-                    FileDirectoryManager.GetFileSize(PreviewAsset.FullName)
+                    previewSize
+                    
                 );
+
                 ProdisAdiContentManager.SetAdiAssetContentField(
                     "preview",
                     PreviewAsset.Name);
+
 
                 return true;
             }
@@ -1045,21 +1057,45 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
 
                 //if tvod remove enhanced movie section
-                if (IsTvodPackage)
+                if (IsTvodPackage && AdiData.UpdateAdi != null)
                 {
-                    var movieData = EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(m => m.Metadata.AMS.Asset_Class == "movie");
-                    AdiContentManager.MovieContent = movieData?.Content.Value;
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Remove(movieData);
+                    //var movieData = EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(m => m.Metadata.AMS.Asset_Class == "movie");
+                    //AdiContentManager.MovieContent = movieData?.Content.Value;
+                    //EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Remove(movieData);
                     //Load the update adi ready for preview data checks
-                    if (AdiData.UpdateAdi != null)
-                        WorkflowEntities.SerializeAdiFile(true, AdiData.UpdateAdi, true);
+                    WorkflowEntities.SerializeAdiFile(true, AdiData.UpdateAdi, true);
                 }
 
                 //ProdisAdiContentManager.RemoveMovieContentFromUpdate();
                 //Get original asset data and modify new adi.
-                if (!ProdisAdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi(ZipHandler.HasPreviewAsset, AdiData.UpdateAdi != null))
+                if (!ProdisAdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi(
+                    ZipHandler.HasPreviewAsset, 
+                    AdiData.UpdateAdi != null))
                     return false;
 
+                if (EnrichmentWorkflowEntities.PackageHasPreviewMetadata && AdiData.PreviewFileChecksum != null)
+                {
+                    var previewAsset =
+                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(p =>
+                            p.Metadata.AMS.Asset_Class == "preview");
+
+                    if (previewAsset?.Metadata.App_Data != null)
+                    {
+                        foreach (var appdata in (previewAsset?.Metadata.App_Data))
+                        {
+                            if (appdata.Name.ToLower() == "content_checksum")
+                            {
+                                appdata.Value = AdiData.PreviewFileChecksum;
+                            }
+
+                            if (appdata.Name.ToLower() == "content_filesize")
+                            {
+                                appdata.Value = AdiData.PreviewFileSize;
+                            }
+                        }
+                    }
+
+                }
 
                 //Update all version major values to correct value.
                 if (!ProdisAdiContentManager.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
@@ -1071,8 +1107,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 Log.Info("Adi data updated in the database.");
 
                 //nullify updateadi data
-                if(AdiData.UpdateAdi != null)
-                    AdiData.UpdateAdi = null;
+                if(EnrichmentWorkflowEntities.UpdateAdi != null)
+                    EnrichmentWorkflowEntities.UpdateAdi = null;
 
                 return true;
 
