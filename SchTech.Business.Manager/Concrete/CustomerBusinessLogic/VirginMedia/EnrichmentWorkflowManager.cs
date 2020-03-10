@@ -949,11 +949,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
+                throw new Exception();
                 //Insert Layer data for Program Layer
                 ProdisAdiContentManager.InsertProgramLayerData(
                     WorkflowEntities.GraceNoteTmsId,
-                    programRootId: ApiManager.MovieEpisodeProgramData.rootId,
-                    shoDataRootId: ApiManager.ShowSeriesSeasonProgramData.rootId);
+                    programRootId: ApiManager.MovieEpisodeProgramData?.rootId,
+                    shoDataRootId: ApiManager.ShowSeriesSeasonProgramData?.rootId);
 
                 ProdisAdiContentManager.CheckAndAddBlockPlatformData();
                     if (WorkflowEntities.IsQamAsset && IsPackageAnUpdate)

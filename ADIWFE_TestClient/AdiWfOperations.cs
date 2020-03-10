@@ -168,13 +168,20 @@ namespace ADIWFE_TestClient
                             "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
                     if (!WorkflowManager.IsMoviePackage)
                         ProcessSeriesEpisodePackage();
+                    
 
-
-
-                    AllPackageTasks();
-                    WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
-                    AdiEnrichmentQueueController.QueuedPackages.Remove(package);
-                    Log.Info($"############### Processing FINISHED For Queued file: {IngestFile.AdiPackage.Name} ###############\r\n");
+                    if(Success)
+                    {
+                        AllPackageTasks();
+                        WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
+                        AdiEnrichmentQueueController.QueuedPackages.Remove(package);
+                        Log.Info(
+                            $"############### Processing FINISHED For Queued file: {IngestFile.AdiPackage.Name} ###############\r\n");
+                    }
+                    else
+                    {
+                        throw new Exception("Workflow Processing failed.");
+                    }
                 }
                 catch (Exception pqiEx)
                 {
@@ -227,8 +234,8 @@ namespace ADIWFE_TestClient
             }
             catch (Exception pfpex)
             {
-                LogError("ProcessFullPackage", "Error Processing Full package", pfpex);
                 Success = false;
+                LogError("ProcessFullPackage", "Error Processing Full package", pfpex);
             }
         }
 
@@ -246,6 +253,7 @@ namespace ADIWFE_TestClient
             }
             catch (Exception aptex)
             {
+                Success = false;
                 LogError("AllPackageTasks", "Error Carrying out all common package tasks", aptex);
             }
         }

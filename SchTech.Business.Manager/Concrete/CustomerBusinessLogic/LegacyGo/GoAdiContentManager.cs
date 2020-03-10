@@ -446,7 +446,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 if (ipldEx.InnerException != null)
                     Log.Error("[InsertProgramLayerData] Inner Exception: " +
                               $"{ipldEx.InnerException.Message}");
-                return false;
             }
         }
 

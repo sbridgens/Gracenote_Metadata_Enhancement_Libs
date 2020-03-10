@@ -860,7 +860,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 //Insert Layer data for Program Layer
                 GoAdiContentManager.InsertProgramLayerData(
                     WorkflowEntities.GraceNoteTmsId,
-                    programRootId: ApiManager.MovieEpisodeProgramData.rootId,
+                    programRootId: ApiManager.MovieEpisodeProgramData?.rootId,
                     shoDataRootId: ApiManager.ShowSeriesSeasonProgramData?.rootId);
 
                 GoAdiContentManager.CheckAndAddBlockPlatformData();
