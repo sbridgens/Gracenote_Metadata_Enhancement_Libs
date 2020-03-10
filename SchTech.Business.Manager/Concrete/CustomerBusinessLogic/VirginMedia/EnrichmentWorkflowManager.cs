@@ -39,7 +39,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         private ProdisAdiContentManager AdiContentManager { get; }
         private GN_Mapping_Data GnMappingData { get; set; }
-        public bool IsMoviePackage { get; private set; }
         private GraceNoteApiManager ApiManager { get; }
         private string DeliveryPackage { get; set; }
         private bool IsPackageAnUpdate { get; set; }
@@ -603,7 +602,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             {
                 AdiContentManager.RemoveDefaultAdiNodes();
 
-                if (!IsMoviePackage)
+                if (!EnrichmentWorkflowEntities.IsMoviePackage)
                 {
                     ProdisAdiContentManager.InsertEpisodeData(
                         WorkflowEntities.GraceNoteTmsId,
@@ -629,7 +628,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     AdiContentManager.InsertCrewData() &&
 
                     //Insert Program Title Data
-                    AdiContentManager.InsertTitleData(IsMoviePackage) &&
+                    AdiContentManager.InsertTitleData(EnrichmentWorkflowEntities.IsMoviePackage) &&
 
                     //Add Correct description summaries
                     AdiContentManager.InsertDescriptionData(
@@ -834,8 +833,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     mappingData.ProgramType.SingleOrDefault(p => p == ApiManager.MovieEpisodeProgramData.progType);
 
                 // Ensure we don't use series or show assets for movies
-                if (IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_series_") ||
-                    IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_show_"))
+                if (EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_series_") ||
+                    EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_show_"))
                     continue;
 
                 //prevent duplicate processing
@@ -949,7 +948,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                throw new Exception();
                 //Insert Layer data for Program Layer
                 ProdisAdiContentManager.InsertProgramLayerData(
                     WorkflowEntities.GraceNoteTmsId,

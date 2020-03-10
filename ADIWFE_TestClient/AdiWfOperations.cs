@@ -8,6 +8,7 @@ using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
 using System;
 using System.Timers;
+using SchTech.Entities.ConcreteTypes;
 
 namespace ADIWFE_TestClient
 {
@@ -166,13 +167,13 @@ namespace ADIWFE_TestClient
                     if (!Success)
                         throw new Exception(
                             "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
-                    if (!WorkflowManager.IsMoviePackage)
-                        ProcessSeriesEpisodePackage();
-                    
-
-                    if(Success)
+                    if (!EnrichmentWorkflowEntities.IsMoviePackage)
                     {
-                        AllPackageTasks();
+                        if(!ProcessSeriesEpisodePackage())
+                            throw new Exception("Error Processing Series/Episode data.");
+                    }
+                    if(AllPackageTasks())
+                    {
                         WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
                         AdiEnrichmentQueueController.QueuedPackages.Remove(package);
                         Log.Info(
@@ -200,17 +201,14 @@ namespace ADIWFE_TestClient
         {
             try
             {
-                if (WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
-                    WorkflowManager.ValidatePackageIsUnique() &&
-                    WorkflowManager.CallAndParseGnMappingData() &&
-                    WorkflowManager.SeedGnMappingData() &&
-                    WorkflowManager.ExtractPackageMedia() &&
-                    WorkflowManager.SetAdiMovieMetadata() &&
-                    WorkflowManager.GetGracenoteMovieEpisodeData() &&
-                    WorkflowManager.SetAdiMovieEpisodeMetadata())
-
-                    return true;
-                return false;
+                return WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
+                       WorkflowManager.ValidatePackageIsUnique() &&
+                       WorkflowManager.CallAndParseGnMappingData() &&
+                       WorkflowManager.SeedGnMappingData() &&
+                       WorkflowManager.ExtractPackageMedia() &&
+                       WorkflowManager.SetAdiMovieMetadata() &&
+                       WorkflowManager.GetGracenoteMovieEpisodeData() &&
+                       WorkflowManager.SetAdiMovieEpisodeMetadata();
             }
             catch (Exception gmaepEx)
             {
@@ -223,28 +221,28 @@ namespace ADIWFE_TestClient
             }
         }
 
-        private void ProcessSeriesEpisodePackage()
+        private bool ProcessSeriesEpisodePackage()
         {
             try
             {
-                Success = WorkflowManager.GetSeriesSeasonSpecialsData() &&
-                          WorkflowManager.SetAdiSeriesData() &&
-                          WorkflowManager.SetAdiSeasonData();
+                return WorkflowManager.GetSeriesSeasonSpecialsData() &&
+                       WorkflowManager.SetAdiSeriesData() &&
+                       WorkflowManager.SetAdiSeasonData();
 
             }
             catch (Exception pfpex)
             {
-                Success = false;
                 LogError("ProcessFullPackage", "Error Processing Full package", pfpex);
+                return false;
             }
         }
 
 
-        private void AllPackageTasks()
+        private bool AllPackageTasks()
         {
             try
             {
-                Success = WorkflowManager.ImageSelectionLogic() &&
+                return WorkflowManager.ImageSelectionLogic() &&
                           WorkflowManager.RemoveDerivedFromAsset() &&
                           WorkflowManager.FinalisePackageData() &&
                           WorkflowManager.SaveAdiFile() &&
@@ -253,8 +251,8 @@ namespace ADIWFE_TestClient
             }
             catch (Exception aptex)
             {
-                Success = false;
                 LogError("AllPackageTasks", "Error Carrying out all common package tasks", aptex);
+                return false;
             }
         }
     }

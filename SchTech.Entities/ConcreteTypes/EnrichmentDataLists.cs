@@ -119,14 +119,17 @@ namespace SchTech.Entities.ConcreteTypes
 
         public void AddExternalLinksToList(IEnumerable<GnApiProgramsSchema.externalLinksTypeExternalLink> externalLinks)
         {
-            if (externalLinks != null)
+            var externalLinksTypeExternalLinks = externalLinks.ToList();
+
+            if (externalLinksTypeExternalLinks.Any())
             {
                 Log.Info("Asset has External Links, Storing IMDB Data.");
 
                 if (ExternalLinks == null)
                     ExternalLinks = new List<GnApiProgramsSchema.externalLinksTypeExternalLink>();
 
-                foreach (var link in externalLinks) ExternalLinks.Add(link);
+                foreach (var link in externalLinksTypeExternalLinks)
+                    ExternalLinks.Add(link);
             }
             else
             {
