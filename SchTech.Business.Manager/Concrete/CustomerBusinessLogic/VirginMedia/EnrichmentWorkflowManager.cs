@@ -17,6 +17,7 @@ using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.File.Manager.Concrete.ZipArchive;
 using SchTech.Queue.Manager.Concrete;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -1294,14 +1295,16 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        private void ClearProperties(PropertyInfo[] propertyInfos)
+        private static void ClearProperties(IEnumerable<PropertyInfo> propertyInfos)
         {
-            foreach (PropertyInfo item in propertyInfos)
+            if (propertyInfos == null)
+                return;
+
+            foreach (var item in propertyInfos)
             {
                 try
                 {
-                    if (!item.Name.Equals("BIsRunning"))
-                        item.SetValue(null, null);
+                    item.SetValue(null, null);
                 }
                 catch
                 {

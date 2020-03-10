@@ -226,7 +226,30 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data
                 .FirstOrDefault(l => l.Name.Equals("Licensing_Window_End"))?.Value;
         }
-        
+
+        private static void CheckPreviewData()
+        {
+            var hasUpdatePreviewData = false;
+            if (EnrichmentWorkflowEntities.UpdateAdi != null)
+                hasUpdatePreviewData =
+                    EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(p =>
+                        p.Metadata.AMS.Asset_Class == "preview");
+
+            if (hasUpdatePreviewData)
+                return;
+
+            Log.Info($"Incoming asset has preview metadata, " +
+                     $"No Preview asset supplied and " +
+                     $"Enriched data does not contain preview metadata! " +
+                     $"removing preview data from adi.xml");
+
+            var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
+                .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
+
+            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewData);
+        }
+
+
         //Clone / Copy previous enrichment media data to current adi
         public static bool CopyPreviouslyEnrichedAssetDataToAdi(bool hasPreviewAsset, bool hasPreviousUpdate)
         {
@@ -236,23 +259,16 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image");
 
                 var enrichedDataHasPreview =
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.All(p =>
+                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p =>
                         p.Metadata.AMS.Asset_Class == "preview");
-
+                
                 //no enriched preview data,
                 //no preview asset supplied preview metadata included via incoming adi
                 if (!hasPreviewAsset && 
                     EnrichmentWorkflowEntities.PackageHasPreviewMetadata && 
                     !enrichedDataHasPreview)
                 {
-                    Log.Info($"Incoming asset has preview metadata, " +
-                                    $"No Preview asset supplied and " +
-                                    $"Enriched data does not contain preview metadata! " +
-                                    $"removing preview data from adi.xml");
-
-                    var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                        .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
-                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewData);
+                    CheckPreviewData();
                 }
 
 
