@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
@@ -61,12 +62,12 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 try
                 {
                     EfStaticMethods.Log.Info("Checking for expired data in the adi db");
-                    var checkWindow = Convert.ToInt32(ADIWF_Config.MinusExpiredAssetWindowHours);
-                    var expiredRows = CurrentContext.Adi_Data
-                        .Where(item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < DateTime.Now.AddHours(-checkWindow));
+                    var checkWindow = DateTime.Now.AddHours(-Convert.ToInt32(ADIWF_Config.MinusExpiredAssetWindowHours));
+                    var expiredRows = CurrentContext.Adi_Data.Where(
+                                        item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < checkWindow);
 
                     var mapData = new List<GN_Mapping_Data>();
-
+                    //get matching gn row data
                     foreach (var item in expiredRows)
                     {
                         EfStaticMethods.Log.Debug($"DB Row ID {item.Id} with PAID Value: {item.TitlPaid} has expired with License Window End Date: {item.Licensing_Window_End.Trim()} marked for removal.");
@@ -125,95 +126,45 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 try
                 {
-                    EfStaticMethods.Log.Info(
-                        "Checking for orphaned db data, this may take time dependent on db size; please be patient");
+                    /*
+                    * WORKING SQL QUERY
+                    * SELECT id,TITLPAID FROM Adi_Data AS A WHERE NOT EXISTS( SELECT GN_Paid FROM GN_Mapping_Data AS G WHERE RIGHT(G.GN_Paid, 8) = RIGHT(A.TITLPAID, 8))
+                    * SELECT id, GN_Paid FROM GN_Mapping_Data AS G WHERE NOT EXISTS ( SELECT TITLPAID FROM Adi_Data AS A WHERE RIGHT(A.TITLPAID,8) = RIGHT(G.GN_Paid,8))
+                    */
+
+                    EfStaticMethods.Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
 
                     var stopWatch = new Stopwatch();
                     stopWatch.Start();
 
 
-
-
-                    var adiNoMapped = CurrentContext.Adi_Data.Select(a => new
-                        {
-                            a.Id,
-                            a.TitlPaid
-                        }).ToList();
-
-                    var mappedNoAdi = CurrentContext.GN_Mapping_Data.Select(m => new
+                    var adiOrphans = CurrentContext.Adi_Data.FromSql("EXEC GetAdiDataOrphans").ToList();
+                    if (adiOrphans.Any())
                     {
-                        m.Id,
-                        m.GN_Paid
-                    }).ToList();
+                        EfStaticMethods.Log.Warn("Adi_Data table has orphaned rows, cleaning up");
 
-                    var logcount = 0;
-
-                    foreach (var item in adiNoMapped)
-                    {
-                        var a = EfStaticMethods.GetPaidLastValue(item.TitlPaid);
-                        if (mappedNoAdi.Any(i => i.GN_Paid.Contains(a)))
-                            continue;
-
-                        var adidata = CurrentContext.Adi_Data.FirstOrDefault(i => i.Id == item.Id);
-
-                        if (adidata == null) continue;
-
-                        if (logcount == 0)
+                        foreach (var adiO in adiOrphans)
                         {
-                            EfStaticMethods.Log.Warn("ADI Data table has orphaned rows, cleaning up");
-                            logcount++;
+                            EfStaticMethods.Log.Warn(
+                                $"Adi_Data table entry with id: {adiO.Id} and PAID: {adiO.TitlPaid} found that does not exist in GNMapping table, removing row data.");
+                            CurrentContext.Database.ExecuteSqlCommand($"DELETE FROM Adi_Data WHERE ID={adiO.Id}");
                         }
-
-                        EfStaticMethods.Log.Warn(
-                            $"Adi_Data table entry with id: {item.Id} and PAID: {item.TitlPaid} found that does not exist in GNMapping table, removing row data.");
-
-                        CurrentContext.Adi_Data.Remove(adidata);
                     }
 
 
-                    if (logcount > 0)
+                    var gnOrphans = CurrentContext.GN_Mapping_Data.FromSql("EXEC GetMappingOrphans").ToList();
+                    if (gnOrphans.Any())
                     {
-                        CurrentContext.SaveChanges();
-                        logcount = 0;
-                        //changes made so update lists.
-                        adiNoMapped = CurrentContext.Adi_Data.Select(a => new
+                        EfStaticMethods.Log.Warn("GN_Mapping_Data table has orphaned rows, cleaning up");
+
+                        foreach (var gnItem in gnOrphans)
                         {
-                            a.Id,
-                            a.TitlPaid
-                        }).ToList();
-
-
-                        mappedNoAdi = CurrentContext.GN_Mapping_Data.Select(m => new
-                        {
-                            m.Id,
-                            m.GN_Paid
-                        }).ToList();
-                    }
-
-
-                    foreach (var item in mappedNoAdi)
-                    {
-                        var m = EfStaticMethods.GetPaidLastValue(item.GN_Paid);
-                        if (adiNoMapped.Any(i => i.TitlPaid.Contains(m)))
-                            continue;
-
-                        var mapdata = CurrentContext.GN_Mapping_Data.FirstOrDefault(i => i.Id == item.Id);
-                        if (mapdata == null)
-                            continue;
-
-                        if (logcount == 0)
-                        {
-                            EfStaticMethods.Log.Warn("GN_Mapping_Data has orphaned rows, cleaning up");
-                            logcount++;
+                            EfStaticMethods.Log.Warn(
+                                $"Mapping table entry with id: {gnItem.Id} and PAID: {gnItem.GN_Paid} found that does not exist in adi data table, removing row data.");
+                            CurrentContext.Database.ExecuteSqlCommand($"DELETE FROM GN_Mapping_Data WHERE ID={gnItem.Id}");
                         }
-
-                        EfStaticMethods.Log.Warn(
-                            $"Mapping table entry with id: {item.Id} and PAID: {item.GN_Paid} found that does not exist in adi data table, removing row data.");
-
-                        CurrentContext.GN_Mapping_Data.Remove(mapdata);
                     }
 
-                    CurrentContext.SaveChanges();
                     stopWatch.Stop();
 
                     EfStaticMethods.Log.Info($"Orphan cleanup completed in: {stopWatch.Elapsed.Duration()}");
