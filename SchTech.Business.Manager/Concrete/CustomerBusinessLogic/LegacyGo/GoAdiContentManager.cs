@@ -427,16 +427,16 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             }
         }
 
-        public static bool InsertProgramLayerData(string tmsid, string programRootId, string shoDataRootId)
+        public static void InsertProgramLayerData(string tmsid, string programRootId, string shoDataRootId)
         {
             try
             {
                 if (string.IsNullOrEmpty(shoDataRootId))
                     shoDataRootId = programRootId;
 
-                return AddTitleMetadataApp_DataNode("GN_Layer1_TMSId", tmsid) &&
-                       AddTitleMetadataApp_DataNode("GN_Layer1_RootId", programRootId) &&
-                       AddTitleMetadataApp_DataNode("GN_Layer2_RootId", shoDataRootId);
+                AddTitleMetadataApp_DataNode("GN_Layer1_TMSId", tmsid);
+                AddTitleMetadataApp_DataNode("GN_Layer1_RootId", programRootId);
+                AddTitleMetadataApp_DataNode("GN_Layer2_RootId", shoDataRootId);
             }
             catch (Exception ipldEx)
             {
