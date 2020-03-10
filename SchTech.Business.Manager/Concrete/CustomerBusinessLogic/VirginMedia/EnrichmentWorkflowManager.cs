@@ -622,12 +622,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         programDatas: ApiManager.MovieEpisodeProgramData
                         ) &&
 
-                    //Insert Layer data for Program Layer
-                    ProdisAdiContentManager.InsertProgramLayerData(
-                        WorkflowEntities.GraceNoteTmsId,
-                        rootId: ApiManager.MovieEpisodeProgramData.rootId
-                        ) &&
-
                     //Insert Crew Actor Data
                     AdiContentManager.InsertActorData() &&
 
@@ -955,9 +949,15 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
+                //Insert Layer data for Program Layer
+                ProdisAdiContentManager.InsertProgramLayerData(
+                    WorkflowEntities.GraceNoteTmsId,
+                    programRootId: ApiManager.MovieEpisodeProgramData.rootId,
+                    shoDataRootId: ApiManager.ShowSeriesSeasonProgramData.rootId);
+
                 ProdisAdiContentManager.CheckAndAddBlockPlatformData();
-                if (WorkflowEntities.IsQamAsset && IsPackageAnUpdate)
-                    AdiContentManager.SetQamUpdateContent();
+                    if (WorkflowEntities.IsQamAsset && IsPackageAnUpdate)
+                        AdiContentManager.SetQamUpdateContent();
             }
             catch (Exception ex)
             {
@@ -1081,7 +1081,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                     if (previewAsset?.Metadata.App_Data != null)
                     {
-                        foreach (var appdata in (previewAsset?.Metadata.App_Data))
+                        foreach (var appdata in (previewAsset.Metadata.App_Data))
                         {
                             if (appdata.Name.ToLower() == "content_checksum")
                             {

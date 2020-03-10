@@ -615,12 +615,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                             programDatas: ApiManager.MovieEpisodeProgramData
                         ) &&
 
-                        //Insert Layer data for Program Layer
-                        GoAdiContentManager.InsertProgramLayerData(
-                            WorkflowEntities.GraceNoteTmsId,
-                            seriesId: ApiManager.GetSeriesId()
-                        ) &&
-
                         //Insert Crew Actor Data
                         AdiContentManager.InsertActorData() &&
 
@@ -859,10 +853,16 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             }
         }
 
-        public static bool FinalisePackageData()
+        public bool FinalisePackageData()
         {
             try
             {
+                //Insert Layer data for Program Layer
+                GoAdiContentManager.InsertProgramLayerData(
+                    WorkflowEntities.GraceNoteTmsId,
+                    programRootId: ApiManager.MovieEpisodeProgramData.rootId,
+                    shoDataRootId: ApiManager.ShowSeriesSeasonProgramData?.rootId);
+
                 GoAdiContentManager.CheckAndAddBlockPlatformData();
             }
             catch (Exception ex)

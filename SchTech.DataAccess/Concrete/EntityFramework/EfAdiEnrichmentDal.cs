@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {
@@ -127,10 +126,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 try
                 {
                     /*
-                    * WORKING SQL QUERY
-                    * SELECT id,TITLPAID FROM Adi_Data AS A WHERE NOT EXISTS( SELECT GN_Paid FROM GN_Mapping_Data AS G WHERE RIGHT(G.GN_Paid, 8) = RIGHT(A.TITLPAID, 8))
-                    * SELECT id, GN_Paid FROM GN_Mapping_Data AS G WHERE NOT EXISTS ( SELECT TITLPAID FROM Adi_Data AS A WHERE RIGHT(A.TITLPAID,8) = RIGHT(G.GN_Paid,8))
-                    */
+                     * See solution Items dir
+                     * WORKING SQL QUERY
+                     * SELECT id,TITLPAID FROM Adi_Data AS A WHERE NOT EXISTS( SELECT GN_Paid FROM GN_Mapping_Data AS G WHERE RIGHT(G.GN_Paid, 8) = RIGHT(A.TITLPAID, 8))
+                     * SELECT id, GN_Paid FROM GN_Mapping_Data AS G WHERE NOT EXISTS ( SELECT TITLPAID FROM Adi_Data AS A WHERE RIGHT(A.TITLPAID,8) = RIGHT(G.GN_Paid,8))
+                     */
 
                     EfStaticMethods.Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
 

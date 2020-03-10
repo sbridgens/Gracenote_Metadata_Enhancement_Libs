@@ -18,8 +18,10 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 try
                 {
-                    var mappedNoAdi = mapContext.GN_Mapping_Data.Where(map => !mapContext.Adi_Data.Any(
-                        adata => EfStaticMethods.GetPaidLastValue(adata.TitlPaid) == EfStaticMethods.GetPaidLastValue(map.GN_Paid))
+                    var adiData = mapContext.Adi_Data;
+
+                    var mappedNoAdi = mapContext.GN_Mapping_Data.Where(map =>
+                        !adiData.Any(adata => EfStaticMethods.GetPaidLastValue(adata.TitlPaid) == EfStaticMethods.GetPaidLastValue(map.GN_Paid))
                     );
 
                     if (mappedNoAdi.FirstOrDefault() != null)

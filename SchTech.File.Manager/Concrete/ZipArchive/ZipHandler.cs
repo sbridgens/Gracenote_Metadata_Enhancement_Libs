@@ -130,7 +130,6 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             {
                 if (AdiExtracted && IsLegacyGoPackage)
                 {
-                    bAdiOnly = true;
                     break;
                 }
 
