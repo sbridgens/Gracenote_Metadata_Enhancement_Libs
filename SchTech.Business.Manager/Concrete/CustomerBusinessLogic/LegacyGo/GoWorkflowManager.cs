@@ -1085,6 +1085,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     Log.Info("Move to failed directory successful.");
 
                 FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
+
+                Log.Info($"Removing db entries for Failed Package.");
+                _adiDataService.Delete(AdiData);
+                _gnMappingDataService.Delete(GnMappingData);
             }
             catch (Exception pfpex)
             {

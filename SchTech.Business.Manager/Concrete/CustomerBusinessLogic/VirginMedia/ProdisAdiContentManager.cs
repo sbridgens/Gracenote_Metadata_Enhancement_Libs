@@ -237,7 +237,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 var enrichedDataHasPreview =
                     EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.All(p =>
-                        p.Metadata.AMS.Asset_Class != "preview");
+                        p.Metadata.AMS.Asset_Class == "preview");
 
                 //no enriched preview data,
                 //no preview asset supplied preview metadata included via incoming adi
@@ -279,6 +279,20 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                             };
                             movieData.Content = null;
                             movieData.Metadata = assetSection.Metadata;
+                        }
+                        else
+                        {
+                            var assetSection = new ADIAssetAsset
+                            {
+                                Metadata = new ADIAssetAssetMetadata
+                                {
+                                    //ensure incoming ams is used to maintain pricing information!
+                                    AMS = assetData.Metadata.AMS,
+                                    App_Data = assetData.Metadata.App_Data
+                                }
+                            };
+
+                            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetSection);
                         }
                     }
                     if (assetData.Metadata.AMS.Asset_Class == "preview")
@@ -1065,13 +1079,18 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                var movieAsset =
-                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
+                var enrichedMovieAsset =
+                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(c =>
                         c.Metadata.AMS.Asset_Class == "movie");
-                if (movieAsset == null)
-                    throw new Exception("Error retrieving previously Enriched movie section for QAM Update.");
-                movieAsset.Content = new ADIAssetAssetContent { Value = MovieContent };
 
+                if (enrichedMovieAsset == null)
+                    throw new Exception("Error retrieving previously Enriched movie section for QAM Update.");
+
+                var adiMovie = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
+                    c.Metadata.AMS.Asset_Class == "movie");
+
+                if (adiMovie != null)
+                    adiMovie.Content = new ADIAssetAssetContent {Value = enrichedMovieAsset.Content.Value};
             }
             catch (Exception squcex)
             {

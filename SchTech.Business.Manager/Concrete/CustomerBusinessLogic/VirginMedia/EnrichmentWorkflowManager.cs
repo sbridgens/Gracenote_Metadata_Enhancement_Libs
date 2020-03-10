@@ -19,6 +19,7 @@ using SchTech.Queue.Manager.Concrete;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
@@ -350,20 +351,27 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var mapData = GetGnMappingData();
                 GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
 
-                if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
+                if (GnMappingData != null)
                 {
-                    Log.Info($"TMSID Mismatch updating db with new value.");
-                    GnMappingData.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
+                    if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
+                    {
+                        Log.Info($"TMSID Mismatch updating db with new value.");
+                        GnMappingData.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
+                    }
+
+                    Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
+
+                    GnMappingData.GN_Availability_Start = mapData?.availability?.start;
+                    GnMappingData.GN_Availability_End = mapData?.availability?.end;
+                    GnMappingData.GN_updateId = mapData?.updateId;
+                    _gnMappingDataService.Update(GnMappingData);
+
+
+                    return true;
                 }
 
-                Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
-
-                GnMappingData.GN_Availability_Start = mapData?.availability?.start;
-                GnMappingData.GN_Availability_End = mapData?.availability?.end;
-                GnMappingData.GN_updateId = mapData?.updateId;
-                _gnMappingDataService.Update(GnMappingData);
-
-                return true;
+                throw new NullReferenceException(
+                    "Failed to update the GN Mapping table! Is this Ingest a genuine Update?");
             }
             catch (Exception ugmdex)
             {
@@ -1228,6 +1236,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     Log.Info("Move to failed directory successful.");
                 
                 FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
+
+                if (IsPackageAnUpdate || EnrichmentWorkflowEntities.IsDuplicateIngest)
+                    return;
+
+                Log.Info($"Removing db entries for Failed Package.");
+                _adiDataService.Delete(AdiData);
+                _gnMappingDataService.Delete(GnMappingData);
+
             }
             catch (Exception pfpex)
             {
@@ -1257,6 +1273,40 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 LogError(
                     "PackageCleanup",
                     "Error Cleaning up processed Package", pcuex);
+            }
+        }
+
+        public void CleanStaticReferences()
+        {
+            try
+            {
+                var properties = typeof(ZipHandler).GetProperties();
+                ClearProperties(properties);
+
+                properties = typeof(EnrichmentWorkflowEntities).GetProperties();
+                ClearProperties(properties);
+            } 
+            catch (Exception csrex)
+            {
+                LogError(
+                    "CleanStaticReferences",
+                    "Error Cleaning up Static references", csrex);
+            }
+        }
+
+        private void ClearProperties(PropertyInfo[] propertyInfos)
+        {
+            foreach (PropertyInfo item in propertyInfos)
+            {
+                try
+                {
+                    if (!item.Name.Equals("BIsRunning"))
+                        item.SetValue(null, null);
+                }
+                catch
+                {
+                    //do nothing
+                }
             }
         }
     }

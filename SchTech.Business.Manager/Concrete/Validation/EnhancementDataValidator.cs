@@ -20,6 +20,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
         {
             var adiVersionMajor = EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
             var paid = EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
+            EnrichmentWorkflowEntities.IsDuplicateIngest = false;
 
             if (dbVersionMajor > 0)
             {
@@ -42,6 +43,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
                 }
                 if (adiVersionMajor == dbVersionMajor)
                 {
+                    EnrichmentWorkflowEntities.IsDuplicateIngest = true;
                     Log.Error($"Package for PAID: {paid} already exists, duplicate ingest detected! Failing Enhancement.");
                     return false;
                 }

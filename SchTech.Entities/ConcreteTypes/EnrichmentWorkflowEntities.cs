@@ -5,6 +5,7 @@ using SchTech.Web.Manager.Concrete;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 
 namespace SchTech.Entities.ConcreteTypes
 {
@@ -16,7 +17,7 @@ namespace SchTech.Entities.ConcreteTypes
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentWorkflowEntities));
 
         private XmlSerializationManager<ADI> XmlSerializer { get; set; }
-        public static ADI AdiFile { get; private set; }
+        public static ADI AdiFile { get; set; }
 
         public static ADI EnrichedAdi { get; set; }
 
@@ -38,7 +39,9 @@ namespace SchTech.Entities.ConcreteTypes
 
         public static bool IsEpisodeSeries { get; set; }
 
-        public static bool PackageHasPreviewMetadata { get; private set; }
+        public static bool PackageHasPreviewMetadata { get; set; }
+
+        public static bool IsDuplicateIngest { get; set; }
 
         public bool HasPackagesToProcess { get; set; }
 
