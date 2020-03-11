@@ -79,8 +79,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
                 if (_adiDataService == null)
                     _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
-                return _adiDataService.CleanAdiDataWithNoMapping(timerElapsed) &&
-                       _gnMappingDataService.CleanMappingDataWithNoAdi();
+                {
+                    _adiDataService.CheckAndClearExpiredData(timerElapsed);
+                    _gnMappingDataService.CleanMappingDataWithNoAdi();
+                }
+                return true;
             }
             catch (Exception e)
             {

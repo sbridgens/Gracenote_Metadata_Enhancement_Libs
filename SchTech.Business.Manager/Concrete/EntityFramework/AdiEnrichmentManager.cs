@@ -4,6 +4,7 @@ using SchTech.Entities.ConcreteTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {
@@ -37,9 +38,9 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _adiDataDal.Delete(adiData);
         }
 
-        public bool CleanAdiDataWithNoMapping(bool timerElapsed)
+        public Task<bool> CheckAndClearExpiredData(bool timerElapsed)
         {
-            return _adiDataDal.CleanAdiDataWithNoMapping(timerElapsed);
+            return _adiDataDal.CheckAndClearExpiredData(timerElapsed);
         }
 
         public Adi_Data Update(Adi_Data adiData)

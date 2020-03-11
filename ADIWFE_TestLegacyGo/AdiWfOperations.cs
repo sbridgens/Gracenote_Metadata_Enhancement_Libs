@@ -57,7 +57,7 @@ namespace ADIWFE_TestLegacyGo
         {
             if (!IsInCleanup)
             {
-                AdiEnrichmentDal.CleanAdiDataWithNoMapping(TimerElapsed);
+                AdiEnrichmentDal.CheckAndClearExpiredData(TimerElapsed);
             }
 
 

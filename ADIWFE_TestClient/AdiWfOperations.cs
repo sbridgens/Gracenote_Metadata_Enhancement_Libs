@@ -63,8 +63,8 @@ namespace ADIWFE_TestClient
                     HasCleanedExpired = true;
                     TimerElapsed = true;
                 }
-
-                AdiEnrichmentDal.CleanAdiDataWithNoMapping(TimerElapsed);
+                AdiEnrichmentDal?.CheckForOrphanedData();
+                AdiEnrichmentDal?.CheckAndClearExpiredData(TimerElapsed);
             }
 
             TimerElapsed = false;

@@ -22,16 +22,32 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         private bool IsOrphanCleanupRunning { get; set; }
 
         private ADI_EnrichmentContext CurrentContext { get; set; }
-        
-        public bool CleanAdiDataWithNoMapping(bool timerElapsed)
+
+        public void CheckForOrphanedData()
         {
             try
             {
                 if (!IsWorkflowProcessing && !IsOrphanCleanupRunning)
                     CheckAndClearOrphanedData();
+            }
+            catch (Exception cfodex)
+            {
+                EfStaticMethods.Log.Error($"General Exception during Orphan cleanup: {cfodex.Message}");
+                if (cfodex.InnerException != null)
+                    EfStaticMethods.Log.Error($"Inner Exception: {cfodex.InnerException.Message}");
 
+            }
+        }
+
+        public async Task<bool> CheckAndClearExpiredData(bool timerElapsed)
+        {
+            try
+            {
                 if (!ExpiryProcessing && timerElapsed)
-                    Task.Run((Action)ClearExpiredAssets);
+                {
+                    await Task.Run((Action)ClearExpiredAssets);
+                }
+
                 return true;
             }
             catch (SqlException sqlEx)
@@ -52,7 +68,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        private void ClearExpiredAssets()
+        private async void ClearExpiredAssets()
         {
             ExpiryProcessing = true;
 
@@ -84,23 +100,27 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     EfStaticMethods.Log.Info($"Number of expired assets for removal: {expiredRows.Count()}");
                     CurrentContext.Adi_Data.RemoveRange(expiredRows);
                     CurrentContext.GN_Mapping_Data.RemoveRange(mapData);
-                    CurrentContext.SaveChanges();
-
 
                     EfStaticMethods.Log.Info(rowCount == 0
                         ? "No expired data present."
                         : $"Number of expired assets removed from database = {rowCount}");
+
+
+                    ExpiryProcessing = false;
+
+                    await CurrentContext.SaveChangesAsync();
+
+
                 }
                 catch (Exception ceaEx)
                 {
+
+                    ExpiryProcessing = false;
                     EfStaticMethods.Log.Error($"General Exception during Cleanup of Expired Assets: {ceaEx.Message}");
                     if (ceaEx.InnerException != null)
                         EfStaticMethods.Log.Error($"Inner Exception: {ceaEx.InnerException.Message}");
                 }
-
             }
-
-            ExpiryProcessing = false;
         }
 
         public Adi_Data GetAdiData(string titlPaid)

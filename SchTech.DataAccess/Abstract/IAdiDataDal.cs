@@ -1,11 +1,12 @@
-﻿using SchTech.Core.DataAccess;
+﻿using System.Threading.Tasks;
+using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
 
 namespace SchTech.DataAccess.Abstract
 {
     public interface IAdiDataDal : IEntityRepository<Adi_Data>
     {
-        bool CleanAdiDataWithNoMapping(bool timerElapsed);
+        Task<bool> CheckAndClearExpiredData(bool timerElapsed);
 
         Adi_Data GetAdiData(string titlPaid);
     }

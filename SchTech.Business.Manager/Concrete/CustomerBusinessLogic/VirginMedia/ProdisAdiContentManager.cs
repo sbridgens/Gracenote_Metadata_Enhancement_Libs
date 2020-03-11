@@ -629,7 +629,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public bool InsertTitleData(bool IsMoviePackage)
+        public bool InsertTitleData(bool isMoviePackage)
         {
             try
             {
@@ -639,7 +639,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 var titleAdded = AddTitleMetadataApp_DataNode("Title", title);
 
-                if (IsMoviePackage)
+                if (isMoviePackage)
                     return titleAdded;
 
                 var sortTitle = EnrichmentDataLists.ProgramTitles.FirstOrDefault(t => t.type == "sort")?.Value;
