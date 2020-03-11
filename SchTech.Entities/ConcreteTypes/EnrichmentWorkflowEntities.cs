@@ -17,6 +17,7 @@ namespace SchTech.Entities.ConcreteTypes
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentWorkflowEntities));
 
         private XmlSerializationManager<ADI> XmlSerializer { get; set; }
+
         public static ADI AdiFile { get; set; }
 
         public static ADI EnrichedAdi { get; set; }
@@ -31,7 +32,7 @@ namespace SchTech.Entities.ConcreteTypes
 
         public string PreviewCheckSum { get; set; }
 
-        private bool IsSdContent { get; set; }
+        public static bool IsSdContent { get; set; }
 
         public static bool PackageIsAOneOffSpecial { get; set; }
 
@@ -154,7 +155,7 @@ namespace SchTech.Entities.ConcreteTypes
 
             if (adiAssetAssetMetadata != null)
                 IsSdContent = (adiAssetAssetMetadata.App_Data)
-                              .FirstOrDefault(c => c.Name == "HDContent")
+                              .FirstOrDefault(c => c.Name.ToLower() == "hdcontent")
                               ?.Value.ToLower() != "y";
 
             if (IsSdContent && !Convert.ToBoolean(ADIWF_Config.AllowSDContentIngest))

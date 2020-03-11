@@ -968,6 +968,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (externalLinks.Count <= 0 && IdmbDataInserted)
                     return true;
 
+                if (!externalLinks.Any())
+                    return true;
+
                 var links = externalLinks;
                 Log.Info("Adding IMDb_ID data.");
                 AddTitleMetadataApp_DataNode("IMDb_ID", links.FirstOrDefault()?.id);

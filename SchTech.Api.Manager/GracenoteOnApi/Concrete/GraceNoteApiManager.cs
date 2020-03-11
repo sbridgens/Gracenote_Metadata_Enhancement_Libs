@@ -23,10 +23,10 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
             var externalLinks = new List<GnApiProgramsSchema.externalLinksTypeExternalLink>();
 
 
-            if (MovieEpisodeProgramData?.externalLinks != null)
+            if (MovieEpisodeProgramData.externalLinks.Any())
                 externalLinks.AddRange(MovieEpisodeProgramData.externalLinks);
             
-            if (ShowSeriesSeasonProgramData?.externalLinks != null)
+            if (ShowSeriesSeasonProgramData != null && ShowSeriesSeasonProgramData.externalLinks.Any())
                 externalLinks.AddRange(ShowSeriesSeasonProgramData.externalLinks);
 
             return externalLinks;
@@ -146,7 +146,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetEpisodeSeason()
         {
-            return MovieEpisodeProgramData.episodeInfo.season;
+            return MovieEpisodeProgramData.episodeInfo?.season;
         }
 
         public List<GnApiProgramsSchema.programsProgramSeason> GetSeasonInfo()

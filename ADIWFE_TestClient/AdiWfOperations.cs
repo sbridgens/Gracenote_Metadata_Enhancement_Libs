@@ -26,6 +26,7 @@ namespace ADIWFE_TestClient
         private HardwareInformationManager HwInformationManager { get; set; }
         private WorkQueueItem IngestFile { get; set; }
         private bool TimerElapsed { get; set; }
+        private bool HasGnMapping { get; set; }
         public bool IsInCleanup => false;
         private bool HasCleanedExpired { get; set; }
 
@@ -187,12 +188,19 @@ namespace ADIWFE_TestClient
                 }
                 catch (Exception pqiEx)
                 {
-                    LogError("ProcessQueuedItems",
-                        $"Error encountered processing package: {IngestFile.AdiPackage.Name}",
-                        pqiEx);
+                    if(HasGnMapping)
+                        LogError("ProcessQueuedItems",
+                            $"Error encountered processing package: {IngestFile.AdiPackage.Name}",
+                            pqiEx);
 
                     WorkflowManager.ProcessFailedPackage(IngestFile.AdiPackage);
-                    Log.Info($"############### Processing FAILED! for item: {IngestFile.AdiPackage.Name} ###############\r\n");
+                    if(HasGnMapping)
+                        Log.Info($"############### Processing FAILED! for item: {IngestFile.AdiPackage.Name} ###############\r\n");
+                    else
+                    {
+                        Log.Info(
+                            $"############### Processing FINISHED For Queued file: {IngestFile.AdiPackage.Name} ###############\r\n");
+                    }
 
                 }
             }
@@ -202,14 +210,22 @@ namespace ADIWFE_TestClient
         {
             try
             {
-                return WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
-                       WorkflowManager.ValidatePackageIsUnique() &&
-                       WorkflowManager.CallAndParseGnMappingData() &&
-                       WorkflowManager.SeedGnMappingData() &&
-                       WorkflowManager.ExtractPackageMedia() &&
-                       WorkflowManager.SetAdiMovieMetadata() &&
-                       WorkflowManager.GetGracenoteMovieEpisodeData() &&
-                       WorkflowManager.SetAdiMovieEpisodeMetadata();
+                if(WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
+                       WorkflowManager.ValidatePackageIsUnique())
+                {
+                    HasGnMapping = WorkflowManager.CallAndParseGnMappingData();
+                    if(HasGnMapping)
+                        return WorkflowManager.SeedGnMappingData() &&
+                               WorkflowManager.ExtractPackageMedia() &&
+                               WorkflowManager.SetAdiMovieMetadata() &&
+                               WorkflowManager.GetGracenoteMovieEpisodeData() &&
+                               WorkflowManager.SetAdiMovieEpisodeMetadata();
+
+                    return HasGnMapping;
+                }
+
+                return false;
+
             }
             catch (Exception gmaepEx)
             {
@@ -226,9 +242,12 @@ namespace ADIWFE_TestClient
         {
             try
             {
-                return WorkflowManager.GetSeriesSeasonSpecialsData() &&
-                       WorkflowManager.SetAdiSeriesData() &&
-                       WorkflowManager.SetAdiSeasonData();
+                if (!WorkflowManager.GetSeriesSeasonSpecialsData() &&
+                    !WorkflowManager.SetAdiSeriesData())
+                    return false;
+
+                WorkflowManager.SetAdiSeasonData();
+                return true;
 
             }
             catch (Exception pfpex)

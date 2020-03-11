@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
@@ -179,6 +180,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var serializeMappingData = new XmlApiSerializationHelper<GnOnApiProgramMappingSchema.@on>();
                 ApiManager.CoreGnMappingData = serializeMappingData.Read(WorkflowEntities.GracenoteMappingData);
 
+                if(ApiManager.CoreGnMappingData.programMappings.programMapping == null)
+                {
+                    Log.Warn($"Processing Stopped as mapping data is not ready, package will be retried for {ADIWF_Config.FailedToMap_Max_Retry_Days} days before failing!");
+                    FailedToMap = true;
+                    return false;
+                }
+
                 var gnMappingData = new GraceNoteApiManager
                 {
                     GraceNoteMappingData = ApiManager.CoreGnMappingData.programMappings.programMapping.FirstOrDefault
@@ -197,7 +205,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 if (gnMappingData.GraceNoteMappingData == null)
                 {
-                    Log.Warn("Package is not yet mapped and will not continue to be processed until a later time.");
+                    Log.Warn($"Processing Stopped as mapping data is not ready, package will be retried for {ADIWF_Config.FailedToMap_Max_Retry_Days} days before failing!");
                     FailedToMap = true;
                     return false;
                 }
@@ -229,7 +237,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 FailedToMap = true;
                 LogError(
                     "CallAndParseGnMappingData",
-                    "Error During Mapping Gracenote of Data", ex);
+                    "Error During Mapping of GracenoteData", ex);
                 return false;
             }
         }
@@ -770,35 +778,27 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 ApiManager.SetSeasonData();
                 AdiContentManager.SeasonInfo = ApiManager.GetSeasonInfo();
                 //Insert IMDB Data
-                return AdiContentManager.InsertIdmbData(
-                           ApiManager.ExternalLinks(),
-                           HasMovieInfo()
-                           ) &&
-
-                       //Insert the TITL Series Layerdata
-                       ProdisAdiContentManager.InsertSeriesLayerData(
-                           ApiManager.ShowSeriesSeasonProgramData.connectorId,
-                           ApiManager.GetSeriesId()
-                           ) &&
-
-                       //Insert the TITL Show Data
-                       AdiContentManager.InsertShowData(
-                           showId: ApiManager.GetShowId(),
-                           showName: ApiManager.GetShowName(),
-                           totalSeasons: ApiManager.GetNumberOfSeasons(),
-                           descriptions: ApiManager.ShowSeriesSeasonProgramData.descriptions
-                           ) &&
-
-                       //Insert the TITLE Series Genres
-                       AdiContentManager.InsertSeriesGenreData() &&
-
-                       //Insert the Series ID information
-                       AdiContentManager.InsertSeriesData(
-                           ApiManager.GetGnSeriesId(),
-                           seriesOrdinalValue: ApiManager.GetSeriesOrdinalValue(),
-                           ApiManager.GetSeasonId(),
-                           episodeSeason: ApiManager.GetEpisodeSeason()
-                           );
+                 return AdiContentManager.InsertIdmbData(
+                            ApiManager.ExternalLinks(),
+                            HasMovieInfo()) &&
+                        
+                        ProdisAdiContentManager.InsertSeriesLayerData(
+                            ApiManager.ShowSeriesSeasonProgramData.connectorId,
+                            ApiManager.GetSeriesId()) && 
+                        
+                        AdiContentManager.InsertShowData(
+                            showId: ApiManager.GetShowId(),
+                            showName: ApiManager.GetShowName(),
+                            totalSeasons: ApiManager.GetNumberOfSeasons(),
+                            descriptions: ApiManager.ShowSeriesSeasonProgramData.descriptions) &&
+                        
+                        AdiContentManager.InsertSeriesGenreData() &&
+                        
+                        AdiContentManager.InsertSeriesData(
+                            ApiManager.GetGnSeriesId(),
+                            seriesOrdinalValue: ApiManager.GetSeriesOrdinalValue(),
+                            ApiManager.GetSeasonId(),
+                            episodeSeason: ApiManager.GetEpisodeSeason() );
             }
             catch (Exception ex)
             {
@@ -807,18 +807,23 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     "Error Setting Series metadata", ex);
                 return false;
             }
+            
         }
 
         public bool SetAdiSeasonData()
         {
             try
             {
-                return ProdisAdiContentManager.InsertProductionYears(
+                ProdisAdiContentManager.InsertProductionYears(
                     ApiManager.GetSeriesPremiere(),
                     ApiManager.GetSeasonPremiere(),
                     ApiManager.GetSeriesFinale(),
                     ApiManager.GetSeasonFinale()
                     );
+
+                //return true here to continue flow and allow for the fact that some items do not require season items
+                //returns false on error only
+                return true;
             }
             catch (Exception ex)
             {
@@ -1199,15 +1204,18 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var source = packageFile.FullName;
                 var destination = FailedToMap
                     ? $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageFile.Name}"
-                    : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}";
+                    : (EnrichmentWorkflowEntities.IsSdContent 
+                        ? $"{ADIWF_Config.UnrequiredSDContentDirectory}\\{packageFile.Name}"
+                        : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}");
 
                 if (System.IO.File.Exists(destination))
                     System.IO.File.Delete(destination);
 
                 if (FailedToMap)
                 {
-                    Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
+                    Log.Info($"Setting Package: {packageFile} Move Destination to Failed to map directory: " +
                              $"{ADIWF_Config.MoveNonMappedDirectory}");
+
                     Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
                              $" before it is failed completely.");
 
@@ -1223,14 +1231,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 if (IsPackageAnUpdate)
                 {
-                    Log.Info($"Moving Package: {packageFile} to Updates Failed directory: " +
+                    Log.Info($"Setting Package: {packageFile} Move Destination to Updates Failed directory: " +
                              $"{ADIWF_Config.UpdatesFailedDirectory}");
                     System.IO.File.Move(source, destination);
                 }
                 else
                 {
-                    Log.Info($"Moving Package: {packageFile} to Failed directory: " +
-                             $"{ADIWF_Config.FailedDirectory}");
+                    Log.Info($"Moving Package: {packageFile} to Failed directory: {destination}");
 
                     System.IO.File.Move(source, destination);
                 }
@@ -1245,8 +1252,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     return;
 
                 Log.Info($"Removing db entries for Failed Package.");
-                _adiDataService.Delete(AdiData);
-                _gnMappingDataService.Delete(GnMappingData);
+                if(AdiData?.TitlPaid != null)
+                    _adiDataService.Delete(AdiData);
+                if(GnMappingData?.GN_Paid != null)
+                    _gnMappingDataService.Delete(GnMappingData);
 
             }
             catch (Exception pfpex)
