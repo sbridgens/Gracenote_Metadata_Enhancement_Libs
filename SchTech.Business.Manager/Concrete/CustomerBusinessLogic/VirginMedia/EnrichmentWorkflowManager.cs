@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 
 namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
@@ -44,7 +43,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         private GN_Mapping_Data GnMappingData { get; set; }
         private GraceNoteApiManager ApiManager { get; }
         private string DeliveryPackage { get; set; }
-        private bool IsPackageAnUpdate { get; set; }
+        public bool IsPackageAnUpdate { get; set; }
         private ZipHandler ZipHandler { get; set; }
         public FileInfo PrimaryAsset { get; set; }
         public FileInfo PreviewAsset { get; set; }
@@ -258,9 +257,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             if (IsPackageAnUpdate && adiData == null)
                 Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
 
-            if (!IsPackageAnUpdate && adiData != null)
+            if (!IsPackageAnUpdate && adiData != null && !EnhancementDataValidator.UpdateVersionFailure)
             {
                 Log.Error($"Package with Paid: {WorkflowEntities.TitlPaidValue} Exists in the database, failing Ingest.");
+                return false;
+            }
+            if (!IsPackageAnUpdate && adiData != null && EnhancementDataValidator.UpdateVersionFailure)
+            {
                 return false;
             }
 
@@ -1197,19 +1200,37 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
+        private string GetFailureDirectory(string packageName)
+        {
+            if (FailedToMap)
+            {
+                return $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageName}";
+            }
+
+            if (IsPackageAnUpdate || EnhancementDataValidator.UpdateVersionFailure)
+            {
+                // set here to ensure correct cleanup is run
+                IsPackageAnUpdate = true;
+                return $"{ADIWF_Config.UpdatesFailedDirectory}\\{packageName}";
+            }
+
+            if (EnrichmentWorkflowEntities.IsSdContent)
+            {
+                return $"{ADIWF_Config.UnrequiredSDContentDirectory}\\{packageName}";
+            }
+
+           
+
+            return $"{ADIWF_Config.FailedDirectory}\\{packageName}";
+        }
+
+
         public void ProcessFailedPackage(FileInfo packageFile)
         {
             try
             {
                 var source = packageFile.FullName;
-                var destination = FailedToMap
-                    ? $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageFile.Name}"
-                    : (EnrichmentWorkflowEntities.IsSdContent 
-                        ? $"{ADIWF_Config.UnrequiredSDContentDirectory}\\{packageFile.Name}"
-                        : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}");
-
-                if (System.IO.File.Exists(destination))
-                    System.IO.File.Delete(destination);
+                var destination = GetFailureDirectory(packageFile.Name);
 
                 if (FailedToMap)
                 {
@@ -1217,7 +1238,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                              $"{ADIWF_Config.MoveNonMappedDirectory}");
 
                     Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
-                             $" before it is failed completely.");
+                             $" days before it is failed completely.");
 
                     var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
 
@@ -1225,6 +1246,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     {
                         Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
                         System.IO.File.Delete(packageFile.FullName);
+                        return;
+                    }
+                    if (System.IO.File.Exists(destination))
+                    {
+                        Log.Info("No package move required for Mapping failure retry.");
                         return;
                     }
                 }
@@ -1238,6 +1264,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 else
                 {
                     Log.Info($"Moving Package: {packageFile} to Failed directory: {destination}");
+
+                    if (System.IO.File.Exists(destination) && source != destination)
+                        System.IO.File.Delete(destination);
 
                     System.IO.File.Move(source, destination);
                 }

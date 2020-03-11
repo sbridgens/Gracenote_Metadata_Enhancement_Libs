@@ -16,11 +16,14 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
         public string AdiYearValue { get; private set; }
 
+        public static bool UpdateVersionFailure { get; set; }
+
         public static bool ValidateVersionMajor(int? dbVersionMajor, bool isTvod = false)
         {
             var adiVersionMajor = EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
             var paid = EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
             EnrichmentWorkflowEntities.IsDuplicateIngest = false;
+            UpdateVersionFailure = false;
 
             if (dbVersionMajor > 0)
             {
@@ -48,6 +51,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
                     return false;
                 }
 
+                UpdateVersionFailure = true;
                 Log.Error(
                     $"Package for PAID: {paid} detected as an update but does not have a higher Version Major! Failing Enhancement.");
                 return false;

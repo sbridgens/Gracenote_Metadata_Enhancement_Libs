@@ -194,7 +194,7 @@ namespace ADIWFE_TestClient
                             pqiEx);
 
                     WorkflowManager.ProcessFailedPackage(IngestFile.AdiPackage);
-                    if(HasGnMapping)
+                    if(HasGnMapping || WorkflowManager.IsPackageAnUpdate)
                         Log.Info($"############### Processing FAILED! for item: {IngestFile.AdiPackage.Name} ###############\r\n");
                     else
                     {
