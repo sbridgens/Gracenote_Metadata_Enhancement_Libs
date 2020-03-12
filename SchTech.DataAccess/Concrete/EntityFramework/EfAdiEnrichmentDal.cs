@@ -5,6 +5,7 @@ using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 using SchTech.Entities.ConcreteTypes;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             try
             {
-                if (!IsWorkflowProcessing && !IsOrphanCleanupRunning)
+                if (!IsWorkflowProcessing && !IsOrphanCleanupRunning && !ExpiryProcessing)
                     CheckAndClearOrphanedData();
             }
             catch (Exception cfodex)
@@ -77,9 +78,10 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 try
                 {
                     EfStaticMethods.Log.Info("Checking for expired data in the adi db");
+
                     var checkWindow = DateTime.Now.AddHours(-Convert.ToInt32(ADIWF_Config.MinusExpiredAssetWindowHours));
                     var expiredRows = CurrentContext.Adi_Data.Where(
-                                        item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < checkWindow);
+                              item => Convert.ToDateTime(item.Licensing_Window_End.Trim()) < checkWindow);
 
                     var mapData = new List<GN_Mapping_Data>();
                     //get matching gn row data
@@ -87,7 +89,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     {
                         EfStaticMethods.Log.Debug($"DB Row ID {item.Id} with PAID Value: {item.TitlPaid} has expired with License Window End Date: {item.Licensing_Window_End.Trim()} marked for removal.");
                         var adiPaid = EfStaticMethods.GetPaidLastValue(item.TitlPaid);
-                        var gnMappingData = CurrentContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid.Contains(adiPaid));
+                        var gnMappingData = CurrentContext.GN_Mapping_Data
+                            .FirstOrDefault(
+                                p => EfStaticMethods.GetPaidLastValue(p.GN_Paid) == adiPaid
+                        );
+
                         if (gnMappingData == null)
                             continue;
                         mapData.Add(gnMappingData);
@@ -158,6 +164,23 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     stopWatch.Start();
 
 
+                    //var adiOrphans = CurrentContext.Adi_Data.FromSql("EXEC GetAdiDataOrphans").ToList();
+                    //if (adiOrphans.Any())
+                    //{
+                    //    EfStaticMethods.Log.Warn("Adi_Data table has orphaned rows, cleaning up");
+                    //    if (EfStaticMethods.Log.IsDebugEnabled)
+                    //        adiOrphans.ForEach(a => EfStaticMethods.Log.Warn($"Adi_Data table entry with id: {a.Id} and PAID: {a.TitlPaid} found that does not exist in GNMapping table, removing row data."));
+                    //    CurrentContext.RemoveRange(adiOrphans);
+                    //}
+
+                    //var gnOrphans = CurrentContext.GN_Mapping_Data.FromSql("EXEC GetMappingOrphans").ToList();
+                    //if (gnOrphans.Any())
+                    //{
+                    //    EfStaticMethods.Log.Warn("GN_Mapping_Data table has orphaned rows, cleaning up");
+                    //    if(EfStaticMethods.Log.IsDebugEnabled)
+                    //        gnOrphans.ForEach(g => EfStaticMethods.Log.Warn($"Mapping table entry with id: {g.Id} and PAID: {g.GN_Paid} found that does not exist in adi data table, removing row data."));
+                    //    CurrentContext.RemoveRange(gnOrphans);
+                    //}
                     var adiOrphans = CurrentContext.Adi_Data.FromSql("EXEC GetAdiDataOrphans").ToList();
                     if (adiOrphans.Any())
                     {
@@ -165,7 +188,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                         foreach (var adiO in adiOrphans)
                         {
-                            EfStaticMethods.Log.Warn(
+                            if (EfStaticMethods.Log.IsDebugEnabled)
+                                EfStaticMethods.Log.Warn(
                                 $"Adi_Data table entry with id: {adiO.Id} and PAID: {adiO.TitlPaid} found that does not exist in GNMapping table, removing row data.");
                             CurrentContext.Database.ExecuteSqlCommand($"DELETE FROM Adi_Data WHERE ID={adiO.Id}");
                         }
@@ -179,7 +203,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                         foreach (var gnItem in gnOrphans)
                         {
-                            EfStaticMethods.Log.Warn(
+                            if (EfStaticMethods.Log.IsDebugEnabled)
+                                EfStaticMethods.Log.Warn(
                                 $"Mapping table entry with id: {gnItem.Id} and PAID: {gnItem.GN_Paid} found that does not exist in adi data table, removing row data.");
                             CurrentContext.Database.ExecuteSqlCommand($"DELETE FROM GN_Mapping_Data WHERE ID={gnItem.Id}");
                         }
