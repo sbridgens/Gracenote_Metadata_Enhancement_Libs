@@ -56,30 +56,28 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
                     if (extractAdiOnly || IsLegacyGoPackage && AdiExtracted)
                     {
-                        OperationsSuccessful = true;
+                        return true;
                     }
                     if (IsUpdatePackage && AdiExtracted && !HasPreviewAsset)
                     {
-                        OperationsSuccessful = true;
+                        return true;
                     }
 
                     if (IsUpdatePackage && AdiExtracted && HasPreviewAsset && PreviewExtracted)
                     {
-                        OperationsSuccessful = true;
+                        return true;
                     }
-                    else if (!extractAdiOnly && MovieAssetExtracted)
+                    if (!extractAdiOnly && MovieAssetExtracted)
                     {
                         if (HasPreviewAsset && PreviewExtracted)
                             OperationsSuccessful = true;
                         else if (!HasPreviewAsset)
                             OperationsSuccessful = true;
+                        return true;
                     }
-                    else
-                    {
-                        Log.Info($"Metadata Update only, no media supplied.");
-                        HasPreviewAsset = false;
-                        OperationsSuccessful = true;
-                    }
+                    Log.Info($"Metadata Update only, no media supplied.");
+                    HasPreviewAsset = false;
+
                 }
                 catch (Exception eifaEx)
                 {

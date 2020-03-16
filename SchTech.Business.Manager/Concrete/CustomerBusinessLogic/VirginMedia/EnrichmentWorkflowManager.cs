@@ -113,6 +113,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 ZipHandler = new ZipHandler();
+                ZipHandler.IsUpdatePackage = false;
                 WorkflowEntities.CurrentPackage = adiPackageInfo;
                 WorkflowEntities.SetCurrentWorkingDirectory();
                 if (Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
@@ -244,7 +245,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         public bool ValidatePackageIsUnique()
         {
             var adiData = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue);
-            if(adiData?.VersionMajor != null)
+
+            if (IsPackageAnUpdate && adiData == null)
+            {
+                Log.Error(
+                    $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+            }
+
+            if (adiData?.VersionMajor != null)
                 IsPackageAnUpdate = EnhancementDataValidator.ValidateVersionMajor(adiData.VersionMajor, IsTvodPackage);
 
             if (IsPackageAnUpdate && adiData != null)
@@ -254,9 +262,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 return true;
             }
 
-            if (IsPackageAnUpdate && adiData == null)
-                Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
-
+           
             if (!IsPackageAnUpdate && adiData != null && !EnhancementDataValidator.UpdateVersionFailure)
             {
                 Log.Error($"Package with Paid: {WorkflowEntities.TitlPaidValue} Exists in the database, failing Ingest.");
