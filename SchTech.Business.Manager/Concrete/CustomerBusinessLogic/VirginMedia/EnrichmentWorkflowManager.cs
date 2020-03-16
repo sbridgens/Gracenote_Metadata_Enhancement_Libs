@@ -376,8 +376,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                     Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
 
-                    GnMappingData.GN_Availability_Start = mapData?.availability?.start;
-                    GnMappingData.GN_Availability_End = mapData?.availability?.end;
+                    GnMappingData.GN_Availability_Start = GetAvailability("start", mapData);
+                    GnMappingData.GN_Availability_End = GetAvailability("end", mapData);
                     GnMappingData.GN_updateId = mapData?.updateId;
                     _gnMappingDataService.Update(GnMappingData);
 
