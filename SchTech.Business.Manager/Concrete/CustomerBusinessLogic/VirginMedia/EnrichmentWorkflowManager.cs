@@ -891,10 +891,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 var localImage = GetImageName(imageUri, configLookup.Image_Mapping);
                 isl.DownloadImage(imageUri, localImage);
+                var imagepaid = $"{isl.ImageQualifier}{WorkflowEntities.TitlPaidValue.Replace("TITL", "")}";
 
-                if (IsPackageAnUpdate && !string.IsNullOrEmpty(isl.DbImages))
+                var imageExists = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(i => i.Metadata.AMS.Asset_ID == imagepaid);
+                if(imageExists != null)
                 {
-
                     InsertSuccess = ProdisAdiContentManager.UpdateImageData(
                         isl.ImageQualifier,
                         WorkflowEntities.TitlPaidValue,
@@ -905,10 +906,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         FileDirectoryManager.GetFileSize(localImage)
                     );
 
-                    //update image data in db and adi
-                    UpdateDbImages(isl.DbImages);
-                    isl.DbImages = null;
                 }
+                //If its an update but the image is new then we will get a false back
+                //therefore update the adi
                 else
                 {
                     //download and insert image
@@ -924,9 +924,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         configLookup.Image_Lookup,
                         isl.GetFileAspectRatio(localImage)
                     );
-                    //update image data in db and adi
-                    UpdateDbImages(isl.DbImages);
                 }
+
+
+                //update image data in db and adi
+                UpdateDbImages(isl.DbImages);
+                isl.DbImages = null;
 
                 if (InsertSuccess)
                     currentImage = configLookup.Image_Mapping;
@@ -977,6 +980,19 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 ProdisAdiContentManager.CheckAndAddBlockPlatformData();
                     if (WorkflowEntities.IsQamAsset && IsPackageAnUpdate)
                         AdiContentManager.SetQamUpdateContent();
+
+                //Ensure db checksum is correct
+                var enrichedChecksum =
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(a =>
+                        a.Metadata.AMS.Asset_Class == "movie");
+                AdiData.ContentTsFileChecksum = enrichedChecksum?.Metadata.App_Data
+                    .FirstOrDefault(c => c.Name.ToLower() == "content_checksum")
+                    ?.Value;
+
+                AdiData.ContentTsFileSize = enrichedChecksum?.Metadata.App_Data
+                    .FirstOrDefault(c => c.Name.ToLower() == "content_filesize")?.Value;
+
+                _adiDataService.Update(AdiData);
             }
             catch (Exception ex)
             {

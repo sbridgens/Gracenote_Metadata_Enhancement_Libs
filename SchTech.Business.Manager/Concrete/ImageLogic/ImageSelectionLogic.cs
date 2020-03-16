@@ -244,7 +244,6 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
             DbImages = String.IsNullOrEmpty(matchValue)
                 ? $"{DbImages}, {imageTypeRequired}: {uri}"
                 : DbImages.Replace(matchValue, $"{imageTypeRequired}: {uri}");
-
         }
 
         //private void LogIdentifierLogic(int identifiersCount, string imageName)
@@ -316,6 +315,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                                 _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
+                                if(imageTypeRequired == "TitleTreatment")
+                                    _log.Info("");
                                 //check if the image is flagged as a requires trimming in config
                                 var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
                                     .Select(r => r.TrimImage).FirstOrDefault());
@@ -362,6 +363,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                             ? CurrentMappingData.GN_Images = $"{CurrentMappingData.GN_Images}, {imageTypeRequired}: {image.URI}"
                                             : CurrentMappingData.GN_Images = CurrentMappingData.GN_Images.Replace(match.Value, newUri);
 
+                                        
                                         //update DbImages list, this will be saved by calling class.
                                         UpdateDbImages(match.Value, imageTypeRequired, image.URI);
 

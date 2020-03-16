@@ -5,7 +5,6 @@ using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 using SchTech.Entities.ConcreteTypes;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Objects;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -98,8 +97,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                             continue;
                         mapData.Add(gnMappingData);
                     }
-
-
+                    
                     var rowCount = expiredRows.Count();
                     
 

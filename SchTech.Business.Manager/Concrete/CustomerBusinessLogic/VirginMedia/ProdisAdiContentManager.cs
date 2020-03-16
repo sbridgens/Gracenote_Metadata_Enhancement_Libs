@@ -1049,6 +1049,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AddAssetMetadataApp_DataNode(paid, "Encoding_Type", encodingType);
                 AddAssetMetadataApp_DataNode(paid, "Image_Qualifier", imageLookupName);
                 AddAssetMetadataApp_DataNode(paid, "Image_Aspect_Ratio", imageAspectRatio);
+                AddAssetMetadataApp_DataNode(paid, "Type", "image");
 
                 return true;
             }
@@ -1074,7 +1075,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var adiObject = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(i => i.Metadata.AMS.Asset_ID == paid);
 
                 if (adiObject == null)
-                    throw new Exception($"Error retrieving ADI data for image: {paid}");
+                    return false;
 
                 adiObject.Content.Value = ImageSelectionLogic.GetImageName(imageName, imageMapping);
                 var cSum = adiObject.Metadata.App_Data.FirstOrDefault(c => c.Name == "Content_CheckSum");
