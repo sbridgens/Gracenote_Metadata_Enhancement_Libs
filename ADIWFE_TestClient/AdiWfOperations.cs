@@ -177,7 +177,6 @@ namespace ADIWFE_TestClient
                     {
                         WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
                         AdiEnrichmentQueueController.QueuedPackages.Remove(package);
-                        WorkflowManager.CleanStaticReferences();
                         Log.Info(
                             $"############### Processing FINISHED For Queued file: {IngestFile.AdiPackage.Name} ###############\r\n");
                     }
@@ -203,6 +202,8 @@ namespace ADIWFE_TestClient
                     }
 
                 }
+
+                WorkflowManager.CleanStaticReferences();
             }
         }
 
