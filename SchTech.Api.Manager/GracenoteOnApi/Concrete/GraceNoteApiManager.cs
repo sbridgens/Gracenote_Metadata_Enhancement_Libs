@@ -83,7 +83,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public int GetSeasonId()
         {
-            var sId = Convert.ToInt32(MovieEpisodeProgramData.seasonId);
+            var sId = Convert.ToInt32(MovieEpisodeProgramData?.seasonId);
             return sId > 0 ? sId : 0;
         }
 
@@ -125,7 +125,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public int SetSeasonId()
         {
-            return Convert.ToInt32(SeasonData.seasonId);
+            return Convert.ToInt32(SeasonData?.seasonId);
         }
 
         public string GetShowName()
