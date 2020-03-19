@@ -365,9 +365,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     }
                 }
 
-                if (!enrichedDataHasImages)
+                if (!enrichedDataHasImages && EnrichmentWorkflowEntities.UpdateAdi != null)
                 {
-                    if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.All(u => u.Metadata.AMS.Asset_Class != "image"))
+                    if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(u => u.Metadata.AMS.Asset_Class != "image"))
                     {
                         Log.Warn("We shouldn't be here! No image data found in the Enriched adi data or the Update Adi data?");
                         return false;
@@ -799,7 +799,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AddTitleMetadataApp_DataNode("Series_Ordinal", seriesOrdinalValue);
 
                 if (seasonId == 0)
-                    return false;
+                    return true;
 
 
                 AddTitleMetadataApp_DataNode("Series_Name",
@@ -877,7 +877,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 var gId = "";
-                var hasGenres = false;
                 var genres = EnrichmentDataLists.GenresList.Distinct(new GenreComparer()).ToList();
 
                 foreach (var genre in genres)
@@ -886,13 +885,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     {
                         AddTitleMetadataApp_DataNode("Show_Genre", genre.Value);
                         AddTitleMetadataApp_DataNode("Show_GenreID", genre.genreId);
-                        hasGenres = true;
                     }
 
                     gId = genre.genreId;
                 }
 
-                return hasGenres;
+                return true;
             }
             catch (Exception isgdEx)
             {

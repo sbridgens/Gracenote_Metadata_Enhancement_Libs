@@ -285,7 +285,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return ApiManager.CoreGnMappingData
                 .programMappings
                 .programMapping
-                .FirstOrDefault();
+                .FirstOrDefault(m => m.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped);
         }
 
         private static DateTime? GetAvailability(string typeRequired,
@@ -322,39 +322,50 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
 
                 var mapData = GetGnMappingData();
 
-                var data = new GN_Mapping_Data
+                //secondary check
+                if (mapData?.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped)
                 {
-                    GN_TMSID = WorkflowEntities.GraceNoteTmsId,
-                    GN_Paid = mapData?.link.Where(i => i.idType.Equals("PAID"))
-                        .Select(r => r.Value)
-                        .FirstOrDefault(),
+                    Log.Info($"Asset Mapping status: {mapData.status}, Catalog Name: {mapData?.catalogName}");
+                    var data = new GN_Mapping_Data
+                    {
+                        GN_TMSID = WorkflowEntities.GraceNoteTmsId,
+                        GN_Paid = mapData?.link.Where(i => i.idType.Equals("PAID"))
+                            .Select(r => r.Value)
+                            .FirstOrDefault(),
 
-                    GN_RootID = mapData?.id.Where(t => t.type.Equals("rootId"))
-                        .Select(r => r.Value)
-                        .FirstOrDefault(),
+                        GN_RootID = mapData?.id.Where(t => t.type.Equals("rootId"))
+                            .Select(r => r.Value)
+                            .FirstOrDefault(),
 
-                    GN_Status = mapData?.status.ToString(),
-                    GN_ProviderId = mapData?.link.Where(i => i.idType.Equals("ProviderId"))
-                        .Select(r => r.Value)
-                        .FirstOrDefault(),
+                        GN_Status = mapData?.status.ToString(),
+                        GN_ProviderId = mapData?.link.Where(i => i.idType.Equals("ProviderId"))
+                            .Select(r => r.Value)
+                            .FirstOrDefault(),
 
-                    GN_Pid = mapData?.link.Where(i => i.idType.Equals("PID"))
-                        .Select(r => r.Value)
-                        .FirstOrDefault(),
+                        GN_Pid = mapData?.link.Where(i => i.idType.Equals("PID"))
+                            .Select(r => r.Value)
+                            .FirstOrDefault(),
 
-                    GN_programMappingId = mapData?.programMappingId,
-                    GN_creationDate = mapData?.creationDate != null
-                        ? Convert.ToDateTime(mapData.creationDate)
-                        : DateTime.Now,
-                    GN_updateId = mapData?.updateId,
-                    GN_Availability_Start = GetAvailability("start", mapData),
-                    GN_Availability_End = GetAvailability("end", mapData)
-                };
+                        GN_programMappingId = mapData?.programMappingId,
+                        GN_creationDate = mapData?.creationDate != null
+                            ? Convert.ToDateTime(mapData.creationDate)
+                            : DateTime.Now,
+                        GN_updateId = mapData?.updateId,
+                        GN_Availability_Start = GetAvailability("start", mapData),
+                        GN_Availability_End = GetAvailability("end", mapData)
+                    };
 
-                GnMappingData = _gnMappingDataService.Add(data);
-                Log.Info($"Gracenote Mapping data seeded to the database with Row Id: {GnMappingData.Id}");
+                    GnMappingData = _gnMappingDataService.Add(data);
+                    Log.Info($"Gracenote Mapping data seeded to the database with Row Id: {GnMappingData.Id}");
+                    return true;
 
-                return true;
+                }
+
+                Log.Error($"Package {WorkflowEntities.TitlPaidValue} is not mapped, Status returned: {mapData?.status.ToString()}, Catalog Name: {mapData?.catalogName}");
+                FailedToMap = true;
+                return false;
+
+
             }
             catch (Exception ex)
             {
@@ -782,8 +793,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
         {
             try
             {
-                //need to check api calls as The series and season data is missing
-
                 ApiManager.SetSeasonData();
                 AdiContentManager.SeasonInfo = ApiManager.GetSeasonInfo();
                 //Insert IMDB Data
@@ -1096,14 +1105,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     ? ProdisAdiContentManager.GetLicenceEndData()
                     : throw new Exception("Licensing_Window_End Is not a valid DateTime Format, Rejecting Ingest");
 
-
-                //if tvod remove enhanced movie section
+                
                 if (IsTvodPackage && AdiData.UpdateAdi != null)
                 {
-                    //var movieData = EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(m => m.Metadata.AMS.Asset_Class == "movie");
-                    //AdiContentManager.MovieContent = movieData?.Content.Value;
-                    //EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Remove(movieData);
-                    //Load the update adi ready for preview data checks
                     WorkflowEntities.SerializeAdiFile(true, AdiData.UpdateAdi, true);
                 }
 

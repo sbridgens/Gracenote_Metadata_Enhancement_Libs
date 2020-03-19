@@ -58,7 +58,6 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetSeriesTitle()
         {
-            var tets = MovieEpisodeProgramData.progType;
             if (MovieEpisodeProgramData.movieInfo != null)
                 return null;
 

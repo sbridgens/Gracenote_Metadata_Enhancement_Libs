@@ -141,6 +141,7 @@ namespace ADIWFE_TestClient
             }
             catch (Exception spex)
             {
+
                 LogError("StartProcessing", "Error during Processing", spex);
             }
         }
@@ -243,12 +244,9 @@ namespace ADIWFE_TestClient
         {
             try
             {
-                if (!WorkflowManager.GetSeriesSeasonSpecialsData() &&
-                    !WorkflowManager.SetAdiSeriesData())
-                    return false;
-
-                WorkflowManager.SetAdiSeasonData();
-                return true;
+                return WorkflowManager.GetSeriesSeasonSpecialsData() &&
+                       WorkflowManager.SetAdiSeriesData() &&
+                       WorkflowManager.SetAdiSeasonData();
 
             }
             catch (Exception pfpex)
