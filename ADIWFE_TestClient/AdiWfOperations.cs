@@ -1,6 +1,6 @@
 ﻿using ADIWFE_TestClient.Properties;
 using log4net;
-using SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia;
+using VirginMediaWorkflowDirector;
 using SchTech.Configuration.Manager.Concrete;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
@@ -20,7 +20,7 @@ namespace ADIWFE_TestClient
         private static readonly ILog Log = LogManager.GetLogger(typeof(AdiWfOperations));
 
         private Timer _timer;
-        private EnrichmentWorkflowManager WorkflowManager { get; set; }
+        private EnrichmentControl WorkflowManager { get; set; }
         private EfAdiEnrichmentDal AdiEnrichmentDal { get; set; }
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
@@ -163,7 +163,7 @@ namespace ADIWFE_TestClient
 
                     Log.Info(
                         $"############### Processing STARTED For Queued item {package + 1} of {AdiEnrichmentQueueController.QueuedPackages.Count}: {IngestFile.AdiPackage.FullName} ###############\r\n");
-                    WorkflowManager = new EnrichmentWorkflowManager();
+                    WorkflowManager = new EnrichmentControl();
 
                     Success = GetMappingAndExtractPackage();
                     if (!Success)

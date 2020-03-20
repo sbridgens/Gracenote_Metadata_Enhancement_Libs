@@ -1,6 +1,6 @@
 ﻿using ADIWFE_TestLegacyGo.Properties;
 using log4net;
-using SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo;
+using LegacyGoWorkflowDirector;
 using SchTech.Configuration.Manager.Concrete;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
@@ -20,7 +20,7 @@ namespace ADIWFE_TestLegacyGo
         private static readonly ILog Log = LogManager.GetLogger(typeof(AdiWfOperations));
 
         private Timer _timer;
-        private GoWorkflowManager WorkflowManager { get; set; }
+        private EnrichmentControl WorkflowManager { get; set; }
         private EfAdiEnrichmentDal AdiEnrichmentDal { get; set; }
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
@@ -155,7 +155,7 @@ namespace ADIWFE_TestLegacyGo
 
                     Log.Info(
                         $"############### Processing STARTED For Queued item {package + 1} of {AdiEnrichmentQueueController.QueuedPackages.Count}: {IngestFile.AdiPackage.FullName} ###############\r\n");
-                    WorkflowManager = new GoWorkflowManager();
+                    WorkflowManager = new EnrichmentControl();
 
                     Success = GetMappingAndExtractPackage();
                     if (!Success)
@@ -233,7 +233,7 @@ namespace ADIWFE_TestLegacyGo
             try
             {
                 Success = WorkflowManager.ImageSelectionLogic() &&
-                          GoWorkflowManager.RemoveDerivedFromAsset() &&
+                          EnrichmentControl.RemoveDerivedFromAsset() &&
                           WorkflowManager.FinalisePackageData() &&
                           WorkflowManager.SaveAdiFile() &&
                           WorkflowManager.PackageEnrichedAsset(IngestFile.AdiPackage) &&

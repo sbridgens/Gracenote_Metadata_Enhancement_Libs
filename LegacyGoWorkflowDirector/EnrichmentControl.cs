@@ -1,9 +1,13 @@
-﻿using log4net;
+﻿using System;
+using System.IO;
+using System.Linq;
+using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Api.Manager.Serialization;
 using SchTech.Business.Manager.Abstract.EntityFramework;
+using SchTech.Business.Manager.Concrete;
 using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.Business.Manager.Concrete.ImageLogic;
 using SchTech.Business.Manager.Concrete.Validation;
@@ -15,19 +19,15 @@ using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.File.Manager.Concrete.ZipArchive;
 using SchTech.Queue.Manager.Concrete;
-using System;
-using System.IO;
-using System.Linq;
 
-
-namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
+namespace LegacyGoWorkflowDirector
 {
-    public class GoWorkflowManager
+    public class EnrichmentControl
     {
         /// <summary>
         ///     Initialize Log4net
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(GoWorkflowManager));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentControl));
 
         private IAdiEnrichmentService _adiDataService;
 
@@ -38,7 +38,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
         private readonly ICategoryMappingService _categoryMappingService;
 
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
-        private GoAdiContentManager AdiContentManager { get; }
+        private AdiContentController AdiContentManager { get; }
         private GN_Mapping_Data GnMappingData { get; set; }
         private GraceNoteApiManager ApiManager { get; }
         private string DeliveryPackage { get; set; }
@@ -51,11 +51,11 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
         private bool HasPoster { get; set; }
 
-        public GoWorkflowManager()
+        public EnrichmentControl()
         {
             ApiManager = new GraceNoteApiManager();
             WorkflowEntities = new EnrichmentWorkflowEntities();
-            AdiContentManager = new GoAdiContentManager();
+            AdiContentManager = new AdiContentController();
             _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
             _gnImageLookupService = new GnImageLookupManager(new EfGnImageLookupDal());
             _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
@@ -106,7 +106,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             pollController.StartPollingOperations(ADIWF_Config.InputDirectory, "*.zip");
             WorkflowEntities.HasPackagesToProcess = pollController.HasFilesToProcess;
         }
-        
+
         public bool ObtainAndParseAdiFile(FileInfo adiPackageInfo)
         {
             try
@@ -131,8 +131,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 if (!WorkflowEntities.SerializeAdiFile(false))
                     return false;
 
-                
-                if (!GoAdiContentManager.ValidatePackageIsLegacyGo(adiPackageInfo))
+
+                if (!AdiContentController.ValidatePackageIsLegacyGo(adiPackageInfo))
                 {
                     NonLegacyGoPackage = true;
                     return false;
@@ -144,10 +144,10 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 WorkflowEntities.TitlPaidValue =
                     EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
 
-                HasPoster = GoAdiContentManager.CheckAndRemovePosterSection();
+                HasPoster = AdiContentController.CheckAndRemovePosterSection();
 
                 var adiValidation = new AdiXmlValidator();
-                
+
 
                 WorkflowEntities.OnapiProviderid =
                     adiValidation.ValidatePaidValue(WorkflowEntities.TitlPaidValue);
@@ -170,7 +170,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 return false;
             }
         }
-        
+
         public bool CallAndParseGnMappingData()
         {
             try
@@ -282,17 +282,17 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             switch (typeRequired)
             {
                 case "start":
-                {
-                    if (mapdata.availability?.start != null && mapdata.availability?.start.Year != 1)
-                        availableDateTime = Convert.ToDateTime(mapdata.availability?.start);
-                    break;
-                }
+                    {
+                        if (mapdata.availability?.start != null && mapdata.availability?.start.Year != 1)
+                            availableDateTime = Convert.ToDateTime(mapdata.availability?.start);
+                        break;
+                    }
                 case "end":
-                {
-                    if (mapdata.availability?.end != null && mapdata.availability?.end.Year != 1)
-                        availableDateTime = Convert.ToDateTime(mapdata.availability?.end);
-                    break;
-                }
+                    {
+                        if (mapdata.availability?.end != null && mapdata.availability?.end.Year != 1)
+                            availableDateTime = Convert.ToDateTime(mapdata.availability?.end);
+                        break;
+                    }
             }
 
             return availableDateTime;
@@ -362,7 +362,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
                 if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
                 {
-                    Log.Info($"TMSID Mismatch updating db with new value.");
+                    Log.Info("TMSID Mismatch updating db with new value.");
                     GnMappingData.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
                 }
 
@@ -453,17 +453,17 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     {
                         TitlPaid = WorkflowEntities.TitlPaidValue,
                         OriginalAdi = FileDirectoryManager.ReturnAdiAsAString(ZipHandler.ExtractedAdiFile.FullName),
-                        VersionMajor = GoAdiContentManager.GetVersionMajor(),
-                        VersionMinor = GoAdiContentManager.GetVersionMinor(),
-                        ProviderId = GoAdiContentManager.GetProviderId(),
+                        VersionMajor = AdiContentController.GetVersionMajor(),
+                        VersionMinor = AdiContentController.GetVersionMinor(),
+                        ProviderId = AdiContentController.GetProviderId(),
                         TmsId = WorkflowEntities.GraceNoteTmsId,
                         Licensing_Window_End = WorkflowEntities.IsDateTime(
-                            GoAdiContentManager.GetLicenceEndData()
+                            AdiContentController.GetLicenceEndData()
                         )
-                            ? GoAdiContentManager.GetLicenceEndData()
+                            ? AdiContentController.GetLicenceEndData()
                             : throw new Exception("Licensing_Window_End Is not a valid DateTime Format," +
                                                   " Rejecting Ingest"),
-                        ProcessedDateTime = DateTime.Now,
+                        ProcessedDateTime = DateTime.Now
                     };
 
                     _adiDataService.Add(AdiData);
@@ -509,9 +509,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 GnMappingData.GN_connectorId = WorkflowEntities.GraceNoteConnectorId;
                 _gnMappingDataService.Update(GnMappingData);
 
-               ProgramTypes.SetProgramType(
-                   ApiManager.MovieEpisodeProgramData.progType, 
-                   ApiManager.MovieEpisodeProgramData.subType);
+                ProgramTypes.SetProgramType(
+                    ApiManager.MovieEpisodeProgramData.progType,
+                    ApiManager.MovieEpisodeProgramData.subType);
 
                 //set default vars for workflow
                 AdiContentManager.InitialiseAndSeedObjectLists(ApiManager.MovieEpisodeProgramData,
@@ -576,7 +576,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
         {
             try
             {
-                var provider = GoAdiContentManager.GetProvider();
+                var provider = AdiContentController.GetProvider();
                 return _categoryMappingService.Get(
                     c => c.ProviderName == provider).CategoryValue;
             }
@@ -584,7 +584,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             {
                 return null;
             }
-            
+
         }
 
 
@@ -596,7 +596,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
 
                 if (!EnrichmentWorkflowEntities.IsMoviePackage)
                 {
-                    GoAdiContentManager.InsertEpisodeData(
+                    AdiContentController.InsertEpisodeData(
                         WorkflowEntities.GraceNoteTmsId,
                         episodeOrdinalValue: ApiManager.GetEpisodeOrdinalValue(),
                         episodeTitle: ApiManager.GetEpisodeTitle()
@@ -647,7 +647,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                             hasMovieInfo: HasMovieInfo()
                         );
 
-                Log.Error($"A correct Category Mapping for Provider: {GoAdiContentManager.GetProvider()} was not found, failing ingest.");
+                Log.Error($"A correct Category Mapping for Provider: {AdiContentController.GetProvider()} was not found, failing ingest.");
                 return false;
 
             }
@@ -670,13 +670,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 ApiManager.SetSeasonData();
                 AdiContentManager.SeasonInfo = ApiManager.GetSeasonInfo();
                 //Insert IMDB Data
-                return  AdiContentManager.InsertIdmbData(
+                return AdiContentManager.InsertIdmbData(
                            ApiManager.ExternalLinks(),
                            HasMovieInfo()
                            ) &&
 
                        //Insert the TITL Series Layerdata
-                       GoAdiContentManager.InsertSeriesLayerData(
+                       AdiContentController.InsertSeriesLayerData(
                            ApiManager.ShowSeriesSeasonProgramData.connectorId,
                            ApiManager.GetSeriesId()
                            ) &&
@@ -713,7 +713,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
         {
             try
             {
-                return GoAdiContentManager.InsertProductionYears(
+                return AdiContentController.InsertProductionYears(
                     ApiManager.GetSeriesPremiere(),
                     ApiManager.GetSeasonPremiere(),
                     ApiManager.GetSeriesFinale(),
@@ -750,7 +750,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     continue;
 
                 //prevent duplicate processing
-                if (string.IsNullOrEmpty(currentProgramType) || 
+                if (string.IsNullOrEmpty(currentProgramType) ||
                     configLookup.Image_Mapping == currentImage)
                     continue;
 
@@ -770,9 +770,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 );
 
                 var imageUri = isl.GetGracenoteImage(
-                    configLookup.Image_Lookup, 
+                    configLookup.Image_Lookup,
                     currentProgramType,
-                    WorkflowEntities.TitlPaidValue, 
+                    WorkflowEntities.TitlPaidValue,
                     WorkflowEntities.SeasonId);
 
                 if (string.IsNullOrEmpty(imageUri))
@@ -787,7 +787,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 if (IsPackageAnUpdate && !string.IsNullOrEmpty(isl.DbImages))
                 {
 
-                    InsertSuccess = GoAdiContentManager.UpdateImageData(
+                    InsertSuccess = AdiContentController.UpdateImageData(
                         isl.ImageQualifier,
                         WorkflowEntities.TitlPaidValue,
                         imageUri.Replace("assets/", ""),
@@ -804,7 +804,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 else
                 {
                     //download and insert image
-                    InsertSuccess = GoAdiContentManager.InsertImageData
+                    InsertSuccess = AdiContentController.InsertImageData
                     (
                         WorkflowEntities.TitlPaidValue,
                         imageUri.Replace("assets/", ""),
@@ -861,12 +861,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             try
             {
                 //Insert Layer data for Program Layer
-                GoAdiContentManager.InsertProgramLayerData(
+                AdiContentController.InsertProgramLayerData(
                     WorkflowEntities.GraceNoteTmsId,
                     programRootId: ApiManager.MovieEpisodeProgramData?.rootId,
                     shoDataRootId: ApiManager.ShowSeriesSeasonProgramData?.rootId);
 
-                GoAdiContentManager.CheckAndAddBlockPlatformData();
+                AdiContentController.CheckAndAddBlockPlatformData();
             }
             catch (Exception ex)
             {
@@ -907,12 +907,12 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 var finalPackage = Path.Combine(ADIWF_Config.IngestDirectory, fInfo.Name);
 
                 Log.Info($"Moving Temp Package to ingest: {DeliveryPackage} to {tmpPackage}");
-                System.IO.File.Move(DeliveryPackage, tmpPackage);
-                if (System.IO.File.Exists(tmpPackage))
+                File.Move(DeliveryPackage, tmpPackage);
+                if (File.Exists(tmpPackage))
                 {
                     Log.Info("Temp package successfully moved");
                     Log.Info($"Moving Temp Package: {tmpPackage} to Ingest package {finalPackage}");
-                    System.IO.File.Move(tmpPackage, finalPackage);
+                    File.Move(tmpPackage, finalPackage);
                     Log.Info("Ingest package Delivered successfully.");
                     return true;
                 }
@@ -941,27 +941,27 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
                 if (AdiData.EnrichedAdi == null)
                     throw new Exception($"Previously Enriched ADI data for Paid: {WorkflowEntities.TitlPaidValue}" +
-                                        $" was not found in the database?");
+                                        " was not found in the database?");
 
                 //Serialize previously enriched Adi File to obtain Asset data
                 WorkflowEntities.SerializeAdiFile(true, AdiData.EnrichedAdi);
                 AdiData.TmsId = WorkflowEntities.GraceNoteTmsId;
-                AdiData.VersionMajor = GoAdiContentManager.GetVersionMajor();
-                AdiData.VersionMinor = GoAdiContentManager.GetVersionMinor();
+                AdiData.VersionMajor = AdiContentController.GetVersionMajor();
+                AdiData.VersionMinor = AdiContentController.GetVersionMinor();
 
                 AdiData.Licensing_Window_End = WorkflowEntities.IsDateTime(
-                    GoAdiContentManager.GetLicenceEndData()
+                    AdiContentController.GetLicenceEndData()
                 )
-                    ? GoAdiContentManager.GetLicenceEndData()
+                    ? AdiContentController.GetLicenceEndData()
                     : throw new Exception("Licensing_Window_End Is not a valid DateTime Format, Rejecting Ingest");
 
 
-                GoAdiContentManager.RemoveMovieContentFromUpdate();
+                AdiContentController.RemoveMovieContentFromUpdate();
                 //Get original asset data and modify new adi.
-                if (!GoAdiContentManager.CopyPreviouslyEnrichedAssetDataToAdi())
+                if (!AdiContentController.CopyPreviouslyEnrichedAssetDataToAdi())
                     return false;
                 //Update all version major values to correct value.
-                if (!GoAdiContentManager.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
+                if (!AdiContentController.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
                     return false;
 
 
@@ -1049,22 +1049,22 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                     ? $"{ADIWF_Config.MoveNonMappedDirectory}\\{packageFile.Name}"
                     : $"{ADIWF_Config.FailedDirectory}\\{packageFile.Name}";
 
-                if (System.IO.File.Exists(destination))
-                    System.IO.File.Delete(destination);
+                if (File.Exists(destination))
+                    File.Delete(destination);
 
                 if (FailedToMap)
                 {
                     Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
                              $"{ADIWF_Config.MoveNonMappedDirectory}");
                     Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
-                             $" before it is failed completely.");
+                             " before it is failed completely.");
 
                     var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
 
                     if (dt >= packageFile.LastWriteTime.Date)
                     {
-                        Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
-                        System.IO.File.Delete(packageFile.FullName);
+                        Log.Warn("Ingest file has passed the time for allowed mapping and will deleted!");
+                        File.Delete(packageFile.FullName);
                         return;
                     }
                 }
@@ -1073,23 +1073,23 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
                 {
                     Log.Info($"Moving Package: {packageFile} to Updates Failed directory: " +
                              $"{ADIWF_Config.UpdatesFailedDirectory}");
-                    System.IO.File.Move(source, destination);
+                    File.Move(source, destination);
                 }
-                if(!NonLegacyGoPackage)
+                if (!NonLegacyGoPackage)
                 {
                     Log.Info($"Moving Package: {packageFile} to Failed directory: " +
                              $"{ADIWF_Config.FailedDirectory}");
 
-                    System.IO.File.Move(source, destination);
+                    File.Move(source, destination);
                 }
 
 
-                if (System.IO.File.Exists(destination) && !NonLegacyGoPackage)
+                if (File.Exists(destination) && !NonLegacyGoPackage)
                     Log.Info("Move to failed directory successful.");
 
                 FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
 
-                Log.Info($"Removing db entries for Failed Package.");
+                Log.Info("Removing db entries for Failed Package.");
                 _adiDataService.Delete(AdiData);
                 _gnMappingDataService.Delete(GnMappingData);
             }
@@ -1106,8 +1106,8 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.LegacyGo
             try
             {
                 Log.Info($"Deleting package file: {packageFile.FullName}");
-                System.IO.File.Delete(packageFile.FullName);
-                if (!System.IO.File.Exists(packageFile.FullName))
+                File.Delete(packageFile.FullName);
+                if (!File.Exists(packageFile.FullName))
                     Log.Info($"Successfully deleted {packageFile.FullName}");
 
                 Log.Info($"Removing working directory: {WorkflowEntities.CurrentWorkingDirectory}");

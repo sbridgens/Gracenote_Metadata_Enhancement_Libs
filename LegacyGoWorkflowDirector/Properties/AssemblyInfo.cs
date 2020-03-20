@@ -10,11 +10,11 @@ using log4net.Config;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SchTech Core")]
-[assembly: AssemblyDescription("SCH Tech Core")]
+[assembly: AssemblyTitle("Legacy Go Workflow Controller")]
+[assembly: AssemblyDescription("SCH Tech Legacy Go Workflow Controller")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SCH Tech Ltd")]
-[assembly: AssemblyProduct("SchTech.Core")]
+[assembly: AssemblyProduct("LegacyGoWorkflowDirector")]
 [assembly: AssemblyCopyright("Copyright © SCH Tech Ltd 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -25,7 +25,7 @@ using log4net.Config;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("45d7d10a-d8b6-4381-995b-44f8e2e3d500")]
+[assembly: Guid("cfce7286-3697-4f87-8673-f25e71d9b06a")]
 
 // Version information for an assembly consists of the following four values:
 //

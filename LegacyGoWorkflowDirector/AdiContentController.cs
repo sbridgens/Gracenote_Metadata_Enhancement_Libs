@@ -1,23 +1,24 @@
-﻿using log4net;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
+using SchTech.Business.Manager.Concrete.ImageLogic;
 using SchTech.Business.Manager.Concrete.Validation;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using SchTech.Business.Manager.Concrete.ImageLogic;
 
-namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
+namespace LegacyGoWorkflowDirector
 {
-    public class ProdisAdiContentManager
+    public class AdiContentController
     {
         /// <summary>
         ///     Initialize Log4net
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ProdisAdiContentManager));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AdiContentController));
 
         private readonly List<string> _adiNodesToRemove = new List<string>
         {
@@ -34,6 +35,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             "ExtraData_1",
             "ExtraData_3",
             "GN_Layer1_TMSId",
+            "GN_Layer1_RootId",
             "GN_Layer2_RootId",
             "GN_Layer2_SeriesId",
             "GN_Layer2_TMSId",
@@ -54,16 +56,16 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             "Writer"
         };
 
-        public ProdisAdiContentManager()
+        public AdiContentController()
         {
             AdiDataValidator = new EnhancementDataValidator();
         }
 
-        public List<GnApiProgramsSchema.programsProgramSeason> SeasonInfo { get; set; }
-
         private EnrichmentDataLists EnrichmentDataLists { get; set; }
 
         private EnhancementDataValidator AdiDataValidator { get; }
+
+        public List<GnApiProgramsSchema.programsProgramSeason> SeasonInfo { get; set; }
 
         private bool IdmbDataInserted { get; set; }
 
@@ -143,7 +145,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public static bool AddAssetMetadataApp_DataNode(string assetId, string nodeName, string nodeValue)
+        private static void AddAssetMetadataApp_DataNode(string assetId, string nodeName, string nodeValue)
         {
             try
             {
@@ -170,7 +172,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                         ?.Metadata.App_Data.Add(newAppData);
                 }
 
-                return true;
             }
             catch (Exception aamdadnEx)
             {
@@ -180,24 +181,9 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (aamdadnEx.InnerException != null)
                     Log.Error("[AddAssetMetadataApp_DataNode] Inner Exception:" +
                               $" {aamdadnEx.InnerException.Message}");
-                return false;
             }
         }
 
-        public static bool SetAdiAssetContentField(string assetClass, string assetFileName)
-        {
-            var contentFile = EnrichmentWorkflowEntities.AdiFile
-                .Asset.Asset
-                .FirstOrDefault(asset => $"{assetClass}".Equals(asset.Metadata.AMS.Asset_Class));
-
-            if (contentFile == null)
-                return false;
-
-            contentFile.Content.Value = assetFileName;
-
-            Log.Info($"Successfully Set Content Value for Asset Type: {assetClass} to {assetFileName}");
-            return true;
-        }
 
         public static int GetVersionMajor()
         {
@@ -209,16 +195,14 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor;
         }
 
+        public static string GetProvider()
+        {
+            return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Provider;
+        }
+
         public static string GetProviderId()
         {
             return EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Provider_ID;
-        }
-
-        public static string GetAssetPaid(string assetType)
-        {
-            return EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                .Where(asset => asset.Metadata.AMS.Asset_Class.Equals(assetType))
-                .Select(asset => asset.Metadata.AMS.Asset_ID.ToString()).FirstOrDefault();
         }
 
         public static string GetLicenceEndData()
@@ -227,174 +211,25 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 .FirstOrDefault(l => l.Name.Equals("Licensing_Window_End"))?.Value;
         }
 
-        private static void CheckPreviewData()
-        {
-            var hasUpdatePreviewData = false;
-            if (EnrichmentWorkflowEntities.UpdateAdi != null)
-                hasUpdatePreviewData =
-                    EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(p =>
-                        p.Metadata.AMS.Asset_Class == "preview");
-
-            if (hasUpdatePreviewData)
-                return;
-
-            Log.Info($"Incoming asset has preview metadata, " +
-                     $"No Preview asset supplied and " +
-                     $"Enriched data does not contain preview metadata! " +
-                     $"removing preview data from adi.xml");
-
-            var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
-
-            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewData);
-        }
-
-
-        //Clone / Copy previous enrichment media data to current adi
-        public static bool CopyPreviouslyEnrichedAssetDataToAdi(bool hasPreviewAsset, bool hasPreviousUpdate)
+        public static bool CopyPreviouslyEnrichedAssetDataToAdi()
         {
             try
             {
-                var enrichedDataHasImages =
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image");
-
-                var enrichedDataHasPreview =
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p =>
-                        p.Metadata.AMS.Asset_Class == "preview");
-                
-                //no enriched preview data,
-                //no preview asset supplied preview metadata included via incoming adi
-                if (!hasPreviewAsset && 
-                    EnrichmentWorkflowEntities.PackageHasPreviewMetadata && 
-                    !enrichedDataHasPreview)
-                {
-                    CheckPreviewData();
-                }
-
-
-                foreach (var assetData in EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.ToList())
-                {
-                    if (assetData.Metadata.AMS.Asset_Class == "movie")
+                foreach (var assetData in EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset
+                    .Select(assetSection => new ADIAssetAsset
                     {
-                        var movieData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(
-                            m => m.Metadata.AMS.Asset_Class == "movie");
-
-                        if(movieData != null)
+                        Content = new ADIAssetAssetContent
                         {
-                            //add without content node
-                            var assetSection = new ADIAssetAsset
-                            {
-                                Metadata = new ADIAssetAssetMetadata
-                                {
-                                    //ensure incoming ams is used to maintain pricing information!
-                                    AMS = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                                        .FirstOrDefault(m => m.Metadata.AMS.Asset_Class == "movie")
-                                        ?.Metadata.AMS,
-                                    App_Data = assetData.Metadata.App_Data
-                                }
-                            };
-                            movieData.Content = null;
-                            movieData.Metadata = assetSection.Metadata;
+                            Value = assetSection.Content.Value
+                        },
+                        Metadata = new ADIAssetAssetMetadata
+                        {
+                            AMS = assetSection.Metadata.AMS,
+                            App_Data = assetSection.Metadata.App_Data
                         }
-                        else
-                        {
-                            var assetSection = new ADIAssetAsset
-                            {
-                                Metadata = new ADIAssetAssetMetadata
-                                {
-                                    //ensure incoming ams is used to maintain pricing information!
-                                    AMS = assetData.Metadata.AMS,
-                                    App_Data = assetData.Metadata.App_Data
-                                }
-                            };
-
-                            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetSection);
-                        }
-                    }
-                    if (assetData.Metadata.AMS.Asset_Class == "preview")
-                    {
-                        if (!hasPreviewAsset)
-                        {
-                            //enriched = preview, adi = no preview asset and no preview metadata
-                            if (EnrichmentWorkflowEntities.PackageHasPreviewMetadata)
-                            {
-                                var previewData = EnrichmentWorkflowEntities.AdiFile.Asset.Asset
-                                    .FirstOrDefault(c => c.Metadata.AMS.Asset_Class == "preview");
-                                
-                                var previewAsset = new ADIAssetAsset
-                                {
-                                    Metadata = new ADIAssetAssetMetadata
-                                    {
-                                        AMS = assetData.Metadata.AMS,
-                                        App_Data = assetData.Metadata.App_Data
-                                    }
-                                };
-
-                                if (previewData != null)
-                                {
-                                    previewData.Content = null;
-                                    previewData.Metadata = previewAsset.Metadata;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (EnrichmentWorkflowEntities.PackageHasPreviewMetadata)
-                            {
-                                Log.Info("Using supplied preview metadata as the update contains a physical asset plus preview metadata.");
-                                continue;
-                            }
-                        }
-                    }
-                    if (assetData.Metadata.AMS.Asset_Class == "image")
-                    {
-                        var imageSection = new ADIAssetAsset
-                        {
-                            Content = new ADIAssetAssetContent
-                            {
-                                Value = assetData.Content.Value
-                            },
-                            Metadata = new ADIAssetAssetMetadata
-                            {
-                                AMS = assetData.Metadata.AMS,
-                                App_Data = assetData.Metadata.App_Data
-                            }
-                        };
-
-                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
-                    }
-                }
-
-                if (!enrichedDataHasImages && EnrichmentWorkflowEntities.UpdateAdi != null)
-                {
-                    if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(u => u.Metadata.AMS.Asset_Class != "image"))
-                    {
-                        Log.Warn("We shouldn't be here! No image data found in the Enriched adi data or the Update Adi data?");
-                        return false;
-                    }
-
-                    Log.Info("Cloning image data from db UpdateAdi data.");
-
-                    foreach (var imageSection in
-                        from assetData in EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.ToList()
-                        where assetData.Metadata.AMS.Asset_Class == "image"
-                        select new ADIAssetAsset
-                        {
-                            Content = new ADIAssetAssetContent
-                            {
-                                Value = assetData.Content.Value
-                            },
-                            Metadata = new ADIAssetAssetMetadata
-                            {
-                                AMS = assetData.Metadata.AMS,
-                                App_Data = assetData.Metadata.App_Data
-                            }
-                        })
-                    {
-                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
-                    }
-
-                }
+                    }))
+                    if (assetData.Metadata != null)
+                        EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(assetData);
 
                 return true;
             }
@@ -410,6 +245,52 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
+        public static bool RemoveMovieContentFromUpdate()
+        {
+            try
+            {
+                var movieAsset =
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
+                        c.Metadata.AMS.Asset_Class == "movie");
+                var previewAsset = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
+                    c.Metadata.AMS.Asset_Class == "preview");
+
+                if (movieAsset != null)
+                {
+                    var newMovie = new ADIAssetAsset
+                    {
+                        Metadata = new ADIAssetAssetMetadata
+                        {
+                            AMS = new ADIAssetAssetMetadataAMS(),
+                            App_Data = new List<ADIAssetAssetMetadataApp_Data>()
+                        }
+                    };
+
+                    newMovie.Metadata.AMS = movieAsset.Metadata.AMS;
+                    newMovie.Metadata.App_Data = movieAsset.Metadata.App_Data;
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(movieAsset);
+                    EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(newMovie);
+                }
+
+                if (previewAsset == null)
+                    return true;
+                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(previewAsset);
+                EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(previewAsset);
+
+
+                return true;
+            }
+            catch (Exception rmcfuEx)
+            {
+                Log.Error("[RemoveMovieContentFromUpdate] Error during Removal of " +
+                          $"Movie Content section from Update {rmcfuEx.Message}");
+
+                if (rmcfuEx.InnerException != null)
+                    Log.Error(
+                        $"[RemoveMovieContentFromUpdate] Inner Exception: {rmcfuEx.InnerException.Message}");
+                return false;
+            }
+        }
 
         public static bool UpdateAllVersionMajorValues(int newVersionMajor)
         {
@@ -439,7 +320,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data.Remove(adiNode);
         }
 
-        public bool CheckAndRemovePosterSection()
+        public static bool CheckAndRemovePosterSection()
         {
             var hasPoster =
                 EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(p =>
@@ -451,6 +332,59 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Remove(hasPoster);
             return true;
 
+        }
+
+        private static bool ValidateBlockOtt()
+        {
+            try
+            {
+                var hasBlockPlatform = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(
+                    b => b.Metadata.AMS.Asset_Class == "movie"
+                )?.Metadata.App_Data.Where(
+                    bp => bp.Name.ToLower() == "block_platform");
+
+                return hasBlockPlatform != null && hasBlockPlatform.Any();
+            }
+            catch (Exception vpciEx)
+            {
+                Log.Error($"[ValidatePackageIsLegacyGo]: Error validating if package has Block_OTT: {vpciEx.Message}");
+                if (vpciEx.InnerException != null)
+                    Log.Error("[ValidatePackageIsLegacyGo] Inner Exception: " +
+                              $"{vpciEx.InnerException.Message}");
+                return false;
+            }
+        }
+
+        public static bool ValidatePackageIsLegacyGo(FileInfo packageInfo)
+        {
+            try
+            {
+                var providers = LegacyGoAllowedProviders.GoProviders
+                    .Split(',')
+                    .ToList();
+                var currentProvider = AdiContentController.GetProvider();
+
+                var isValid = providers.FirstOrDefault(p => p.Trim(' ').Contains(currentProvider));
+
+                if (!ValidateBlockOtt() && !string.IsNullOrEmpty(isValid))
+                    return true;
+
+                Log.Error($"Package for Provider: {currentProvider} is not a Legacy Go Package");
+                Log.Warn($"Moving non legacy go package to configured \"MoveNonLegacyToDirectory\" location: {LegacyGoAllowedProviders.MoveNonLegacyToDirectory}");
+                File.Move(packageInfo.FullName,
+                    Path.Combine(LegacyGoAllowedProviders.MoveNonLegacyToDirectory, packageInfo.Name));
+                Log.Info($"Successfully Moved ingest package to: {LegacyGoAllowedProviders.MoveNonLegacyToDirectory}");
+                return false;
+
+            }
+            catch (Exception vpilgEx)
+            {
+                Log.Error($"[ValidatePackageIsLegacyGo]: Error validating if package is a legacy go ingest: {vpilgEx.Message}");
+                if (vpilgEx.InnerException != null)
+                    Log.Error("[ValidatePackageIsLegacyGo] Inner Exception: " +
+                              $"{vpilgEx.InnerException.Message}");
+                return false;
+            }
         }
 
         public static void CheckAndAddBlockPlatformData()
@@ -799,7 +733,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AddTitleMetadataApp_DataNode("Series_Ordinal", seriesOrdinalValue);
 
                 if (seasonId == 0)
-                    return true;
+                    return false;
 
 
                 AddTitleMetadataApp_DataNode("Series_Name",
@@ -808,7 +742,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 //if (SeasonInfo != null && SeasonInfo.Any())
                 if (!SeasonInfo.Any())
                     return true;
-
 
                 var seasonData = SeasonInfo.FirstOrDefault(i => i.seasonId == seasonId.ToString());
 
@@ -877,6 +810,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             try
             {
                 var gId = "";
+                var hasGenres = false;
                 var genres = EnrichmentDataLists.GenresList.Distinct(new GenreComparer()).ToList();
 
                 foreach (var genre in genres)
@@ -885,12 +819,13 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                     {
                         AddTitleMetadataApp_DataNode("Show_Genre", genre.Value);
                         AddTitleMetadataApp_DataNode("Show_GenreID", genre.genreId);
+                        hasGenres = true;
                     }
 
                     gId = genre.genreId;
                 }
 
-                return true;
+                return hasGenres;
             }
             catch (Exception isgdEx)
             {
@@ -966,9 +901,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (externalLinks.Count <= 0 && IdmbDataInserted)
                     return true;
 
-                if (!externalLinks.Any())
-                    return true;
-
                 var links = externalLinks;
                 Log.Info("Adding IMDb_ID data.");
                 AddTitleMetadataApp_DataNode("IMDb_ID", links.FirstOrDefault()?.id);
@@ -994,6 +926,26 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 if (iidEx.InnerException != null)
                     Log.Error("[InsertIdmbData] Inner Exception: " +
                               $"{iidEx.InnerException.Message}");
+                return false;
+            }
+        }
+
+        public bool InsertCategoryValue(string mappingValue)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(mappingValue))
+                    return AddTitleMetadataApp_DataNode("Category", mappingValue);
+                throw new Exception("Category Value was Null?");
+            }
+            catch (Exception icvEx)
+            {
+                Log.Error("[InsertCategoryValue] Error Setting Category Value: " +
+                          $": {icvEx.Message}");
+
+                if (icvEx.InnerException != null)
+                    Log.Error("[InsertCategoryValue] Inner Exception: " +
+                              $"{icvEx.InnerException.Message}");
                 return false;
             }
         }
@@ -1047,7 +999,6 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 AddAssetMetadataApp_DataNode(paid, "Encoding_Type", encodingType);
                 AddAssetMetadataApp_DataNode(paid, "Image_Qualifier", imageLookupName);
                 AddAssetMetadataApp_DataNode(paid, "Image_Aspect_Ratio", imageAspectRatio);
-                AddAssetMetadataApp_DataNode(paid, "Type", "image");
 
                 return true;
             }
@@ -1073,7 +1024,7 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
                 var adiObject = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(i => i.Metadata.AMS.Asset_ID == paid);
 
                 if (adiObject == null)
-                    return false;
+                    throw new Exception($"Error retrieving ADI data for image: {paid}");
 
                 adiObject.Content.Value = ImageSelectionLogic.GetImageName(imageName, imageMapping);
                 var cSum = adiObject.Metadata.App_Data.FirstOrDefault(c => c.Name == "Content_CheckSum");
@@ -1093,27 +1044,5 @@ namespace SchTech.Business.Manager.Concrete.CustomerBusinessLogic.VirginMedia
             }
         }
 
-        public void SetQamUpdateContent()
-        {
-            try
-            {
-                var enrichedMovieAsset =
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(c =>
-                        c.Metadata.AMS.Asset_Class == "movie");
-
-                if (enrichedMovieAsset == null)
-                    throw new Exception("Error retrieving previously Enriched movie section for QAM Update.");
-
-                var adiMovie = EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(c =>
-                    c.Metadata.AMS.Asset_Class == "movie");
-
-                if (adiMovie != null)
-                    adiMovie.Content = new ADIAssetAssetContent {Value = enrichedMovieAsset.Content.Value};
-            }
-            catch (Exception squcex)
-            {
-                Log.Error($"Error Encountered Setting QAM Update content field: {squcex.Message}");
-            }
-        }
     }
 }

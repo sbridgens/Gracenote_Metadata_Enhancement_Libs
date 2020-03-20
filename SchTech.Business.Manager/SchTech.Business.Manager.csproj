@@ -86,10 +86,6 @@
     <Compile Include="Abstract\EntityFramework\IGnMappingDataService.cs" />
     <Compile Include="Abstract\EntityFramework\IGnProgramTypeLookupService.cs" />
     <Compile Include="Concrete\ProgramTypes.cs" />
-    <Compile Include="Concrete\CustomerBusinessLogic\LegacyGo\GoWorkflowManager.cs" />
-    <Compile Include="Concrete\CustomerBusinessLogic\LegacyGo\GoAdiContentManager.cs" />
-    <Compile Include="Concrete\CustomerBusinessLogic\VirginMedia\EnrichmentWorkflowManager.cs" />
-    <Compile Include="Concrete\CustomerBusinessLogic\VirginMedia\ProdisAdiContentManager.cs" />
     <Compile Include="Concrete\EntityFramework\AdiEnrichmentManager.cs" />
     <Compile Include="Concrete\EntityFramework\CategoryMappingManager.cs" />
     <Compile Include="Concrete\EntityFramework\GnImageLookupManager.cs" />
