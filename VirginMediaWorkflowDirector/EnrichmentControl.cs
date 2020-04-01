@@ -328,7 +328,7 @@ namespace VirginMediaWorkflowDirector
                 
 
                 //secondary check
-                if (mapData?.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped)
+                if (mapData.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped)
                 {
                     Log.Info($"Asset Mapping status: {mapData.status}, Catalog Name: {mapData.catalogName}");
                     
@@ -368,7 +368,7 @@ namespace VirginMediaWorkflowDirector
 
                 }
 
-                Log.Error($"Package {WorkflowEntities.TitlPaidValue} is not mapped, Status returned: {mapData?.status.ToString()}, Catalog Name: {mapData?.catalogName}");
+                Log.Error($"Package {WorkflowEntities.TitlPaidValue} is not mapped, Status returned: {mapData.status.ToString()}, Catalog Name: {mapData.catalogName}");
                 FailedToMap = true;
                 return false;
 
@@ -1293,7 +1293,9 @@ namespace VirginMediaWorkflowDirector
                 }
                 else
                 {
-                    Log.Info($"Moving Package: {packageFile} to Failed directory: {destination}");
+                    Log.Info(FailedToMap
+                        ? $"Moving Package: {packageFile} to Failed directory: {destination}"
+                        : $"Moving Package: {packageFile} to Failed to Map directory: {destination}");
 
                     if (File.Exists(destination) && source != destination)
                         File.Delete(destination);
@@ -1356,11 +1358,11 @@ namespace VirginMediaWorkflowDirector
 
                 Log.Info($"Successfully deleted Working directory {WorkflowEntities.CurrentWorkingDirectory}");
             }
-            catch (Exception rmwd_ex)
+            catch (Exception rmwdEx)
             {
                 LogError(
                     "RemoveWorkingDirectory",
-                    "Error Cleaning up Working Directory", rmwd_ex);
+                    "Error Cleaning up Working Directory", rmwdEx);
             }
         }
 
