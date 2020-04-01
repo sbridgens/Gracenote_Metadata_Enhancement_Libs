@@ -358,7 +358,7 @@ namespace LegacyGoWorkflowDirector
             try
             {
                 var mapData = GetGnMappingData();
-                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
+                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
 
                 if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
                 {
@@ -612,7 +612,7 @@ namespace LegacyGoWorkflowDirector
                         AdiContentManager.InsertCategoryValue(catValue) &&
                         //Get and add GN Program Data
                         _gnMappingDataService.AddGraceNoteProgramData(
-                            paid: WorkflowEntities.TitlPaidValue,
+                            paid: WorkflowEntities.GnMappingPaid,
                             seriesTitle: ApiManager.GetSeriesTitle(),
                             episodeTitle: ApiManager.GetEpisodeTitle(),
                             programDatas: ApiManager.MovieEpisodeProgramData
@@ -758,22 +758,18 @@ namespace LegacyGoWorkflowDirector
                 var isl = new ImageSelectionLogic
                 {
                     ImageMapping = mappingData,
-                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue),
+                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid),
                     IsUpdate = IsPackageAnUpdate,
                     ConfigImageCategories = mappingData.ImageCategory,
                     ApiAssetList = AdiContentManager.ReturnAssetList()
                 };
 
                 isl.DbImagesForAsset = _gnMappingDataService.ReturnDbImagesForAsset(
-                    WorkflowEntities.TitlPaidValue,
+                    WorkflowEntities.GnMappingPaid,
                     isl.CurrentMappingData.Id
                 );
 
-                var imageUri = isl.GetGracenoteImage(
-                    configLookup.Image_Lookup,
-                    currentProgramType,
-                    WorkflowEntities.TitlPaidValue,
-                    WorkflowEntities.SeasonId);
+                var imageUri = isl.GetGracenoteImage(configLookup.Image_Lookup);
 
                 if (string.IsNullOrEmpty(imageUri))
                     continue;
@@ -784,7 +780,7 @@ namespace LegacyGoWorkflowDirector
                 var localImage = GetImageName(imageUri, configLookup.Image_Mapping);
                 isl.DownloadImage(imageUri, localImage);
 
-                if (IsPackageAnUpdate && !string.IsNullOrEmpty(isl.DbImages))
+                if (IsPackageAnUpdate && !string.IsNullOrEmpty(SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages))
                 {
 
                     InsertSuccess = AdiContentController.UpdateImageData(
@@ -798,8 +794,8 @@ namespace LegacyGoWorkflowDirector
                     );
 
                     //update image data in db and adi
-                    UpdateDbImages(isl.DbImages);
-                    isl.DbImages = null;
+                    UpdateDbImages();
+                    SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages = null;
                 }
                 else
                 {
@@ -816,8 +812,10 @@ namespace LegacyGoWorkflowDirector
                         configLookup.Image_Lookup,
                         isl.GetFileAspectRatio(localImage)
                     );
+
                     //update image data in db and adi
-                    UpdateDbImages(isl.DbImages);
+                    UpdateDbImages();
+                    SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages = null;
                 }
 
                 if (InsertSuccess)
@@ -997,10 +995,10 @@ namespace LegacyGoWorkflowDirector
             return Path.Combine(WorkflowEntities.CurrentWorkingDirectory, newFileName);
         }
 
-        private void UpdateDbImages(string dbImages)
+        private void UpdateDbImages()
         {
-            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
-            gnMappingRow.GN_Images = dbImages;
+            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
+            gnMappingRow.GN_Images = SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages;
             var rowId = _gnMappingDataService.Update(gnMappingRow);
             Log.Info($"GN Mapping table with row id: {rowId.Id} updated with new image data");
         }

@@ -35,7 +35,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         public bool DownloadImageRequired { get; private set; }
         public ImageMapping ImageMapping { get; set; }
         public string ImageQualifier { get; private set; }
-        public string DbImages { get; set; }
+        public static string DbImages { get; set; }
         public bool IsUpdate { get; set; }
 
         /// <summary>
@@ -236,27 +236,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 : $"{gnimages}, {imageTypeRequired}: {uri}";
         }
 
-        private void UpdateDbImages(string matchValue, string imageTypeRequired, string uri)
-        {
-            if (DbImages == null)
-                DbImages = CurrentMappingData.GN_Images;
 
-            DbImages = String.IsNullOrEmpty(matchValue)
-                ? $"{DbImages}, {imageTypeRequired}: {uri}"
-                : DbImages.Replace(matchValue, $"{imageTypeRequired}: {uri}");
-        }
-
-        //private void LogIdentifierLogic(int identifiersCount, string imageName)
-        //{
-        //    if (!string.IsNullOrEmpty(IdentifierType))
-        //        _log.Info($"Image: {imageName} - Image Identifier TYPE Match: {IdentifierType} matches Config value");
-        //    if (!string.IsNullOrEmpty(IdentifierId))
-        //        _log.Info($"Image: {imageName} - Image Identifier ID: {IdentifierId} matches Config value");
-        //    else if (identifiersCount == 0) _log.Info("No Identifier config found for current image Type.");
-        //}
-
-
-        public string GetGracenoteImage(string imageTypeRequired, string programType, string paid, int seasonId = 0)
+        public string GetGracenoteImage(string imageTypeRequired)
         {
             try
             {
@@ -365,7 +346,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                                         
                                         //update DbImages list, this will be saved by calling class.
-                                        UpdateDbImages(match.Value, imageTypeRequired, image.URI);
+                                        DbImages = CurrentMappingData.GN_Images;
 
                                         _log.Info($"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
                                     }

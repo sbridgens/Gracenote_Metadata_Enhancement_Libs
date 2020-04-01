@@ -116,17 +116,12 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        public GN_Mapping_Data ReturnMapData(string paid)
+        public GN_Mapping_Data ReturnMapData(string gnmappingPaid)
         {
             using (var db = new ADI_EnrichmentContext())
             {
-                var gnPaid = paid
-                    .Replace("TITL", "")
-                    .Replace("i", "")
-                    .TrimStart('0');
-
                 return db.GN_Mapping_Data.FirstOrDefault(
-                    i => i.GN_Paid.Contains(gnPaid));
+                    i => i.GN_Paid.Equals(gnmappingPaid));
             }
         }
     }

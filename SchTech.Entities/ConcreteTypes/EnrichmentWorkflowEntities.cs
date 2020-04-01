@@ -51,6 +51,8 @@ namespace SchTech.Entities.ConcreteTypes
         public string CurrentWorkingDirectory { get; private set; }
 
         public string TitlPaidValue { get; set; }
+
+        public string GnMappingPaid { get; set; }
         
         public bool IsQamAsset { get; set; }
 

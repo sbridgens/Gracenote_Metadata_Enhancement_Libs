@@ -317,15 +317,22 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
+                var mapData = GetGnMappingData();
+                WorkflowEntities.GnMappingPaid = mapData.link.Where(i => i.idType.Equals("PAID"))
+                    .Select(r => r.Value)
+                    .FirstOrDefault();
+
                 if (IsPackageAnUpdate)
                     return UpdateGnMappingData();
 
-                var mapData = GetGnMappingData();
+                
 
                 //secondary check
                 if (mapData?.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped)
                 {
                     Log.Info($"Asset Mapping status: {mapData.status}, Catalog Name: {mapData.catalogName}");
+                    
+
                     var data = new GN_Mapping_Data
                     {
                         GN_TMSID = WorkflowEntities.GraceNoteTmsId,
@@ -380,8 +387,7 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
-                var mapData = GetGnMappingData();
-                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
+                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
 
                 if (GnMappingData != null)
                 {
@@ -392,7 +398,7 @@ namespace VirginMediaWorkflowDirector
                     }
 
                     Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
-
+                    var mapData = GetGnMappingData();
                     GnMappingData.GN_Availability_Start = GetAvailability("start", mapData);
                     GnMappingData.GN_Availability_End = GetAvailability("end", mapData);
                     GnMappingData.GN_updateId = mapData?.updateId;
@@ -655,7 +661,7 @@ namespace VirginMediaWorkflowDirector
                 return
                     //Get and add GN Program Data
                     _gnMappingDataService.AddGraceNoteProgramData(
-                        paid: WorkflowEntities.TitlPaidValue,
+                        paid: WorkflowEntities.GnMappingPaid,
                         seriesTitle: ApiManager.GetSeriesTitle(),
                         episodeTitle: ApiManager.GetEpisodeTitle(),
                         programDatas: ApiManager.MovieEpisodeProgramData
@@ -881,22 +887,18 @@ namespace VirginMediaWorkflowDirector
                 var isl = new ImageSelectionLogic
                 {
                     ImageMapping = mappingData,
-                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue),
+                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid),
                     IsUpdate = IsPackageAnUpdate,
                     ConfigImageCategories = mappingData.ImageCategory,
                     ApiAssetList = AdiContentManager.ReturnAssetList()
                 };
 
                 isl.DbImagesForAsset = _gnMappingDataService.ReturnDbImagesForAsset(
-                    WorkflowEntities.TitlPaidValue,
+                    WorkflowEntities.GnMappingPaid,
                     isl.CurrentMappingData.Id
                 );
 
-                var imageUri = isl.GetGracenoteImage(
-                    configLookup.Image_Lookup,
-                    currentProgramType,
-                    WorkflowEntities.TitlPaidValue,
-                    WorkflowEntities.SeasonId);
+                var imageUri = isl.GetGracenoteImage(configLookup.Image_Lookup);
 
                 if (string.IsNullOrEmpty(imageUri))
                     continue;
@@ -943,8 +945,8 @@ namespace VirginMediaWorkflowDirector
 
 
                 //update image data in db and adi
-                UpdateDbImages(isl.DbImages);
-                isl.DbImages = null;
+                UpdateDbImages();
+                SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages = null;
 
                 if (InsertSuccess)
                     currentImage = configLookup.Image_Mapping;
@@ -1183,10 +1185,10 @@ namespace VirginMediaWorkflowDirector
             return Path.Combine(WorkflowEntities.CurrentWorkingDirectory, newFileName);
         }
 
-        private void UpdateDbImages(string dbImages)
+        private void UpdateDbImages()
         {
-            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.TitlPaidValue);
-            gnMappingRow.GN_Images = dbImages;
+            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
+            gnMappingRow.GN_Images = SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages;
             var rowId = _gnMappingDataService.Update(gnMappingRow);
             Log.Info($"GN Mapping table with row id: {rowId.Id} updated with new image data");
         }
@@ -1272,11 +1274,13 @@ namespace VirginMediaWorkflowDirector
                     {
                         Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
                         File.Delete(packageFile.FullName);
+                        RemoveWorkingDirectory();
                         return;
                     }
                     if (File.Exists(destination))
                     {
                         Log.Info("No package move required for Mapping failure retry.");
+                        RemoveWorkingDirectory();
                         return;
                     }
                 }
@@ -1330,10 +1334,7 @@ namespace VirginMediaWorkflowDirector
                 if (!File.Exists(packageFile.FullName))
                     Log.Info($"Successfully deleted {packageFile.FullName}");
 
-                Log.Info($"Removing working directory: {WorkflowEntities.CurrentWorkingDirectory}");
-                Directory.Delete(WorkflowEntities.CurrentWorkingDirectory, true);
-                if (!Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
-                    Log.Info($"Successfully deleted Working directory {WorkflowEntities.CurrentWorkingDirectory}");
+                RemoveWorkingDirectory();
 
             }
             catch (Exception pcuex)
@@ -1341,6 +1342,25 @@ namespace VirginMediaWorkflowDirector
                 LogError(
                     "PackageCleanup",
                     "Error Cleaning up processed Package", pcuex);
+            }
+        }
+
+        private void RemoveWorkingDirectory()
+        {
+            try
+            {
+                Log.Info($"Removing working directory: {WorkflowEntities.CurrentWorkingDirectory}");
+                
+                if (Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
+                    Directory.Delete(WorkflowEntities.CurrentWorkingDirectory, true);
+
+                Log.Info($"Successfully deleted Working directory {WorkflowEntities.CurrentWorkingDirectory}");
+            }
+            catch (Exception rmwd_ex)
+            {
+                LogError(
+                    "RemoveWorkingDirectory",
+                    "Error Cleaning up Working Directory", rmwd_ex);
             }
         }
 

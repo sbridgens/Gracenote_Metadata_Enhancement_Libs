@@ -26,37 +26,5 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     ?.EnrichedAdi;
             }
         }
-
-        public static bool CheckAndUpdateTmsId(string paidValue, string currentTmsId)
-        {
-            using (var adiContext = new ADI_EnrichmentContext())
-            {
-                var dbPaid =
-                    adiContext.GN_Mapping_Data.FirstOrDefault(p => p.GN_Paid.Contains(GetPaidLastValue(p.GN_Paid)));
-
-                if (dbPaid != null && dbPaid.GN_TMSID != currentTmsId)
-                {
-                    Log.Warn(
-                        $"DB TMSID and API TMSID Mismatch: DB TMSID is {dbPaid.GN_Paid} and API TMSID is: {currentTmsId} GN Mapping update occured, updating db with new GN Data");
-                    dbPaid.GN_TMSID = currentTmsId;
-                    var adiRow =
-                        adiContext.Adi_Data.FirstOrDefault(p => p.TitlPaid.Contains(GetPaidLastValue(paidValue)));
-
-                    if (adiRow != null)
-                    {
-                        adiRow.TmsId = currentTmsId;
-
-                        adiContext.SaveChanges();
-                        Log.Info("db TMSID updated with new api value.");
-                        return true;
-                    }
-
-                    Log.Error("Error retrieving adi_data row in order to update.");
-                    return false;
-                }
-            }
-
-            return true;
-        }
     }
 }

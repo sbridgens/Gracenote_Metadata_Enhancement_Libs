@@ -131,13 +131,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var db = new ADI_EnrichmentContext())
             {
-                var adiPaid = titlPaid
-                    .Replace("TITL", "")
-                    .Replace("i", "")
-                    .TrimStart('0');
-
-                return db.Adi_Data.FirstOrDefault(
-                    i => i.TitlPaid.Contains(adiPaid));
+               return db.Adi_Data.FirstOrDefault(i => i.TitlPaid.Equals(titlPaid));
             }
         }
 
