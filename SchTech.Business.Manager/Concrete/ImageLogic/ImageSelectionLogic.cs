@@ -10,7 +10,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace SchTech.Business.Manager.Concrete.ImageLogic
 {
@@ -341,7 +340,9 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                         _log.Debug($"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
                                         //Added this check in to ensure images are updated if missing or changed.
                                         CurrentMappingData.GN_Images = match.Value == ""
-                                            ? CurrentMappingData.GN_Images = $"{CurrentMappingData.GN_Images}, {imageTypeRequired}: {image.URI}"
+                                            ? (CurrentMappingData.GN_Images != string.Empty 
+                                                ? CurrentMappingData.GN_Images = $"{CurrentMappingData.GN_Images}, {imageTypeRequired}: {image.URI}"
+                                                : CurrentMappingData.GN_Images = $"{imageTypeRequired}: {image.URI}")
                                             : CurrentMappingData.GN_Images = CurrentMappingData.GN_Images.Replace(match.Value, newUri);
 
                                         
