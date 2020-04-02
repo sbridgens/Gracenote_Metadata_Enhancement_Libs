@@ -35,7 +35,6 @@ namespace SchTech.Queue.Manager.Concrete
             HasFilesToProcess = false;
             WorkQueue = new AdiEnrichmentQueueController();
             WorkQueue.ClearWorkQueue();
-            IncludeFailedMappingPackages = false;
             SourcePollDirectory = sourcePollDirectory;
             FileExtensionToPoll = fileExtensionToPoll;
 
@@ -99,7 +98,6 @@ namespace SchTech.Queue.Manager.Concrete
 
         private void SetFailedMappingPollTime()
         {
-            IncludeFailedMappingPackages = true;
             LastFailedMappingPoll = DateTime.Now.AddHours(FailedMappingRepollHours);
         }
 

@@ -119,7 +119,8 @@ namespace ADIWFE_TestClient
                 LastFailedMappingPoll =
                     DateTime.Now.AddHours(-Convert.ToDouble(ADIWF_Config.RepollNonMappedIntervalHours)),
                 FailedMappingRepollHours = Convert.ToDouble(ADIWF_Config.RepollNonMappedIntervalHours),
-                FailedToMapDirectory = ADIWF_Config.MoveNonMappedDirectory
+                FailedToMapDirectory = ADIWF_Config.MoveNonMappedDirectory,
+                IncludeFailedMappingPackages = Convert.ToBoolean(ADIWF_Config.ProcessMappingFailures)
             };
         }
 
