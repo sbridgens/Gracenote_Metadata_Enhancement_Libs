@@ -6,10 +6,8 @@ using SchTech.Entities.ConcreteTypes;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {
@@ -18,26 +16,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         public static bool ExpiryProcessing { get; private set; }
 
         public static bool IsWorkflowProcessing { get; set; }
-
-        private bool IsOrphanCleanupRunning { get; set; }
-
+        
         private ADI_EnrichmentContext CurrentContext { get; set; }
-
-        public void CheckForOrphanedData()
-        {
-            try
-            {
-                if (!IsWorkflowProcessing && !IsOrphanCleanupRunning && !ExpiryProcessing)
-                    CheckAndClearOrphanedData();
-            }
-            catch (Exception cfodex)
-            {
-                EfStaticMethods.Log.Error($"General Exception during Orphan cleanup: {cfodex.Message}");
-                if (cfodex.InnerException != null)
-                    EfStaticMethods.Log.Error($"Inner Exception: {cfodex.InnerException.Message}");
-
-            }
-        }
 
         public async Task<bool> CheckAndClearExpiredData(bool timerElapsed)
         {
@@ -128,80 +108,6 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                return db.Adi_Data.FirstOrDefault(i => i.IngestUUID.Equals(adiGuid));
             }
-        }
-
-        private void CheckAndClearOrphanedData()
-        {
-            IsOrphanCleanupRunning = true;
-
-            using (CurrentContext = new ADI_EnrichmentContext())
-            {
-                try
-                {
-                    /*
-                     * See solution Items dir
-                     * WORKING SQL QUERY
-                     * SELECT id,TITLPAID FROM Adi_Data AS A WHERE NOT EXISTS( SELECT GN_Paid FROM GN_Mapping_Data AS G WHERE RIGHT(G.GN_Paid, 8) = RIGHT(A.TITLPAID, 8))
-                     * SELECT id, GN_Paid FROM GN_Mapping_Data AS G WHERE NOT EXISTS ( SELECT TITLPAID FROM Adi_Data AS A WHERE RIGHT(A.TITLPAID,8) = RIGHT(G.GN_Paid,8))
-                     */
-
-                    EfStaticMethods.Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
-
-                    var stopWatch = new Stopwatch();
-                    stopWatch.Start();
-                    
-                    var adiOrphans = CurrentContext.Adi_Data.FromSql("EXEC GetAdiDataOrphans").ToList();
-                    if (adiOrphans.Any())
-                    {
-                        EfStaticMethods.Log.Warn("Adi_Data table has orphaned rows, cleaning up");
-
-                        foreach (var adiO in adiOrphans)
-                        {
-                            if (EfStaticMethods.Log.IsDebugEnabled)
-                                EfStaticMethods.Log.Warn(
-                                $"Adi_Data table entry with id: {adiO.Id} and PAID: {adiO.TitlPaid} found that does not exist in GNMapping table, removing row data.");
-                            CurrentContext.Database.ExecuteSqlCommand($"DELETE FROM Adi_Data WHERE ID={adiO.Id}");
-                        }
-                    }
-
-
-                    var gnOrphans = CurrentContext.GN_Mapping_Data.FromSql("EXEC GetMappingOrphans").ToList();
-                    if (gnOrphans.Any())
-                    {
-                        EfStaticMethods.Log.Warn("GN_Mapping_Data table has orphaned rows, cleaning up");
-
-                        foreach (var gnItem in gnOrphans)
-                        {
-                            if (EfStaticMethods.Log.IsDebugEnabled)
-                                EfStaticMethods.Log.Warn(
-                                $"Mapping table entry with id: {gnItem.Id} and PAID: {gnItem.GN_Paid} found that does not exist in adi data table, removing row data.");
-                            CurrentContext.Database.ExecuteSqlCommand($"DELETE FROM GN_Mapping_Data WHERE ID={gnItem.Id}");
-                        }
-                    }
-
-                    stopWatch.Stop();
-
-                    EfStaticMethods.Log.Info($"Orphan cleanup completed in: {stopWatch.Elapsed.Duration()}");
-                }
-                catch (SqlException sqlEx)
-                {
-                    EfStaticMethods.Log.Error($"SQL Exception during database connection: {sqlEx.Message}");
-                    if (sqlEx.InnerException != null)
-                        EfStaticMethods.Log.Error($"Inner Exception: {sqlEx.InnerException.Message}");
-                }
-                catch (Exception capoEx)
-                {
-                    EfStaticMethods.Log.Error($"General Exception during database connection: {capoEx.Message}");
-                    if (capoEx.InnerException != null)
-                        EfStaticMethods.Log.Error($"Inner Exception: {capoEx.InnerException.Message}");
-                }
-                finally
-                {
-                    IsOrphanCleanupRunning = false;
-                }
-            }
-
-            IsOrphanCleanupRunning = false;
         }
     }
 }
