@@ -5,7 +5,6 @@ using SchTech.Web.Manager.Concrete;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Configuration;
 
 namespace SchTech.Entities.ConcreteTypes
 {
@@ -17,12 +16,14 @@ namespace SchTech.Entities.ConcreteTypes
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentWorkflowEntities));
 
         private XmlSerializationManager<ADI> XmlSerializer { get; set; }
-
+        
         public static ADI AdiFile { get; set; }
 
         public static ADI EnrichedAdi { get; set; }
 
         public static ADI UpdateAdi { get; set; }
+
+        public Guid IngestUuid { get; set; }
 
         public string MovieFileSize { get; set; }
 

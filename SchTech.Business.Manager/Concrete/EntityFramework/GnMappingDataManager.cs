@@ -47,10 +47,10 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _gnMappingDataDal.CleanMappingDataWithNoAdi();
         }
 
-        public bool AddGraceNoteProgramData(string paid, string seriesTitle, string episodeTitle,
+        public bool AddGraceNoteProgramData(Guid ingestGuid, string seriesTitle, string episodeTitle,
             GnApiProgramsSchema.programsProgram programDatas)
         {
-            return _gnMappingDataDal.AddGraceNoteProgramData(paid, seriesTitle, episodeTitle, programDatas);
+            return _gnMappingDataDal.AddGraceNoteProgramData(ingestGuid, seriesTitle, episodeTitle, programDatas);
         }
 
         public Dictionary<string, string> ReturnDbImagesForAsset(string paidValue, int rowId)
@@ -58,9 +58,9 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _gnMappingDataDal.ReturnDbImagesForAsset(paidValue, rowId);
         }
 
-        public GN_Mapping_Data ReturnMapData(string paid)
+        public GN_Mapping_Data ReturnMapData(Guid ingestGuid)
         {
-            return _gnMappingDataDal.ReturnMapData(paid);
+            return _gnMappingDataDal.ReturnMapData(ingestGuid);
         }
     }
 }

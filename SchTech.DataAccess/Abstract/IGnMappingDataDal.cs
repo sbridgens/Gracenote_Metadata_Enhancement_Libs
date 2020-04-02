@@ -1,4 +1,5 @@
-﻿using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
+﻿using System;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
 using System.Collections.Generic;
@@ -9,11 +10,11 @@ namespace SchTech.DataAccess.Abstract
     {
         bool CleanMappingDataWithNoAdi();
 
-        bool AddGraceNoteProgramData(string paid, string seriesTitle, string episodeTitle,
+        bool AddGraceNoteProgramData(Guid ingestGuid, string seriesTitle, string episodeTitle,
             GnApiProgramsSchema.programsProgram programDatas);
 
         Dictionary<string, string> ReturnDbImagesForAsset(string paidValue, int rowId);
 
-        GN_Mapping_Data ReturnMapData(string paid);
+        GN_Mapping_Data ReturnMapData(Guid ingestGuid);
     }
 }

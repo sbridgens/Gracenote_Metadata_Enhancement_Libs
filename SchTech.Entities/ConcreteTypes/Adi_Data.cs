@@ -6,6 +6,7 @@ namespace SchTech.Entities.ConcreteTypes
     public class Adi_Data : IEntity
     {
         public int Id { get; set; }
+        public Guid IngestUUID { get; set; }
         public string TitlPaid { get; set; }
         public string OriginalAdi { get; set; }
         public int? VersionMajor { get; set; }

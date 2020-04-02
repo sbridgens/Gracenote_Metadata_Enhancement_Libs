@@ -4,6 +4,7 @@ using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Api.Manager.Serialization;
 using SchTech.Business.Manager.Abstract.EntityFramework;
+using SchTech.Business.Manager.Concrete;
 using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.Business.Manager.Concrete.ImageLogic;
 using SchTech.Business.Manager.Concrete.Validation;
@@ -20,7 +21,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SchTech.Business.Manager.Concrete;
 
 
 namespace VirginMediaWorkflowDirector
@@ -134,6 +134,10 @@ namespace VirginMediaWorkflowDirector
                     return false;
 
                 Log.Info("XML well formed, Retrieving PAID Value from ADI to use in Gracenote Mapping Lookup");
+
+                WorkflowEntities.IngestUuid = Guid.NewGuid();
+                Log.Info($"New package Identifier Generated: {WorkflowEntities.IngestUuid}");
+
                 WorkflowEntities.TitlPaidValue =
                     EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
 
@@ -335,6 +339,7 @@ namespace VirginMediaWorkflowDirector
 
                     var data = new GN_Mapping_Data
                     {
+                        IngestUUID = WorkflowEntities.IngestUuid,
                         GN_TMSID = WorkflowEntities.GraceNoteTmsId,
                         GN_Paid = mapData.link.Where(i => i.idType.Equals("PAID"))
                             .Select(r => r.Value)
@@ -387,7 +392,7 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
-                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
+                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.IngestUuid);
 
                 if (GnMappingData != null)
                 {
@@ -513,6 +518,7 @@ namespace VirginMediaWorkflowDirector
 
                     AdiData = new Adi_Data
                     {
+                        IngestUUID = WorkflowEntities.IngestUuid,
                         TitlPaid = WorkflowEntities.TitlPaidValue,
                         OriginalAdi = FileDirectoryManager.ReturnAdiAsAString(ZipHandler.ExtractedAdiFile.FullName),
                         VersionMajor = AdiContentController.GetVersionMajor(),
@@ -661,7 +667,7 @@ namespace VirginMediaWorkflowDirector
                 return
                     //Get and add GN Program Data
                     _gnMappingDataService.AddGraceNoteProgramData(
-                        paid: WorkflowEntities.GnMappingPaid,
+                        ingestGuid: WorkflowEntities.IngestUuid,
                         seriesTitle: ApiManager.GetSeriesTitle(),
                         episodeTitle: ApiManager.GetEpisodeTitle(),
                         programDatas: ApiManager.MovieEpisodeProgramData
@@ -887,7 +893,7 @@ namespace VirginMediaWorkflowDirector
                 var isl = new ImageSelectionLogic
                 {
                     ImageMapping = mappingData,
-                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid),
+                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.IngestUuid),
                     IsUpdate = IsPackageAnUpdate,
                     ConfigImageCategories = mappingData.ImageCategory,
                     ApiAssetList = AdiContentManager.ReturnAssetList()
@@ -1090,7 +1096,7 @@ namespace VirginMediaWorkflowDirector
             try
             {
                 //Get the correct stored adi data
-                AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
+                AdiData = _adiDataService.GetAdiData(WorkflowEntities.IngestUuid);
                 if (AdiData.EnrichedAdi == null)
                     throw new Exception($"Previously Enriched ADI data for Paid: " +
                                         $"{WorkflowEntities.TitlPaidValue} was not found in the database?");
@@ -1187,7 +1193,7 @@ namespace VirginMediaWorkflowDirector
 
         private void UpdateDbImages()
         {
-            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
+            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.IngestUuid);
             gnMappingRow.GN_Images = SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages;
             var rowId = _gnMappingDataService.Update(gnMappingRow);
             Log.Info($"GN Mapping table with row id: {rowId.Id} updated with new image data");
@@ -1203,7 +1209,7 @@ namespace VirginMediaWorkflowDirector
                 var adiString = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
 
                 if (AdiData == null)
-                    AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
+                    AdiData = _adiDataService.GetAdiData(WorkflowEntities.IngestUuid);
 
                 if (!IsPackageAnUpdate)
                 {
@@ -1313,8 +1319,6 @@ namespace VirginMediaWorkflowDirector
                     return;
 
                 Log.Info($"Removing db entries for Failed Package.");
-                if (AdiData?.TitlPaid != null)
-                    _adiDataService.Delete(AdiData);
                 if (GnMappingData?.GN_Paid != null)
                     _gnMappingDataService.Delete(GnMappingData);
 

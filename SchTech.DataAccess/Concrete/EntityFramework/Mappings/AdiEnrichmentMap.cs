@@ -11,9 +11,10 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             ToTable(@"Adi_Data", @"dbo");
             //Primary key is set here
             HasKey(x => x.Id);
-
+            
             //EntityTypeConfiguration properties are now mapped
             //to the db tables matching the property names.
+            Property(x => x.IngestUUID).HasColumnName("IngestUUID");
             Property(x => x.TitlPaid).HasColumnName("TITLPAID");
             Property(x => x.OriginalAdi).HasColumnName("OriginalADI");
             Property(x => x.VersionMajor).HasColumnName("VersionMajor");

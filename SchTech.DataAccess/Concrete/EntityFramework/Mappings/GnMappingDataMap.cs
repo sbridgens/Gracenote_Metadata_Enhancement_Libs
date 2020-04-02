@@ -10,11 +10,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             //mapped to EntityTypeConfiguration Adi_data
             ToTable(@"GN_Mapping_Data", @"dbo");
             //Primary key is set here
-            HasKey(x => x.Id);
-
+            HasKey(x => x.IngestUUID);
 
             //EntityTypeConfiguration properties are now mapped
             //to the db tables matching the property names.
+            Property(x => x.Id).HasColumnName("id");
             Property(x => x.GN_Availability_End).HasColumnName("GN_Availability_End");
             Property(x => x.GN_Availability_Start).HasColumnName("GN_Availability_Start");
             Property(x => x.GN_connectorId).HasColumnName("GN_connectorId");

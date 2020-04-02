@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using System;
+using log4net;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 using System.Linq;
 
@@ -18,12 +19,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 .TrimStart('0');
         }
 
-        public static string GetEnrichedAdiFile(string paidvalue)
+        public static string GetEnrichedAdiFile(Guid adiGuid)
         {
             using (var adiContext = new ADI_EnrichmentContext())
             {
-                return adiContext.Adi_Data.FirstOrDefault(p => p.TitlPaid == paidvalue)
-                    ?.EnrichedAdi;
+                return adiContext.Adi_Data.FirstOrDefault(p => p.IngestUUID == adiGuid)?.EnrichedAdi;
             }
         }
     }

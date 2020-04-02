@@ -6,6 +6,7 @@ namespace SchTech.Entities.ConcreteTypes
     public class GN_Mapping_Data : IEntity
     {
         public int Id { get; set; }
+        public Guid IngestUUID { get; set; }
         public string GN_TMSID { get; set; }
         public string GN_RootID { get; set; }
         public string GN_Status { get; set; }

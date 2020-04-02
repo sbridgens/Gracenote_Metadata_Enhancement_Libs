@@ -55,12 +55,12 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        public bool AddGraceNoteProgramData(string paid, string seriesTitle, string episodeTitle,
+        public bool AddGraceNoteProgramData(Guid ingestGuid, string seriesTitle, string episodeTitle,
             GnApiProgramsSchema.programsProgram programData)
         {
             EfStaticMethods.Log.Info("Updating Gracenote database Mapping table with Program Data");
 
-            var gnMappingData = ReturnMapData(paid);
+            var gnMappingData = ReturnMapData(ingestGuid);
             if (gnMappingData == null)
                 return false;
 
@@ -73,7 +73,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             Update(gnMappingData);
 
             EfStaticMethods.Log.Info($"GN Mapping database updated," +
-                                     $" where Paid: {paid} & Row ID: {gnMappingData.Id}");
+                                     $" where GN_Paid: {gnMappingData.GN_Paid} & Row ID: {gnMappingData.Id}");
 
 
 
@@ -115,13 +115,12 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 return dbImages;
             }
         }
-
-        public GN_Mapping_Data ReturnMapData(string gnmappingPaid)
+        
+        public GN_Mapping_Data ReturnMapData(Guid ingestGuid)
         {
             using (var db = new ADI_EnrichmentContext())
             {
-                return db.GN_Mapping_Data.FirstOrDefault(
-                    i => i.GN_Paid.Equals(gnmappingPaid));
+                return db.GN_Mapping_Data.FirstOrDefault(i => i.IngestUUID.Equals(ingestGuid));
             }
         }
     }

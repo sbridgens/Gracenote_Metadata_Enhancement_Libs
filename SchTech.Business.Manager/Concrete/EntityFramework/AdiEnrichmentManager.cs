@@ -48,9 +48,9 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _adiDataDal.Update(adiData);
         }
 
-        public Adi_Data GetAdiData(string titlPaid)
+        public Adi_Data GetAdiData(Guid adiGuid)
         {
-            return _adiDataDal.GetAdiData(titlPaid);
+            return _adiDataDal.GetAdiData(adiGuid);
         }
     }
 }

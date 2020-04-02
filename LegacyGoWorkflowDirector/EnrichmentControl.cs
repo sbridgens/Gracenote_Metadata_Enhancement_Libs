@@ -358,7 +358,7 @@ namespace LegacyGoWorkflowDirector
             try
             {
                 var mapData = GetGnMappingData();
-                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
+                GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.IngestUuid);
 
                 if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
                 {
@@ -612,7 +612,7 @@ namespace LegacyGoWorkflowDirector
                         AdiContentManager.InsertCategoryValue(catValue) &&
                         //Get and add GN Program Data
                         _gnMappingDataService.AddGraceNoteProgramData(
-                            paid: WorkflowEntities.GnMappingPaid,
+                            ingestGuid: WorkflowEntities.IngestUuid,
                             seriesTitle: ApiManager.GetSeriesTitle(),
                             episodeTitle: ApiManager.GetEpisodeTitle(),
                             programDatas: ApiManager.MovieEpisodeProgramData
@@ -758,7 +758,7 @@ namespace LegacyGoWorkflowDirector
                 var isl = new ImageSelectionLogic
                 {
                     ImageMapping = mappingData,
-                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid),
+                    CurrentMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.IngestUuid),
                     IsUpdate = IsPackageAnUpdate,
                     ConfigImageCategories = mappingData.ImageCategory,
                     ApiAssetList = AdiContentManager.ReturnAssetList()
@@ -936,7 +936,7 @@ namespace LegacyGoWorkflowDirector
             try
             {
                 //Get the correct stored adi data
-                AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
+                AdiData = _adiDataService.GetAdiData(WorkflowEntities.IngestUuid);
                 if (AdiData.EnrichedAdi == null)
                     throw new Exception($"Previously Enriched ADI data for Paid: {WorkflowEntities.TitlPaidValue}" +
                                         " was not found in the database?");
@@ -997,7 +997,7 @@ namespace LegacyGoWorkflowDirector
 
         private void UpdateDbImages()
         {
-            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.GnMappingPaid);
+            var gnMappingRow = _gnMappingDataService.ReturnMapData(WorkflowEntities.IngestUuid);
             gnMappingRow.GN_Images = SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages;
             var rowId = _gnMappingDataService.Update(gnMappingRow);
             Log.Info($"GN Mapping table with row id: {rowId.Id} updated with new image data");
@@ -1013,7 +1013,7 @@ namespace LegacyGoWorkflowDirector
                 var adiString = FileDirectoryManager.ReturnAdiAsAString(outputAdi);
 
                 if (AdiData == null)
-                    AdiData = _adiDataService.GetAdiData(WorkflowEntities.TitlPaidValue);
+                    AdiData = _adiDataService.GetAdiData(WorkflowEntities.IngestUuid);
 
                 if (!IsPackageAnUpdate)
                 {
