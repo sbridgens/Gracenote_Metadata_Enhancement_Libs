@@ -26,10 +26,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADIWFE_TestLegacyGo", "ADIWFE_TestLegacyGo\ADIWFE_TestLegacyGo.csproj", "{370D0E88-3861-47EB-8F3D-BD56B263E723}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B1FD3F40-F015-48A3-93A5-D4F5BFB0A361}"
-	ProjectSection(SolutionItems) = preProject
-		GetAdiDataOrphans_sp.sql = GetAdiDataOrphans_sp.sql
-		GetMappingOrphans_sp.sql = GetMappingOrphans_sp.sql
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirginMediaWorkflowDirector", "VirginMediaWorkflowDirector\VirginMediaWorkflowDirector.csproj", "{7712C303-C6BE-4167-A2C3-8F4D8CC3EA65}"
 EndProject
