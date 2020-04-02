@@ -135,8 +135,6 @@ namespace VirginMediaWorkflowDirector
 
                 Log.Info("XML well formed, Retrieving PAID Value from ADI to use in Gracenote Mapping Lookup");
 
-                WorkflowEntities.IngestUuid = Guid.NewGuid();
-                Log.Info($"New package Identifier Generated: {WorkflowEntities.IngestUuid}");
 
                 WorkflowEntities.TitlPaidValue =
                     EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
@@ -262,7 +260,10 @@ namespace VirginMediaWorkflowDirector
             if (IsPackageAnUpdate && adiData != null)
             {
                 Log.Info("Package is confirmed as a valid Update Package");
+
+                Log.Info($"IngestUUID: {adiData.IngestUUID} Extracted from the database.");
                 IsPackageAnUpdate = true;
+                WorkflowEntities.IngestUuid = adiData.IngestUUID;
                 return true;
             }
 
@@ -279,6 +280,9 @@ namespace VirginMediaWorkflowDirector
 
             Log.Info($"Package with Paid: {WorkflowEntities.TitlPaidValue} " +
                      "confirmed as a unique package, continuing ingest operations.");
+
+            WorkflowEntities.IngestUuid = Guid.NewGuid();
+            Log.Info($"New package Identifier Generated: {WorkflowEntities.IngestUuid}");
 
             return true;
 
