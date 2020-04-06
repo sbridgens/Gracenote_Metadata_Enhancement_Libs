@@ -112,7 +112,8 @@ namespace ADIWFE_TestClient
         public void InitialiseWorkflowOperations()
         {
             AdiEnrichmentDal = new EfAdiEnrichmentDal();
-            InitialiseTimer();
+            if (ADIWF_Config.ProcessExpiredAssets)
+                InitialiseTimer();
 
             PollController = new AdiEnrichmentPollController
             {
@@ -120,7 +121,7 @@ namespace ADIWFE_TestClient
                     DateTime.Now.AddHours(-Convert.ToDouble(ADIWF_Config.RepollNonMappedIntervalHours)),
                 FailedMappingRepollHours = Convert.ToDouble(ADIWF_Config.RepollNonMappedIntervalHours),
                 FailedToMapDirectory = ADIWF_Config.MoveNonMappedDirectory,
-                IncludeFailedMappingPackages = Convert.ToBoolean(ADIWF_Config.ProcessMappingFailures)
+                IncludeFailedMappingPackages = ADIWF_Config.ProcessMappingFailures
             };
         }
 

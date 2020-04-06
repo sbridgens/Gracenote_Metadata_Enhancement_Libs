@@ -29,6 +29,7 @@ namespace SchTech.Queue.Manager.Concrete
         public bool IncludeFailedMappingPackages { get; set; }
         public DateTime? LastFailedMappingPoll { get; set; }
         public string FailedToMapDirectory { get; set; }
+        private bool ProcessMappingFailures { get; set; }
 
         public bool StartPollingOperations(string sourcePollDirectory, string fileExtensionToPoll)
         {
@@ -44,9 +45,12 @@ namespace SchTech.Queue.Manager.Concrete
             {
                 var dtnow = DtNow();
 
-                if (dtnow >= LastFailedMappingPoll) SetFailedMappingPollTime();
-
-
+                if (dtnow >= LastFailedMappingPoll)
+                {
+                    SetFailedMappingPollTime();
+                    ProcessMappingFailures = true;
+                }
+                
                 if (WorkflowFileList().Count < 1)
                     return true;
 
@@ -68,7 +72,7 @@ namespace SchTech.Queue.Manager.Concrete
             try
             {
                 BuildPackageList();
-                if (IncludeFailedMappingPackages)
+                if (IncludeFailedMappingPackages && ProcessMappingFailures)
                     AddMappingFailuresToList();
 
                 if (PackageCount >= 1)
@@ -130,6 +134,8 @@ namespace SchTech.Queue.Manager.Concrete
                 Log.Info($"Adding Previously Failed to map Package: {mapFailure.FullName} to the Work Queue");
                 _packageList.Add(mapFailure);
             }
+
+            ProcessMappingFailures = false;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 
 namespace SchTech.Configuration.Manager.Schema.ADIWFE
 {
@@ -68,8 +69,11 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         [XmlElement(ElementName = "MoveNonMappedDirectory")]
         public static string MoveNonMappedDirectory { get; set; }
 
+        [XmlElement(ElementName = "ProcessExpiredAssets")]
+        public static bool ProcessExpiredAssets { get; set; }
+
         [XmlElement(ElementName = "ProcessMappingFailures")]
-        public static string ProcessMappingFailures { get; set; }
+        public static bool ProcessMappingFailures { get; set; }
 
         [XmlElement(ElementName = "RepollNonMappedIntervalHours")]
         public static string RepollNonMappedIntervalHours { get; set; }

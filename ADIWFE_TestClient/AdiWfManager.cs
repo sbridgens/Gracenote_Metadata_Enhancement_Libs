@@ -88,7 +88,8 @@ namespace ADIWFE_TestClient
                 {
                     EfAdiEnrichmentDal.IsWorkflowProcessing = false;
 
-                    AdiWfOperations.Cleanup();
+                    if (ADIWF_Config.ProcessExpiredAssets)
+                        AdiWfOperations.Cleanup();
 
                     if (AdiWfOperations.IsInCleanup == false)
                         AdiWfOperations.StartProcessing();
