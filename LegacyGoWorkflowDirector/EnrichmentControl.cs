@@ -254,7 +254,11 @@ namespace LegacyGoWorkflowDirector
             }
 
             if (IsPackageAnUpdate && adiMajor == null)
-                Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+            {
+                Log.Error(
+                    $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+                return false;
+            }
             //if (!IsPackageAnUpdate && adiMajor == null)
             if (IsPackageAnUpdate && adiMajor != null)
                 return false;

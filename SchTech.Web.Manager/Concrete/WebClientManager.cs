@@ -25,7 +25,8 @@ namespace SchTech.Web.Manager.Concrete
         public bool SuccessfulWebRequest { get; set; }
         public string WebErrorMessage { get; set; }
         public int RequestStatusCode { get; set; }
-        private int WebRetries { get; set; }
+        private const int MaxWebRetries = 5;
+        private int CurrentRetryCount { get; set; }
 
         private readonly CookieContainer _cJar;
 
@@ -73,6 +74,7 @@ namespace SchTech.Web.Manager.Concrete
         public string HttpGetRequest(string url, bool followRedirect = true)
         {
             RequestStatusCode = 0;
+            CurrentRetryCount = 1;
             WebClientRequest = (HttpWebRequest)WebRequest.Create(url);
             WebClientRequest.CookieContainer = _cJar;
             WebClientRequest.UserAgent = WebUserAgentString;
@@ -83,10 +85,12 @@ namespace SchTech.Web.Manager.Concrete
             if (followRedirect) WebClientRequest.AllowAutoRedirect = false;
 
             if (!CheckWebResponse())
-                throw new Exception("Exception during http get call - status code: " +
-                                    $"{(int) WebClientResponse.StatusCode}, " +
-                                    $"status string: {WebClientResponse.StatusCode} " +
-                                    $"{WebClientResponse.StatusDescription}");
+            {
+                Log.Error("Exception during http GET request - status code: " +
+                          $"{(int)WebClientResponse.StatusCode}, " +
+                          $"status string: {WebClientResponse.StatusCode} " +
+                          $"{WebClientResponse.StatusDescription}");
+            }
 
             if (followRedirect && (RequestStatusCode == (int)HttpStatusCode.Moved ||
                                    RequestStatusCode == (int)HttpStatusCode.Found))
@@ -192,15 +196,14 @@ namespace SchTech.Web.Manager.Concrete
             }
             catch (Exception cwrException)
             {
-                if (WebRetries <= 5)
+                if (CurrentRetryCount <= 5)
                 {
+                    Log.Error($"Http Get Exception: {cwrException.Message}");
+                    if (cwrException.InnerException != null)
+                        Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
+                    SuccessfulWebRequest = false;
                     WebRequestRetries();
                 }
-
-                Log.Error($"Http Get Exception: {cwrException.Message}");
-                if (cwrException.InnerException != null)
-                    Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
-                SuccessfulWebRequest = false;
             }
 
             return SuccessfulWebRequest;
@@ -208,13 +211,13 @@ namespace SchTech.Web.Manager.Concrete
 
         private void WebRequestRetries()
         {
-            for (var r = 1; r <= WebRetries; r++)
+            for (var r = CurrentRetryCount; r <= MaxWebRetries; r++)
             {
                 Thread.Sleep(2000);
 
-                Log.Info($"HTTP Get Retry: {r} of {WebRetries}");
+                CurrentRetryCount++;
+                Log.Info($"HTTP Get Retry: {r} of {MaxWebRetries}");
                 CheckWebResponse();
-                WebRetries++;
             }
         }
 
