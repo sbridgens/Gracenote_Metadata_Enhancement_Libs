@@ -47,6 +47,7 @@ namespace VirginMediaWorkflowDirector
         private ZipHandler ZipHandler { get; set; }
         public FileInfo PrimaryAsset { get; set; }
         public FileInfo PreviewAsset { get; set; }
+        public int FailedToMapCount { get; set; }
         private bool IsTvodPackage { get; set; }
         private bool InsertSuccess { get; set; }
         private bool FailedToMap { get; set; }
@@ -1272,6 +1273,8 @@ namespace VirginMediaWorkflowDirector
 
                 if (FailedToMap)
                 {
+                    FailedToMapCount++;
+
                     Log.Info($"Setting Package: {packageFile} Move Destination to Failed to map directory: " +
                              $"{ADIWF_Config.MoveNonMappedDirectory}");
 
