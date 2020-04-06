@@ -161,7 +161,7 @@ namespace SchTech.Entities.ConcreteTypes
                               .FirstOrDefault(c => c.Name.ToLower() == "hdcontent")
                               ?.Value.ToLower() != "y";
 
-            if (IsSdContent && !Convert.ToBoolean(ADIWF_Config.AllowSDContentIngest))
+            if (IsSdContent && !Convert.ToBoolean(ADIWF_Config.AllowSdContentIngest))
                 throw new InvalidOperationException(
                     $"SD Content Detected, Configuration disallows SD Content from Ingest; Failing ingest for {TitlPaidValue}");
 

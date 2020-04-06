@@ -185,7 +185,7 @@ namespace VirginMediaWorkflowDirector
 
                 if (ApiManager.CoreGnMappingData.programMappings.programMapping == null)
                 {
-                    Log.Warn($"Processing Stopped as mapping data is not ready, package will be retried for {ADIWF_Config.FailedToMap_Max_Retry_Days} days before failing!");
+                    Log.Warn($"Processing Stopped as mapping data is not ready, package will be retried for {ADIWF_Config.FailedToMapMaxRetryDays} days before failing!");
                     FailedToMap = true;
                     return false;
                 }
@@ -208,7 +208,7 @@ namespace VirginMediaWorkflowDirector
 
                 if (gnMappingData.GraceNoteMappingData == null)
                 {
-                    Log.Warn($"Processing Stopped as mapping data is not ready, package will be retried for {ADIWF_Config.FailedToMap_Max_Retry_Days} days before failing!");
+                    Log.Warn($"Processing Stopped as mapping data is not ready, package will be retried for {ADIWF_Config.FailedToMapMaxRetryDays} days before failing!");
                     FailedToMap = true;
                     return false;
                 }
@@ -1062,11 +1062,11 @@ namespace VirginMediaWorkflowDirector
                 var fInfo = new FileInfo(DeliveryPackage);
 
                 var tmpPackage = IsTvodPackage
-                    ? Path.Combine(ADIWF_Config.TVOD_Delivery_Directory, $"{fInfo.Name}.tmp")
+                    ? Path.Combine(ADIWF_Config.TvodDeliveryDirectory, $"{fInfo.Name}.tmp")
                     : Path.Combine(ADIWF_Config.IngestDirectory, $"{fInfo.Name}.tmp");
 
                 var finalPackage = IsTvodPackage
-                    ? Path.Combine(ADIWF_Config.TVOD_Delivery_Directory, fInfo.Name)
+                    ? Path.Combine(ADIWF_Config.TvodDeliveryDirectory, fInfo.Name)
                     : Path.Combine(ADIWF_Config.IngestDirectory, fInfo.Name);
 
                 Log.Info($"Moving Temp Package to ingest: {DeliveryPackage} to {tmpPackage}");
@@ -1255,7 +1255,7 @@ namespace VirginMediaWorkflowDirector
 
             if (EnrichmentWorkflowEntities.IsSdContent)
             {
-                return $"{ADIWF_Config.UnrequiredSDContentDirectory}\\{packageName}";
+                return $"{ADIWF_Config.UnrequiredSdContentDirectory}\\{packageName}";
             }
 
 
@@ -1278,10 +1278,10 @@ namespace VirginMediaWorkflowDirector
                     Log.Info($"Setting Package: {packageFile} Move Destination to Failed to map directory: " +
                              $"{ADIWF_Config.MoveNonMappedDirectory}");
 
-                    Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
+                    Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMapMaxRetryDays}" +
                              $" days before it is failed completely.");
 
-                    var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
+                    var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMapMaxRetryDays));
 
                     if (dt >= packageFile.LastWriteTime.Date)
                     {
