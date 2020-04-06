@@ -725,8 +725,8 @@ namespace LegacyGoWorkflowDirector
         {
             try
             {
-                var seriesIdData = !string.IsNullOrWhiteSpace(ADIWF_Config.PrefixSeriesIdValue)
-                    ? $"{ADIWF_Config.PrefixSeriesIdValue}{seriesId}"
+                var seriesIdData = !string.IsNullOrWhiteSpace(ADIWF_Config.Prefix_Series_ID_Value)
+                    ? $"{ADIWF_Config.Prefix_Series_ID_Value}{seriesId}"
                     : seriesId;
 
                 AddTitleMetadataApp_DataNode("Series_ID", seriesIdData);

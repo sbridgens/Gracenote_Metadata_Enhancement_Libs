@@ -155,7 +155,7 @@ namespace ADIWFE_TestClient
                 return;
 
             EfAdiEnrichmentDal.IsWorkflowProcessing = true;
-            WorkflowManager.FailedToMapCount = 0;
+            int failedToMapCount = 0;
 
             for (var package = 0; package < AdiEnrichmentQueueController.QueuedPackages.Count; package++)
             {
@@ -208,10 +208,13 @@ namespace ADIWFE_TestClient
                 }
 
                 WorkflowManager.CleanStaticReferences();
+
+                if (WorkflowManager.FailedToMap)
+                    failedToMapCount++;
             }
 
-            if (WorkflowManager.FailedToMapCount > 0)
-                Log.Info($"The number of packages failed to map during this poll was: {WorkflowManager.FailedToMapCount}");
+            if (failedToMapCount > 0)
+                Log.Info($"The number of packages failed to map during this poll was: {failedToMapCount}");
         }
 
         private bool GetMappingAndExtractPackage()

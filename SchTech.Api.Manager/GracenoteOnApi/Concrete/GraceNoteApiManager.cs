@@ -138,8 +138,8 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetShowId()
         {
-            return !string.IsNullOrWhiteSpace(ADIWF_Config.PrefixShowIdValue)
-                ? $"{ADIWF_Config.PrefixShowIdValue}{ShowSeriesSeasonProgramData.seriesId}"
+            return !string.IsNullOrWhiteSpace(ADIWF_Config.Prefix_Show_ID_Value)
+                ? $"{ADIWF_Config.Prefix_Show_ID_Value}{ShowSeriesSeasonProgramData.seriesId}"
                 : ShowSeriesSeasonProgramData.seriesId;
         }
 

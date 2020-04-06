@@ -1054,10 +1054,10 @@ namespace LegacyGoWorkflowDirector
                 {
                     Log.Info($"Moving Package: {packageFile} to Failed to map directory: " +
                              $"{ADIWF_Config.MoveNonMappedDirectory}");
-                    Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMapMaxRetryDays}" +
+                    Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
                              " before it is failed completely.");
 
-                    var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMapMaxRetryDays));
+                    var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
 
                     if (dt >= packageFile.LastWriteTime.Date)
                     {

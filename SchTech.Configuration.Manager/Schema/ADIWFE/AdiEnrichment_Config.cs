@@ -48,10 +48,10 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         public static string MinusExpiredAssetWindowHours { get; set; }
 
         [XmlElement(ElementName = "AllowSDContentIngest")]
-        public static string AllowSdContentIngest { get; set; }
+        public static string AllowSDContentIngest { get; set; }
 
         [XmlElement(ElementName = "UnrequiredSDContentDirectory")]
-        public static string UnrequiredSdContentDirectory { get; set; }
+        public static string UnrequiredSDContentDirectory { get; set; }
 
         [XmlElement(ElementName = "TempWorkingDirectory")]
         public static string TempWorkingDirectory { get; set; }
@@ -78,10 +78,10 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         public static string RepollNonMappedIntervalHours { get; set; }
 
         [XmlElement(ElementName = "FailedToMap_Max_Retry_Days")]
-        public static string FailedToMapMaxRetryDays { get; set; }
+        public static string FailedToMap_Max_Retry_Days { get; set; }
 
         [XmlElement(ElementName = "TVOD_Delivery_Directory")]
-        public static string TvodDeliveryDirectory { get; set; }
+        public static string TVOD_Delivery_Directory { get; set; }
 
         [XmlElement(ElementName = "OnApi")] public static string OnApi { get; set; }
 
@@ -91,26 +91,26 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         public static string MediaCloud { get; set; }
 
         [XmlElement(ElementName = "Database_Host")]
-        public static string DatabaseHost { get; set; }
+        public static string Database_Host { get; set; }
 
         [XmlElement(ElementName = "Database_Name")]
-        public static string DatabaseName { get; set; }
+        public static string Database_Name { get; set; }
 
         [XmlElement(ElementName = "Integrated_Security")]
-        public static string IntegratedSecurity { get; set; }
+        public static string Integrated_Security { get; set; }
 
         //[XmlElement(ElementName = "ExtraDataConfig")]
         //public static ExtraDataConfig ExtraDataConfig { get; set; }
         [XmlElement(ElementName = "Block_Platform")]
-        public static Block_Platform BlockPlatform { get; set; }
+        public static Block_Platform Block_Platform { get; set; }
 
         [XmlElement(ElementName = "LegacyGoAllowedProviders")]
         public static LegacyGoAllowedProviders LegacyGoAllowedProviders { get; set; }
 
         [XmlElement(ElementName = "Prefix_Show_ID_Value")]
-        public static string PrefixShowIdValue { get; set; }
+        public static string Prefix_Show_ID_Value { get; set; }
 
         [XmlElement(ElementName = "Prefix_Series_ID_Value")]
-        public static string PrefixSeriesIdValue { get; set; }
+        public static string Prefix_Series_ID_Value { get; set; }
     }
 }
