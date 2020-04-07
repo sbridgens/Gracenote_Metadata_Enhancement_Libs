@@ -252,6 +252,7 @@ namespace VirginMediaWorkflowDirector
             {
                 Log.Error(
                     $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+                return false;
             }
 
             if (adiData?.VersionMajor != null)

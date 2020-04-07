@@ -74,7 +74,7 @@ namespace SchTech.Web.Manager.Concrete
         public string HttpGetRequest(string url, bool followRedirect = true)
         {
             RequestStatusCode = 0;
-            CurrentRetryCount = 1;
+            CurrentRetryCount = 0;
             WebClientRequest = (HttpWebRequest)WebRequest.Create(url);
             WebClientRequest.CookieContainer = _cJar;
             WebClientRequest.UserAgent = WebUserAgentString;
@@ -84,13 +84,21 @@ namespace SchTech.Web.Manager.Concrete
 
             if (followRedirect) WebClientRequest.AllowAutoRedirect = false;
 
-            if (!CheckWebResponse())
+            while (!CheckWebResponse())
             {
                 Log.Error("Exception during http GET request - status code: " +
                           $"{(int)WebClientResponse.StatusCode}, " +
                           $"status string: {WebClientResponse.StatusCode} " +
                           $"{WebClientResponse.StatusDescription}");
+
+                Thread.Sleep(5000);
+
+                CurrentRetryCount++;
+                Log.Info($"HTTP Get Retry: {CurrentRetryCount} of {MaxWebRetries}");
+                if (CurrentRetryCount >= MaxWebRetries)
+                    return string.Empty;
             }
+            
 
             if (followRedirect && (RequestStatusCode == (int)HttpStatusCode.Moved ||
                                    RequestStatusCode == (int)HttpStatusCode.Found))
@@ -196,30 +204,15 @@ namespace SchTech.Web.Manager.Concrete
             }
             catch (Exception cwrException)
             {
-                if (CurrentRetryCount <= 5)
-                {
-                    Log.Error($"Http Get Exception: {cwrException.Message}");
-                    if (cwrException.InnerException != null)
-                        Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
-                    SuccessfulWebRequest = false;
-                    WebRequestRetries();
-                }
+                Log.Error($"Http Get Exception: {cwrException.Message}");
+                if (cwrException.InnerException != null)
+                    Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
+                return false;
             }
 
             return SuccessfulWebRequest;
         }
-
-        private void WebRequestRetries()
-        {
-            for (var r = CurrentRetryCount; r <= MaxWebRetries; r++)
-            {
-                Thread.Sleep(2000);
-
-                CurrentRetryCount++;
-                Log.Info($"HTTP Get Retry: {r} of {MaxWebRetries}");
-                CheckWebResponse();
-            }
-        }
+        
 
     }
 }
