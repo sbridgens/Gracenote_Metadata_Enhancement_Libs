@@ -159,10 +159,12 @@
     <Compile Include="Abstract\IGnImageLookupDal.cs" />
     <Compile Include="Abstract\IGnMappingDataDal.cs" />
     <Compile Include="Abstract\IGnProgramTypeLookupDal.cs" />
+    <Compile Include="Abstract\IGnUpdateTrackingDal.cs" />
     <Compile Include="Concrete\EntityFramework\Contexts\ADI_EnrichmentContext.cs" />
     <Compile Include="Concrete\EntityFramework\EfAdiEnrichmentDal.cs" />
     <Compile Include="Concrete\EntityFramework\EfCategoryMappingDal.cs" />
     <Compile Include="Concrete\EntityFramework\EfGnProgramTypeLookupDal.cs" />
+    <Compile Include="Concrete\EntityFramework\EfGnUpdateTrackerDal.cs" />
     <Compile Include="Concrete\EntityFramework\EfStaticMethods.cs" />
     <Compile Include="Concrete\EntityFramework\EfGnMappingDataDal.cs" />
     <Compile Include="Concrete\EntityFramework\Mappings\AdiEnrichmentMap.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="Concrete\EntityFramework\Mappings\CategoryMappingMap.cs" />
     <Compile Include="Concrete\EntityFramework\Mappings\GnMappingDataMap.cs" />
     <Compile Include="Concrete\EntityFramework\Mappings\GnProgramTypeLookupMap.cs" />
+    <Compile Include="Concrete\EntityFramework\Mappings\GN_UpdateTrackingMap.cs" />
     <Compile Include="Concrete\GN_ImageLookup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
