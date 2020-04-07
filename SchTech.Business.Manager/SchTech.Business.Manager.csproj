@@ -85,6 +85,8 @@
     <Compile Include="Abstract\EntityFramework\IGnImageLookupService.cs" />
     <Compile Include="Abstract\EntityFramework\IGnMappingDataService.cs" />
     <Compile Include="Abstract\EntityFramework\IGnProgramTypeLookupService.cs" />
+    <Compile Include="Abstract\EntityFramework\IGnUpdateTrackerService.cs" />
+    <Compile Include="Concrete\EntityFramework\GnUpdateTrackerManager.cs" />
     <Compile Include="Concrete\ProgramTypes.cs" />
     <Compile Include="Concrete\EntityFramework\AdiEnrichmentManager.cs" />
     <Compile Include="Concrete\EntityFramework\CategoryMappingManager.cs" />

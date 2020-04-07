@@ -31,6 +31,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="SchTech.Business.Manager">
+      <HintPath>..\SchTech.Business.Manager\bin\x64\Release\SchTech.Business.Manager.dll</HintPath>
+    </Reference>
+    <Reference Include="SchTech.Core">
+      <HintPath>..\SchTech.Core\bin\x64\Release\SchTech.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SchTech.DataAccess">
+      <HintPath>..\SchTech.DataAccess\bin\x64\Release\SchTech.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="SchTech.Entities">
+      <HintPath>..\SchTech.Entities\bin\x64\Release\SchTech.Entities.dll</HintPath>
+    </Reference>
+    <Reference Include="SchTech.File.Manager">
+      <HintPath>..\SchTech.File.Manager\bin\x64\Release\SchTech.File.Manager.dll</HintPath>
+    </Reference>
+    <Reference Include="SchTech.Web.Manager">
+      <HintPath>..\SchTech.Web.Manager\bin\x64\Release\SchTech.Web.Manager.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,6 +64,9 @@
   <ItemGroup>
     <Compile Include="GracenoteUpdateController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

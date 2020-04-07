@@ -1,15 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using log4net;
+using SchTech.Business.Manager.Abstract.EntityFramework;
+using SchTech.Business.Manager.Concrete.EntityFramework;
+using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace GracenoteUpdateManager
 {
     public class GracenoteUpdateController
     {
+        /// <summary>
+        ///     Initialize Log4net
+        /// </summary>
+        private static readonly ILog Log = LogManager.GetLogger(typeof(GracenoteUpdateController));
+
+        private readonly IGnUpdateTrackerService _gnUpdateTrackerService;
         /*TODO
-            1: Create db types and mappings
+            1: Create db types and mappings = Done
             2: Create logic to parse db and process data from [GN_UpdateTracking] table
             3: Call http://on-api.gracenote.com/v3/ProgramMappings?updateId=10938407543&limit=100&api_key=wgu7uhqcqyzspwxj28mxgy4b with lowest update id from point 2
             4: parse call results and grab all pidpaid items matching platform
@@ -20,6 +25,11 @@ namespace GracenoteUpdateManager
             9: any matches update the db row for update if an update has not been flagged
          */
 
+        public GracenoteUpdateController()
+        {
+            _gnUpdateTrackerService = new GnUpdateTrackerManager(new EfGnUpdateTrackerDal());
+        }
+        
 
     }
 }

@@ -12,8 +12,7 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
     {
         private readonly IAdiDataDal _adiDataDal;
 
-        public AdiEnrichmentManager(
-            IAdiDataDal adiDataDal)
+        public AdiEnrichmentManager(IAdiDataDal adiDataDal)
         {
             _adiDataDal = adiDataDal;
         }
