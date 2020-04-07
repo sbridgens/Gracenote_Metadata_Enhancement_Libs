@@ -29,5 +29,32 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     t => t.TrackingGnProviderId == gnProviderId);
             }
         }
+
+        public string GetLowestMappingUpdateId()
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.MappingUpdateId).First();
+                return minVal.MappingUpdateId;
+            }
+        }
+
+        public string GetLowestLayer1UpdateId()
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.Layer1UpdateId).First();
+                return minVal.Layer1UpdateId;
+            }
+        }
+
+        public string GetLowestLayer2UpdateId()
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.Layer2UpdateId).First();
+                return minVal.Layer2UpdateId;
+            }
+        }
     }
 }

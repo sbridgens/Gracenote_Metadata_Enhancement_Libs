@@ -15,5 +15,11 @@ namespace SchTech.DataAccess.Abstract
 
         GN_UpdateTracking GetTrackingItemByPidPaid(string gnProviderId);
 
+        string GetLowestMappingUpdateId();
+
+        string GetLowestLayer1UpdateId();
+
+        string GetLowestLayer2UpdateId();
+        
     }
 }
