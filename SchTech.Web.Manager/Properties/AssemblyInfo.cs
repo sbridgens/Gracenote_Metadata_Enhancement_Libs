@@ -39,6 +39,6 @@ using log4net.Config;
 // [assembly: AssemblyVersion("1.0.*")]
 
 
-[assembly: AssemblyVersion("1.0.1.2338")]
-[assembly: AssemblyFileVersion("1.0.1.2338")]
+[assembly: AssemblyVersion("1.0.1.2339")]
+[assembly: AssemblyFileVersion("1.0.1.2339")]
 [assembly: XmlConfigurator(ConfigFile = "Config\\log4net.config")]
