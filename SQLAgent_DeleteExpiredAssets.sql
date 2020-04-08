@@ -1,15 +1,15 @@
 USE [msdb]
 GO
 
-/****** Object:  Job [RemoveExpiredAssets]    Script Date: 08/04/2020 15:01:24 ******/
+/****** Object:  Job [RemoveExpiredAssets]    Script Date: 08/04/2020 16:31:49 ******/
 EXEC msdb.dbo.sp_delete_job @job_id=N'bf35c32e-e3d0-4e65-85b1-c8b43c9e0f5f', @delete_unused_schedule=1
 GO
 
-/****** Object:  Job [RemoveExpiredAssets]    Script Date: 08/04/2020 15:01:24 ******/
+/****** Object:  Job [RemoveExpiredAssets]    Script Date: 08/04/2020 16:31:49 ******/
 BEGIN TRANSACTION
 DECLARE @ReturnCode INT
 SELECT @ReturnCode = 0
-/****** Object:  JobCategory [[Uncategorized (Local)]]    Script Date: 08/04/2020 15:01:24 ******/
+/****** Object:  JobCategory [[Uncategorized (Local)]]    Script Date: 08/04/2020 16:31:50 ******/
 IF NOT EXISTS (SELECT name FROM msdb.dbo.syscategories WHERE name=N'[Uncategorized (Local)]' AND category_class=1)
 BEGIN
 EXEC @ReturnCode = msdb.dbo.sp_add_category @class=N'JOB', @type=N'LOCAL', @name=N'[Uncategorized (Local)]'
@@ -29,7 +29,7 @@ EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'RemoveExpiredAssets',
 		@category_name=N'[Uncategorized (Local)]', 
 		@owner_login_name=N'gpusvr\Simon', @job_id = @jobId OUTPUT
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Find And Delete Expired Assets]    Script Date: 08/04/2020 15:01:24 ******/
+/****** Object:  Step [Find And Delete Expired Assets]    Script Date: 08/04/2020 16:31:50 ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Find And Delete Expired Assets', 
 		@step_id=1, 
 		@cmdexec_success_code=0, 
@@ -90,10 +90,12 @@ WHILE @@FETCH_STATUS = 0
 			@Licensing_Window_End;
     END;
 
-RAISERROR(''%i Expired Assets deleted from the Database'', 0,1, @counter) WITH NOWAIT;
 CLOSE cursor_exipiry;
  
-DEALLOCATE cursor_exipiry;', 
+DEALLOCATE cursor_exipiry;
+
+
+RAISERROR(''%i Expired Assets deleted from the Database'', 0,1, @counter) WITH NOWAIT;', 
 		@database_name=N'ADI_Enrichment', 
 		@output_file_name=N'D:\SQLAgentLog.txt', 
 		@flags=22
