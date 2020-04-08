@@ -25,6 +25,7 @@ namespace SchTech.Business.Manager.Concrete
         {
             try
             {
+                Log.Info("Setting Program Types for Package.");
                 IGnProgramTypeLookupService programTypeLookupService = 
                     new GnProgramTypeLookupManager(new EfGnProgramTypeLookupDal());
 
@@ -34,7 +35,7 @@ namespace SchTech.Business.Manager.Concrete
                          string.Equals(t.GnProgramSubType.ToLower(), progSubType.ToLower(),
                              StringComparison.OrdinalIgnoreCase
                          )).LgiProgramTypeId;
-
+                
                 //set all 3 flags to ensure static flags are set correctly per package.
                 EnrichmentWorkflowEntities.IsMoviePackage = false;
                 EnrichmentWorkflowEntities.IsEpisodeSeries = false;

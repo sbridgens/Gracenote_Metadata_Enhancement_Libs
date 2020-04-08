@@ -87,10 +87,7 @@ namespace ADIWFE_TestLegacyGo
                 {
                     EfAdiEnrichmentDal.IsWorkflowProcessing = false;
 
-                    AdiWfOperations.Cleanup();
-
-                    if (AdiWfOperations.IsInCleanup == false)
-                        AdiWfOperations.StartProcessing();
+                    AdiWfOperations.StartProcessing();
                     Thread.Sleep(Convert.ToInt32(ADIWF_Config.PollIntervalInSeconds) * 1000);
 
                 }

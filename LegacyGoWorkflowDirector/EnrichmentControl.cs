@@ -70,27 +70,7 @@ namespace LegacyGoWorkflowDirector
                 Log.Error($"[{functionName}] Inner Exception:" +
                           $" {ex.InnerException.Message}");
         }
-
-        public bool CheckAndCleanOrphanedData(bool timerElapsed)
-        {
-            try
-            {
-                Log.Info("Checking for orphaned db data, this may take time dependent on db size; please be patient");
-                if (_adiDataService == null)
-                    _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
-                {
-                    _adiDataService?.CheckAndClearExpiredData(timerElapsed);
-                    _gnMappingDataService?.CleanMappingDataWithNoAdi();
-                }
-                return true;
-            }
-            catch (Exception e)
-            {
-                LogError("CheckAndCleanOrphanedData", "Error Cleaning DB Orphans", e);
-                return false;
-            }
-        }
-
+        
         public bool AvailableDriveSpace()
         {
             using (var hardwareInformation = new HardwareInformationManager())

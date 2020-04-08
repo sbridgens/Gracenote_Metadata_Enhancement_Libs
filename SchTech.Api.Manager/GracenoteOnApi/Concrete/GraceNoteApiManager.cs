@@ -34,11 +34,17 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetUpdateId()
         {
+            //"10954028558"
+            if(string.IsNullOrEmpty(MovieEpisodeProgramData.updateId))
+                throw new Exception("No Gracenote UpdateId for package at this time, failing ingest.");
             return MovieEpisodeProgramData.updateId;
         }
 
         public string GetConnectorId()
         {
+            //"SH025371110000"
+            if(string.IsNullOrEmpty(MovieEpisodeProgramData.connectorId))
+                throw new Exception("No Gracenote ConnectorId for package at this time, failing ingest.");
             return MovieEpisodeProgramData.connectorId;
         }
 

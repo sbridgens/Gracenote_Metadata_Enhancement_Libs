@@ -20,9 +20,6 @@ namespace SchTech.Configuration.Manager.Concrete
                 if (pinf.Name == ele.Name.LocalName)
                     switch (ele.Name.LocalName)
                     {
-                        case "ProcessExpiredAssets":
-                            ADIWF_Config.ProcessExpiredAssets = Convert.ToBoolean(ele.Value);
-                            break;
                         case "ProcessMappingFailures":
                             ADIWF_Config.ProcessMappingFailures = Convert.ToBoolean(ele.Value);
                             break;

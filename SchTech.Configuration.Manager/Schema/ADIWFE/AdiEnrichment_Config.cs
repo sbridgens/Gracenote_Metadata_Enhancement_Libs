@@ -41,12 +41,6 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         [XmlElement(ElementName = "PollIntervalInSeconds")]
         public static string PollIntervalInSeconds { get; set; }
 
-        [XmlElement(ElementName = "ExpiredAssetCleanupIntervalHours")]
-        public static string ExpiredAssetCleanupIntervalHours { get; set; }
-
-        [XmlElement(ElementName = "MinusExpiredAssetWindowHours")]
-        public static string MinusExpiredAssetWindowHours { get; set; }
-
         [XmlElement(ElementName = "AllowSDContentIngest")]
         public static string AllowSDContentIngest { get; set; }
 
@@ -67,9 +61,6 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
 
         [XmlElement(ElementName = "MoveNonMappedDirectory")]
         public static string MoveNonMappedDirectory { get; set; }
-
-        [XmlElement(ElementName = "ProcessExpiredAssets")]
-        public static bool ProcessExpiredAssets { get; set; }
 
         [XmlElement(ElementName = "ProcessMappingFailures")]
         public static bool ProcessMappingFailures { get; set; }

@@ -25,8 +25,6 @@ namespace ADIWFE_TestLegacyGo
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
         private WorkQueueItem IngestFile { get; set; }
-        private bool TimerElapsed { get; set; }
-        public bool IsInCleanup => false;
 
         private bool Success { get; set; }
 
@@ -53,59 +51,11 @@ namespace ADIWFE_TestLegacyGo
                 return false;
             }
         }
-        public void Cleanup()
-        {
-            if (!IsInCleanup)
-            {
-                AdiEnrichmentDal?.CheckAndClearExpiredData(TimerElapsed);
-            }
-
-
-            TimerElapsed = false;
-        }
-
-        /// <summary>
-        ///     Timer Event for cleanup, flags a boolean in case there is processing underway
-        ///     allowing the clean up to occur post processing
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="e"></param>
-        private void ElapsedTime(object src, ElapsedEventArgs e)
-        {
-            TimerElapsed = true;
-            if (!IsInCleanup)
-            {
-                Cleanup();
-                TimerElapsed = false;
-            }
-            else if (EfAdiEnrichmentDal.ExpiryProcessing && !IsInCleanup)
-            {
-                Log.Info("Cleanup timer elapsed however the service is still flagged as processing.");
-                TimerElapsed = true;
-            }
-
-            else if (!EfAdiEnrichmentDal.ExpiryProcessing && IsInCleanup)
-            {
-                Log.Info("Cleanup timer elapsed however the service is currently in a cleanup task.");
-                TimerElapsed = true;
-            }
-        }
-
-
-        private void InitialiseTimer()
-        {
-            _timer = new Timer
-            {
-                Interval = Convert.ToDouble(ADIWF_Config.ExpiredAssetCleanupIntervalHours) * 60 * 60 * 1000
-            };
-            _timer.Elapsed += ElapsedTime;
-            _timer.Start();
-        }
+        
 
         public void InitialiseWorkflowOperations()
         {
             AdiEnrichmentDal = new EfAdiEnrichmentDal();
-            InitialiseTimer();
 
             PollController = new AdiEnrichmentPollController
             {

@@ -25,11 +25,8 @@ namespace ADIWFE_TestClient
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
         private WorkQueueItem IngestFile { get; set; }
-        private bool TimerElapsed { get; set; }
         private bool HasGnMapping { get; set; }
-        public bool IsInCleanup => false;
-        private bool HasCleanedExpired { get; set; }
-
+        
         private bool Success { get; set; }
 
         public static void LogError(string functionName, string message, Exception ex)
@@ -55,65 +52,10 @@ namespace ADIWFE_TestClient
                 return false;
             }
         }
-        public void Cleanup()
-        {
-            if (!IsInCleanup)
-            {
-                if (!HasCleanedExpired)
-                {
-                    HasCleanedExpired = true;
-                    TimerElapsed = true;
-                }
-
-                AdiEnrichmentDal?.CheckAndClearExpiredData(TimerElapsed);
-            }
-
-            TimerElapsed = false;
-        }
-
-        /// <summary>
-        ///     Timer Event for cleanup, flags a boolean in case there is processing underway
-        ///     allowing the clean up to occur post processing
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="e"></param>
-        private void ElapsedTime(object src, ElapsedEventArgs e)
-        {
-            if (!IsInCleanup)
-            {
-                Cleanup();
-                TimerElapsed = false;
-            }
-            else if (EfAdiEnrichmentDal.ExpiryProcessing && !IsInCleanup)
-            {
-                Log.Info("Cleanup timer elapsed however the service is still flagged as processing.");
-                TimerElapsed = true;
-            }
-
-            else if (!EfAdiEnrichmentDal.ExpiryProcessing && IsInCleanup)
-            {
-                Log.Info("Cleanup timer elapsed however the service is currently in a cleanup task.");
-                TimerElapsed = true;
-            }
-        }
-
-
-        private void InitialiseTimer()
-        {
-            HasCleanedExpired = false;
-            _timer = new Timer
-            {
-                Interval = Convert.ToDouble(ADIWF_Config.ExpiredAssetCleanupIntervalHours) * 60 * 60 * 1000
-            };
-            _timer.Elapsed += ElapsedTime;
-            _timer.Start();
-        }
-
+       
         public void InitialiseWorkflowOperations()
         {
             AdiEnrichmentDal = new EfAdiEnrichmentDal();
-            if (ADIWF_Config.ProcessExpiredAssets)
-                InitialiseTimer();
 
             PollController = new AdiEnrichmentPollController
             {

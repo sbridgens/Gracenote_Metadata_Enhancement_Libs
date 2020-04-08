@@ -37,11 +37,6 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _adiDataDal.Delete(adiData);
         }
 
-        public Task<bool> CheckAndClearExpiredData(bool timerElapsed)
-        {
-            return _adiDataDal.CheckAndClearExpiredData(timerElapsed);
-        }
-
         public Adi_Data Update(Adi_Data adiData)
         {
             return _adiDataDal.Update(adiData);
