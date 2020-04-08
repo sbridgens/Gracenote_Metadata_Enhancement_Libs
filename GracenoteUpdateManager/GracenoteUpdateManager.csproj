@@ -68,5 +68,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SchTech.Api.Manager\SchTech.Api.Manager.csproj">
+      <Project>{6A566258-03D3-4030-B238-9E9112840837}</Project>
+      <Name>SchTech.Api.Manager</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

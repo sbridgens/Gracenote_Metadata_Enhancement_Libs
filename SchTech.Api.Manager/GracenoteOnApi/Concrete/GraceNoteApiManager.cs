@@ -17,7 +17,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
         public GnApiProgramsSchema.programsProgram MovieEpisodeProgramData { get; set; }
         public GnApiProgramsSchema.programsProgram ShowSeriesSeasonProgramData { get; set; }
         public GnApiProgramsSchema.programsProgramSeason SeasonData { get; set; }
-
+        
         public List<GnApiProgramsSchema.externalLinksTypeExternalLink> ExternalLinks()
         {
             var externalLinks = new List<GnApiProgramsSchema.externalLinksTypeExternalLink>();

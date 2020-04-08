@@ -86,11 +86,6 @@ namespace SchTech.Web.Manager.Concrete
 
             while (!CheckWebResponse())
             {
-                Log.Error("Exception during http GET request - status code: " +
-                          $"{(int)WebClientResponse.StatusCode}, " +
-                          $"status string: {WebClientResponse.StatusCode} " +
-                          $"{WebClientResponse.StatusDescription}");
-
                 Thread.Sleep(5000);
 
                 CurrentRetryCount++;
@@ -207,7 +202,7 @@ namespace SchTech.Web.Manager.Concrete
                 Log.Error($"Http Get Exception: {cwrException.Message}");
                 if (cwrException.InnerException != null)
                     Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
-                return false;
+                SuccessfulWebRequest = false;
             }
 
             return SuccessfulWebRequest;

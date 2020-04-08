@@ -1,7 +1,14 @@
-﻿using log4net;
+﻿using System;
+using System.Runtime.InteropServices;
+using log4net;
+using SchTech.Api.Manager.GracenoteOnApi.Concrete;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
+using SchTech.Api.Manager.Serialization;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.DataAccess.Concrete.EntityFramework;
+using SchTech.Entities.ConcreteTypes;
+using SchTech.Web.Manager.Concrete;
 
 namespace GracenoteUpdateManager
 {
@@ -11,6 +18,10 @@ namespace GracenoteUpdateManager
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(GracenoteUpdateController));
+
+        private GN_Mapping_Data GnMappingData { get; set; }
+        private EnrichmentWorkflowEntities WorkflowEntities { get; }
+        private GraceNoteApiManager ApiManager { get; }
 
         private readonly IGnUpdateTrackerService _gnUpdateTrackerService;
         /*TODO
@@ -28,8 +39,50 @@ namespace GracenoteUpdateManager
         public GracenoteUpdateController()
         {
             _gnUpdateTrackerService = new GnUpdateTrackerManager(new EfGnUpdateTrackerDal());
+            ApiManager = new GraceNoteApiManager();
         }
-        
+
+        private static void LogError(string functionName, string message, Exception ex)
+        {
+            Log.Error($"[{functionName}] {message}: {ex.Message}");
+            if (ex.InnerException != null)
+                Log.Error($"[{functionName}] Inner Exception:" +
+                          $" {ex.InnerException.Message}");
+        }
+
+        public string GetLowestMappingValue(bool checkMapping, bool checkLayer1)
+        {
+            try
+            {
+                return checkMapping
+                    ? _gnUpdateTrackerService.GetLowestMappingUpdateId()
+                    : (checkLayer1
+                        ? _gnUpdateTrackerService.GetLowestLayer1UpdateId()
+                        : _gnUpdateTrackerService.GetLowestLayer2UpdateId());
+            }
+            catch (Exception gmvex)
+            {
+                LogError("GetLowestMappingValue", 
+                    "Error Encountered Obtaining lowest db mapping value", gmvex);
+                return string.Empty;
+            }
+        }
+
+        public bool GetGracenoteMappingData(string dbUpdateId)
+        {
+            try
+            {
+
+
+                return true;
+            }
+            catch (Exception ggmd)
+            {
+                LogError("GetGracenoteMappingData",
+                    $"Error Encountered Obtaining Gracenote Mapping for update Id: {dbUpdateId}", ggmd);
+                return false;
+            }
+        }
 
     }
 }
