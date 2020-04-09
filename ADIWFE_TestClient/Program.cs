@@ -116,8 +116,8 @@ namespace ADIWFE_TestClient
 
         public static void TestDBData()
         {
-            var xmlSerializer = new ConfigSerializationHelper();
-            ConfigSerializationHelper.LoadConfigurationFile(Settings.Default.XmlConfigFile);
+            var xmlSerializer = new ConfigSerializationHelper<ADIWF_Config>();
+            xmlSerializer.LoadConfigurationFile(Settings.Default.XmlConfigFile);
 
             IAdiEnrichmentService adiEnrichment =
                 new AdiEnrichmentManager(new EfAdiEnrichmentDal());

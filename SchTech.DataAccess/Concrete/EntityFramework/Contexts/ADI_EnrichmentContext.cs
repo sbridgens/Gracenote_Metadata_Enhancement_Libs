@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchTech.Configuration.Manager.Parameters;
-using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework.Mappings;
 using SchTech.Entities.ConcreteTypes;
 using System;
@@ -11,7 +10,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
 {
     public class ADI_EnrichmentContext : DbContext
     {
-        private DbModelBuilder modelBuilder;
+        private DbModelBuilder _modelBuilder;
 
         public ADI_EnrichmentContext()
         {
@@ -41,15 +40,15 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
                                         "MultipleActiveResultSets=True;",
                 opts => opts.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds));
 
-            if (modelBuilder != null)
+            if (_modelBuilder != null)
                 return;
-            modelBuilder = new DbModelBuilder();
-            modelBuilder.Configurations.Add(new AdiEnrichmentMap());
-            modelBuilder.Configurations.Add(new GnImageLookupMap());
-            modelBuilder.Configurations.Add(new GnMappingDataMap());
-            modelBuilder.Configurations.Add(new CategoryMappingMap());
-            modelBuilder.Configurations.Add(new GnProgramTypeLookupMap());
-            modelBuilder.Configurations.Add(new GN_UpdateTrackingMap());
+            _modelBuilder = new DbModelBuilder();
+            _modelBuilder.Configurations.Add(new AdiEnrichmentMap());
+            _modelBuilder.Configurations.Add(new GnImageLookupMap());
+            _modelBuilder.Configurations.Add(new GnMappingDataMap());
+            _modelBuilder.Configurations.Add(new CategoryMappingMap());
+            _modelBuilder.Configurations.Add(new GnProgramTypeLookupMap());
+            _modelBuilder.Configurations.Add(new GN_UpdateTrackingMap());
         }
 
         /// <summary>

@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using log4net;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.Business.Manager.Concrete.EntityFramework;
-using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
 

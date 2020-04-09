@@ -40,8 +40,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         }
 
 
-        public bool ExtractItemFromArchive(string sourceArchive, string outputDirectory, bool extractAll,
-            bool extractAdiOnly)
+        public bool ExtractItemFromArchive(string sourceArchive, string outputDirectory, bool extractAll, bool extractAdiOnly)
         {
             OutputDirectory = outputDirectory;
             OperationsSuccessful = false;

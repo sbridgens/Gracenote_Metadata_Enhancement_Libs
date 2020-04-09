@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
@@ -12,12 +9,12 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 {
     public class EfGnUpdateTrackerDal : EfEntityRepositoryBase<GN_UpdateTracking, ADI_EnrichmentContext>, IGnUpdateTrackingDal
     {
-        public GN_UpdateTracking GetTrackingItemByUid(Guid ingestUUID)
+        public GN_UpdateTracking GetTrackingItemByUid(Guid ingestUuid)
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
                 return mapContext.GN_UpdateTracking.FirstOrDefault(
-                    i => i.IngestUUID == ingestUUID);
+                    i => i.IngestUUID == ingestUuid);
             }
         }
 
@@ -30,7 +27,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        public string GetLowestMappingUpdateId()
+        public string GetLowestGnMappingDataUpdateId()
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var minVal = mapContext.GN_Mapping_Data.OrderBy(u => u.GN_updateId).First();
+                return minVal.GN_updateId;
+            }
+        }
+
+        public string GetLowestTrackerMappingUpdateId()
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {

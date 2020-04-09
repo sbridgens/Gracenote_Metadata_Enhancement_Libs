@@ -1,7 +1,5 @@
 ﻿using SchTech.Business.Manager.Abstract.EntityFramework;
-using SchTech.Core.DataAccess;
 using SchTech.DataAccess.Abstract;
-using SchTech.DataAccess.Concrete;
 using SchTech.Entities.ConcreteTypes;
 using System;
 using System.Collections.Generic;

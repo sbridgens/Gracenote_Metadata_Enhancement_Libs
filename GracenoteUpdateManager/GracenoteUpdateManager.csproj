@@ -14,24 +14,6 @@
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -60,24 +42,6 @@
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="SchTech.Business.Manager">
-      <HintPath>..\SchTech.Business.Manager\bin\x64\Release\SchTech.Business.Manager.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Core">
-      <HintPath>..\SchTech.Core\bin\x64\Release\SchTech.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.DataAccess">
-      <HintPath>..\SchTech.DataAccess\bin\x64\Release\SchTech.DataAccess.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Entities">
-      <HintPath>..\SchTech.Entities\bin\x64\Release\SchTech.Entities.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.File.Manager">
-      <HintPath>..\SchTech.File.Manager\bin\x64\Release\SchTech.File.Manager.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Web.Manager">
-      <HintPath>..\SchTech.Web.Manager\bin\x64\Release\SchTech.Web.Manager.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ComponentModel.Annotations.4.7.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
@@ -104,6 +68,22 @@
     <ProjectReference Include="..\SchTech.Api.Manager\SchTech.Api.Manager.csproj">
       <Project>{6A566258-03D3-4030-B238-9E9112840837}</Project>
       <Name>SchTech.Api.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Business.Manager\SchTech.Business.Manager.csproj">
+      <Project>{0868AA0F-32F8-43C2-AF12-5348D854100B}</Project>
+      <Name>SchTech.Business.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Core\SchTech.Core.csproj">
+      <Project>{45D7D10A-D8B6-4381-995B-44F8E2E3D500}</Project>
+      <Name>SchTech.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.DataAccess\SchTech.DataAccess.csproj">
+      <Project>{E41294F8-869A-48BF-B95C-BDF3216E8E07}</Project>
+      <Name>SchTech.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Entities\SchTech.Entities.csproj">
+      <Project>{FBEC6C57-4653-415B-86C0-31545F92E285}</Project>
+      <Name>SchTech.Entities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

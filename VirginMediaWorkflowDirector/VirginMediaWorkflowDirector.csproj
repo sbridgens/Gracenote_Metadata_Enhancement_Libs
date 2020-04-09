@@ -14,27 +14,6 @@
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>7.2</LangVersion>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>7.2</LangVersion>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -66,26 +45,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SchTech.Api.Manager\bin\x64\Debug\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="SchTech.Api.Manager">
-      <HintPath>..\SchTech.Api.Manager\bin\x64\Debug\SchTech.Api.Manager.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Business.Manager">
-      <HintPath>..\SchTech.Business.Manager\bin\x64\Debug\SchTech.Business.Manager.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Configuration.Manager">
-      <HintPath>..\SchTech.Configuration.Manager\bin\x64\Debug\SchTech.Configuration.Manager.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.DataAccess">
-      <HintPath>..\SchTech.DataAccess\bin\x64\Debug\SchTech.DataAccess.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Entities">
-      <HintPath>..\SchTech.Entities\bin\x64\Debug\SchTech.Entities.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.File.Manager">
-      <HintPath>..\SchTech.File.Manager\bin\x64\Debug\SchTech.File.Manager.dll</HintPath>
-    </Reference>
-    <Reference Include="SchTech.Queue.Manager">
-      <HintPath>..\SchTech.Queue.Manager\bin\x64\Debug\SchTech.Queue.Manager.dll</HintPath>
+    <Reference Include="SchTech.Core, Version=1.0.1.2367, Culture=neutral, PublicKeyToken=f7b12d3e4d7db122, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SchTech.Core\bin\x64\Release\SchTech.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -106,12 +68,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SchTech.Core\SchTech.Core.csproj">
-      <Project>{45D7D10A-D8B6-4381-995B-44F8E2E3D500}</Project>
-      <Name>SchTech.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
@@ -122,6 +78,36 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="schtech_signing.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SchTech.Api.Manager\SchTech.Api.Manager.csproj">
+      <Project>{6A566258-03D3-4030-B238-9E9112840837}</Project>
+      <Name>SchTech.Api.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Business.Manager\SchTech.Business.Manager.csproj">
+      <Project>{0868AA0F-32F8-43C2-AF12-5348D854100B}</Project>
+      <Name>SchTech.Business.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Configuration.Manager\SchTech.Configuration.Manager.csproj">
+      <Project>{326210A7-92B9-43DC-A87D-6E6ACEB164FE}</Project>
+      <Name>SchTech.Configuration.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.DataAccess\SchTech.DataAccess.csproj">
+      <Project>{E41294F8-869A-48BF-B95C-BDF3216E8E07}</Project>
+      <Name>SchTech.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Entities\SchTech.Entities.csproj">
+      <Project>{FBEC6C57-4653-415B-86C0-31545F92E285}</Project>
+      <Name>SchTech.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.File.Manager\SchTech.File.Manager.csproj">
+      <Project>{F39AE7F9-3F7D-4942-BB7E-F6DB58255042}</Project>
+      <Name>SchTech.File.Manager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Queue.Manager\SchTech.Queue.Manager.csproj">
+      <Project>{B486D741-AE9E-4745-B6A1-09365FEB22AB}</Project>
+      <Name>SchTech.Queue.Manager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
 

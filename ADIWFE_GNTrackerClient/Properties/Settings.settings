@@ -1,0 +1,9 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ADIWFE_GNTrackerClient.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="XmlConfigFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Config\GN_UpdateTracker_Config.xml</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

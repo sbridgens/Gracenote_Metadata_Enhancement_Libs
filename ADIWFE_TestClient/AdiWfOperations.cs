@@ -1,15 +1,14 @@
 ﻿using ADIWFE_TestClient.Properties;
 using log4net;
-using VirginMediaWorkflowDirector;
 using SchTech.Configuration.Manager.Concrete;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
 using System;
-using System.Timers;
 using SchTech.Configuration.Manager.Parameters;
 using SchTech.Entities.ConcreteTypes;
+using VirginMediaWorkflowDirector;
 
 namespace ADIWFE_TestClient
 {
@@ -43,8 +42,8 @@ namespace ADIWFE_TestClient
 
             try
             {
-                var xmlSerializer = new ConfigSerializationHelper();
-                if (!ConfigSerializationHelper.LoadConfigurationFile(Settings.Default.XmlConfigFile))
+                var xmlSerializer = new ConfigSerializationHelper<ADIWF_Config>();
+                if (!xmlSerializer.LoadConfigurationFile(Settings.Default.XmlConfigFile))
                     return false;
 
                 DBConnectionProperties.DbServerOrIp = ADIWF_Config.Database_Host;

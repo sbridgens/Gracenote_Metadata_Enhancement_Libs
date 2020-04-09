@@ -4,7 +4,6 @@ using SchTech.Entities.ConcreteTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {

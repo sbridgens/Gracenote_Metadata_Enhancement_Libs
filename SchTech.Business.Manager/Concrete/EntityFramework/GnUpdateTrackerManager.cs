@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.Entities.ConcreteTypes;
@@ -44,9 +41,9 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _updateTrackingDal.Delete(entity);
         }
 
-        public GN_UpdateTracking GetTrackingItemByUid(Guid ingestUUID)
+        public GN_UpdateTracking GetTrackingItemByUid(Guid ingestUuid)
         {
-            return _updateTrackingDal.GetTrackingItemByUid(ingestUUID);
+            return _updateTrackingDal.GetTrackingItemByUid(ingestUuid);
         }
 
         public GN_UpdateTracking GetTrackingItemByPidPaid(string gnProviderId)
@@ -54,9 +51,14 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _updateTrackingDal.GetTrackingItemByPidPaid(gnProviderId);
         }
 
-        public string GetLowestMappingUpdateId()
+        public string GetLowestGnMappingDataUpdateId()
         {
-            return _updateTrackingDal.GetLowestMappingUpdateId();
+            return _updateTrackingDal.GetLowestGnMappingDataUpdateId();
+        }
+
+        public string GetLowestTrackerMappingUpdateId()
+        {
+            return _updateTrackingDal.GetLowestGnMappingDataUpdateId();
         }
 
         public string GetLowestLayer1UpdateId()

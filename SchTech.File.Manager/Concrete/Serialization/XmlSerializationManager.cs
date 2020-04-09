@@ -8,7 +8,7 @@ namespace SchTech.File.Manager.Concrete.Serialization
     public class XmlSerializationManager<T>
     {
         private readonly Type _type;
-
+         
 
         public XmlSerializationManager()
         {

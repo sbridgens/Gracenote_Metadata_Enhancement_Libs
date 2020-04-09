@@ -4,9 +4,16 @@ using System.Xml.Linq;
 
 namespace SchTech.Configuration.Manager.Concrete
 {
-    public class ConfigSerializationHelper
+    public class ConfigSerializationHelper<T>
     {
-        public static bool LoadConfigurationFile(string configFile)
+        private readonly Type _type;
+
+        public ConfigSerializationHelper()
+        {
+            _type = typeof(T);
+        }
+
+        public bool LoadConfigurationFile(string configFile)
         {
             var configLoaded = true;
 
@@ -14,13 +21,14 @@ namespace SchTech.Configuration.Manager.Concrete
             if (xDoc.Root == null)
                 return false;
             var configs = xDoc.Elements(xDoc.Root.Name);
-            var properties = typeof(ADIWF_Config).GetProperties();
+            var properties = _type.GetProperties();
             foreach (var ele in configs.Descendants())
             foreach (var pinf in properties)
                 if (pinf.Name == ele.Name.LocalName)
                     switch (ele.Name.LocalName)
                     {
                         case "ProcessMappingFailures":
+                            //Adi and Legacy only hence static ref
                             ADIWF_Config.ProcessMappingFailures = Convert.ToBoolean(ele.Value);
                             break;
                         case "Block_Platform":

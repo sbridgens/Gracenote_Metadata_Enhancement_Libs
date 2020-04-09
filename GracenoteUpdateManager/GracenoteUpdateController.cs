@@ -2,13 +2,11 @@
 using System.Runtime.InteropServices;
 using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
-using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
-using SchTech.Api.Manager.Serialization;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
-using SchTech.Web.Manager.Concrete;
+
 
 namespace GracenoteUpdateManager
 {
@@ -55,7 +53,7 @@ namespace GracenoteUpdateManager
             try
             {
                 return checkMapping
-                    ? _gnUpdateTrackerService.GetLowestMappingUpdateId()
+                    ? _gnUpdateTrackerService.GetLowestGnMappingDataUpdateId()
                     : (checkLayer1
                         ? _gnUpdateTrackerService.GetLowestLayer1UpdateId()
                         : _gnUpdateTrackerService.GetLowestLayer2UpdateId());
