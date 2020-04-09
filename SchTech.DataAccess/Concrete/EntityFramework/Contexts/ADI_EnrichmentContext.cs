@@ -11,12 +11,10 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
 {
     public class ADI_EnrichmentContext : DbContext
     {
-        private readonly AdiWfeProperties _adiWfeProperties;
         private DbModelBuilder modelBuilder;
 
         public ADI_EnrichmentContext()
         {
-            if (_adiWfeProperties == null) _adiWfeProperties = new AdiWfeProperties();
         }
 
 
@@ -37,9 +35,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
             if (optionsBuilder.IsConfigured)
                 return;
 
-            optionsBuilder.UseSqlServer($"Server={ADIWF_Config.Database_Host},1433;" +
-                                        $"Database={ADIWF_Config.Database_Name};" +
-                                        $"Trusted_Connection={ADIWF_Config.Integrated_Security};" +
+            optionsBuilder.UseSqlServer($"Server={DBConnectionProperties.DbServerOrIp},1433;" +
+                                        $"Database={DBConnectionProperties.DatabaseName};" +
+                                        $"Trusted_Connection={DBConnectionProperties.IntegratedSecurity};" +
                                         "MultipleActiveResultSets=True;",
                 opts => opts.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds));
 

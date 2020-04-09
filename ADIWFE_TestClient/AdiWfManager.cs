@@ -69,6 +69,7 @@ namespace ADIWFE_TestClient
 
             if (IsRunning)
             {
+                
                 Log.Info("Service Started Successfully");
 
                 AdiWfOperations.InitialiseWorkflowOperations();

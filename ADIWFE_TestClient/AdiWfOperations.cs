@@ -8,6 +8,7 @@ using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
 using System;
 using System.Timers;
+using SchTech.Configuration.Manager.Parameters;
 using SchTech.Entities.ConcreteTypes;
 
 namespace ADIWFE_TestClient
@@ -18,8 +19,7 @@ namespace ADIWFE_TestClient
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(AdiWfOperations));
-
-        private Timer _timer;
+        
         private EnrichmentControl WorkflowManager { get; set; }
         private EfAdiEnrichmentDal AdiEnrichmentDal { get; set; }
         private AdiEnrichmentPollController PollController { get; set; }
@@ -44,7 +44,14 @@ namespace ADIWFE_TestClient
             try
             {
                 var xmlSerializer = new ConfigSerializationHelper();
-                return ConfigSerializationHelper.LoadConfigurationFile(Settings.Default.XmlConfigFile);
+                if (!ConfigSerializationHelper.LoadConfigurationFile(Settings.Default.XmlConfigFile))
+                    return false;
+
+                DBConnectionProperties.DbServerOrIp = ADIWF_Config.Database_Host;
+                DBConnectionProperties.DatabaseName = ADIWF_Config.Database_Name;
+                DBConnectionProperties.IntegratedSecurity = ADIWF_Config.Integrated_Security;
+
+                return true;
             }
             catch (Exception lacEx)
             {

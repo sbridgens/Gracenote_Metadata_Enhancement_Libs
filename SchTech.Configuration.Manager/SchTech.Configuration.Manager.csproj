@@ -72,13 +72,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Concrete\ConfigSerializationHelper.cs" />
-    <Compile Include="Parameters\AdiWfeProperties.cs" />
+    <Compile Include="Parameters\DBConnectionProperties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
     <Compile Include="Schema\ADIWFE\AdiEnrichment_Config.cs" />
+    <Compile Include="Schema\GNUpdateTracker\UpdateTracker_Config.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

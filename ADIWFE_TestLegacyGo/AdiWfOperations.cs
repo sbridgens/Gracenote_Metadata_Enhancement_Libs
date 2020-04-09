@@ -18,8 +18,7 @@ namespace ADIWFE_TestLegacyGo
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(AdiWfOperations));
-
-        private Timer _timer;
+        
         private EnrichmentControl WorkflowManager { get; set; }
         private EfAdiEnrichmentDal AdiEnrichmentDal { get; set; }
         private AdiEnrichmentPollController PollController { get; set; }
