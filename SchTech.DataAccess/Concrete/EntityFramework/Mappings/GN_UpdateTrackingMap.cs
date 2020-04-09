@@ -12,26 +12,26 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             //Primary key is set here
             HasKey(x => x.Id);
             
-            Property(x => x.TrackingIngestGuid).HasColumnName("IngestUUID");
-            Property(x => x.TrackingGnProviderId).HasColumnName("GN_ProviderId");
+            Property(x => x.IngestUUID).HasColumnName("IngestUUID");
+            Property(x => x.GN_ProviderId).HasColumnName("GN_ProviderId");
 
-            Property(x => x.MappingUpdateId).HasColumnName("Mapping_UpdateId");
-            Property(x => x.MappingUpdateDate).HasColumnName("Mapping_UpdateDate");
-            Property(x => x.MappingNextUpdateId).HasColumnName("Mapping_NextUpdateId");
-            Property(x => x.MappingMaxUpdateId).HasColumnName("Mapping_MaxUpdateId");
-            Property(x => x.MappingRootId).HasColumnName("Mapping_RootId");
+            Property(x => x.Mapping_UpdateId).HasColumnName("Mapping_UpdateId");
+            Property(x => x.Mapping_UpdateDate).HasColumnName("Mapping_UpdateDate");
+            Property(x => x.Mapping_NextUpdateId).HasColumnName("Mapping_NextUpdateId");
+            Property(x => x.Mapping_MaxUpdateId).HasColumnName("Mapping_MaxUpdateId");
+            Property(x => x.Mapping_RootId).HasColumnName("Mapping_RootId");
 
-            Property(x => x.Layer1UpdateId).HasColumnName("Layer1_UpdateId");
-            Property(x => x.Layer1UpdateDate).HasColumnName("Layer1_UpdateDate");
-            Property(x => x.Layer1NextUpdateId).HasColumnName("Layer1_NextUpdateId");
-            Property(x => x.Layer1MaxUpdateId).HasColumnName("Layer1_MaxUpdateId");
-            Property(x => x.Layer1RootId).HasColumnName("Layer1_RootId");
+            Property(x => x.Layer1_UpdateId).HasColumnName("Layer1_UpdateId");
+            Property(x => x.Layer1_UpdateDate).HasColumnName("Layer1_UpdateDate");
+            Property(x => x.Layer1_NextUpdateId).HasColumnName("Layer1_NextUpdateId");
+            Property(x => x.Layer1_MaxUpdateId).HasColumnName("Layer1_MaxUpdateId");
+            Property(x => x.Layer1_RootId).HasColumnName("Layer1_RootId");
 
-            Property(x => x.Layer2UpdateId).HasColumnName("Layer2_UpdateId");
-            Property(x => x.Layer2NextUpdateId).HasColumnName("Layer2_NextUpdateId");
-            Property(x => x.Layer2UpdateDate).HasColumnName("Layer2_UpdateDate");
-            Property(x => x.Layer2MaxUpdateId).HasColumnName("Layer2_MaxUpdateId");
-            Property(x => x.Layer2RootId).HasColumnName("Layer2_RootId");
+            Property(x => x.Layer2_UpdateId).HasColumnName("Layer2_UpdateId");
+            Property(x => x.Layer2_UpdateDate).HasColumnName("Layer2_NextUpdateId");
+            Property(x => x.Layer2_NextUpdateId).HasColumnName("Layer2_UpdateDate");
+            Property(x => x.Layer2_MaxUpdateId).HasColumnName("Layer2_MaxUpdateId");
+            Property(x => x.Layer2_RootId).HasColumnName("Layer2_RootId");
             Property(x => x.UpdatesChecked).HasColumnName("UpdatesChecked");
             Property(x => x.RequiresEnrichment).HasColumnName("RequiresEnrichment");
         }

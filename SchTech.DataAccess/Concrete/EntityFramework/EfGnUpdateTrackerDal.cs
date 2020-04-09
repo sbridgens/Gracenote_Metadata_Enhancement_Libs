@@ -17,7 +17,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             using (var mapContext = new ADI_EnrichmentContext())
             {
                 return mapContext.GN_UpdateTracking.FirstOrDefault(
-                    i => i.TrackingIngestGuid == ingestUUID);
+                    i => i.IngestUUID == ingestUUID);
             }
         }
 
@@ -26,7 +26,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             using (var mapContext = new ADI_EnrichmentContext())
             {
                 return mapContext.GN_UpdateTracking.FirstOrDefault(
-                    t => t.TrackingGnProviderId == gnProviderId);
+                    t => t.GN_ProviderId == gnProviderId);
             }
         }
 
@@ -34,8 +34,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.MappingUpdateId).First();
-                return minVal.MappingUpdateId;
+                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.Mapping_UpdateId).First();
+                return minVal.Mapping_UpdateId;
             }
         }
 
@@ -43,8 +43,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.Layer1UpdateId).First();
-                return minVal.Layer1UpdateId;
+                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.Layer1_UpdateId).First();
+                return minVal.Layer1_UpdateId;
             }
         }
 
@@ -52,8 +52,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.Layer2UpdateId).First();
-                return minVal.Layer2UpdateId;
+                var minVal = mapContext.GN_UpdateTracking.OrderBy(u => u.Layer2_UpdateId).First();
+                return minVal.Layer2_UpdateId;
             }
         }
     }
