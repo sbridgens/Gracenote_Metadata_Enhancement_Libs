@@ -2,7 +2,7 @@
 
 namespace SchTech.Business.Manager.Abstract.EntityFramework
 {
-    public interface IGnUpdateTrackerService : IGnUpdateTrackingDal
+    public interface ILayer2UpdateTrackingService : ILayer2UpdateTrackingDal
     {
     }
 }

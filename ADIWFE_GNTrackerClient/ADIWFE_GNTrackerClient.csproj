@@ -85,6 +85,10 @@
       <Project>{DD3711AF-573C-47EA-B6DF-55F73DBC9B43}</Project>
       <Name>GracenoteUpdateManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SchTech.Api.Manager\SchTech.Api.Manager.csproj">
+      <Project>{6A566258-03D3-4030-B238-9E9112840837}</Project>
+      <Name>SchTech.Api.Manager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SchTech.Configuration.Manager\SchTech.Configuration.Manager.csproj">
       <Project>{326210A7-92B9-43DC-A87D-6E6ACEB164FE}</Project>
       <Name>SchTech.Configuration.Manager</Name>

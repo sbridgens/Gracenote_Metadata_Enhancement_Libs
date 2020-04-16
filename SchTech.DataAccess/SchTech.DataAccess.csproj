@@ -139,12 +139,16 @@
     <Compile Include="Abstract\IGnImageLookupDal.cs" />
     <Compile Include="Abstract\IGnMappingDataDal.cs" />
     <Compile Include="Abstract\IGnProgramTypeLookupDal.cs" />
-    <Compile Include="Abstract\IGnUpdateTrackingDal.cs" />
+    <Compile Include="Abstract\ILayer2UpdateTrackingDal.cs" />
+    <Compile Include="Abstract\ILayer1UpdateTrackingDal.cs" />
+    <Compile Include="Abstract\IMappingsUpdateTrackingDal.cs" />
     <Compile Include="Concrete\EntityFramework\Contexts\ADI_EnrichmentContext.cs" />
     <Compile Include="Concrete\EntityFramework\EfAdiEnrichmentDal.cs" />
     <Compile Include="Concrete\EntityFramework\EfCategoryMappingDal.cs" />
     <Compile Include="Concrete\EntityFramework\EfGnProgramTypeLookupDal.cs" />
-    <Compile Include="Concrete\EntityFramework\EfGnUpdateTrackerDal.cs" />
+    <Compile Include="Concrete\EntityFramework\EfLayer2UpdateTrackingDal.cs" />
+    <Compile Include="Concrete\EntityFramework\EfLayer1UpdateTrackingDal.cs" />
+    <Compile Include="Concrete\EntityFramework\EfMappingsUpdateTrackingDal.cs" />
     <Compile Include="Concrete\EntityFramework\EfStaticMethods.cs" />
     <Compile Include="Concrete\EntityFramework\EfGnMappingDataDal.cs" />
     <Compile Include="Concrete\EntityFramework\Mappings\AdiEnrichmentMap.cs" />
@@ -153,7 +157,9 @@
     <Compile Include="Concrete\EntityFramework\Mappings\CategoryMappingMap.cs" />
     <Compile Include="Concrete\EntityFramework\Mappings\GnMappingDataMap.cs" />
     <Compile Include="Concrete\EntityFramework\Mappings\GnProgramTypeLookupMap.cs" />
-    <Compile Include="Concrete\EntityFramework\Mappings\GN_UpdateTrackingMap.cs" />
+    <Compile Include="Concrete\EntityFramework\Mappings\Layer2UpdateTrackingMap.cs" />
+    <Compile Include="Concrete\EntityFramework\Mappings\Layer1UpdateTrackingMap.cs" />
+    <Compile Include="Concrete\EntityFramework\Mappings\MappingsUpdateTrackingMap.cs" />
     <Compile Include="Concrete\GN_ImageLookup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>

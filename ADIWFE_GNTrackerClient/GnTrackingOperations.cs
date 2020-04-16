@@ -16,7 +16,7 @@ namespace ADIWFE_GNTrackerClient
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(GnTrackingOperations));
-        private EfGnUpdateTrackerDal UpdateTrackerDal { get; set; }
+        private EfMappingsUpdateTrackingDal UpdateTrackerDal { get; set; }
 
         public static void LogError(string functionName, string message, Exception ex)
         {
@@ -52,7 +52,7 @@ namespace ADIWFE_GNTrackerClient
 
         public void InitialiseWorkflowOperations()
         {
-            UpdateTrackerDal = new EfGnUpdateTrackerDal();
+            UpdateTrackerDal = new EfMappingsUpdateTrackingDal();
         }
 
         public void StartOperations()
@@ -61,8 +61,11 @@ namespace ADIWFE_GNTrackerClient
             { 
                 GracenoteUpdateController updateController = new GracenoteUpdateController();
 
-                var lowest = updateController.GetLowestMappingValue(true, false);
-                Log.Info($"Lowest Mapping UpdateId returned: {lowest}");
+               // var lowest = updateController.GetLowestMappingValue(true, false);
+               // Log.Info($"Lowest Mapping UpdateId returned: {lowest}");
+               // updateController.GetGracenoteMappingData(lowest);
+
+                Log.Info($"Number of mappings requiring updates is: {updateController.MappingsRequiringUpdate.Count}");
 
             }
             catch (Exception spex)

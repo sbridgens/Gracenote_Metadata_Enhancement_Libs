@@ -11,6 +11,8 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
     public class GraceNoteApiManager : IGracenoteApi
     {
         public GnOnApiProgramMappingSchema.@on CoreGnMappingData { get; set; }
+        public List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping> UpdateMappingsData { get; set; }
+        public List<GnApiProgramsSchema.programsProgram> UpdateProgramData { get; set; }
         public GnApiProgramsSchema.@on CoreProgramData { get; set; }
         public GnApiProgramsSchema.@on CoreSeriesData { get; set; }
         public GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping GraceNoteMappingData { get; set; }

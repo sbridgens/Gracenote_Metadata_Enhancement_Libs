@@ -27,7 +27,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
         public virtual Microsoft.EntityFrameworkCore.DbSet<GN_Mapping_Data> GN_Mapping_Data { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<CategoryMapping> CategoryMapping { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<GnProgramTypeLookup> GnProgramTypeLookup { get; set; }
-        public virtual Microsoft.EntityFrameworkCore.DbSet<GN_UpdateTracking> GN_UpdateTracking { get; set; }
+        public virtual Microsoft.EntityFrameworkCore.DbSet<MappingsUpdateTracking> MappingsUpdateTracking { get; set; }
+        public virtual Microsoft.EntityFrameworkCore.DbSet<Layer1UpdateTracking> Layer1UpdateTracking { get; set; }
+        public virtual Microsoft.EntityFrameworkCore.DbSet<Layer2UpdateTracking> Layer2UpdateTracking { get; set; }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -48,7 +50,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
             _modelBuilder.Configurations.Add(new GnMappingDataMap());
             _modelBuilder.Configurations.Add(new CategoryMappingMap());
             _modelBuilder.Configurations.Add(new GnProgramTypeLookupMap());
-            _modelBuilder.Configurations.Add(new GN_UpdateTrackingMap());
+            _modelBuilder.Configurations.Add(new MappingsUpdateTrackingMap());
+            _modelBuilder.Configurations.Add(new Layer1UpdateTrackingMap());
+            _modelBuilder.Configurations.Add(new Layer2UpdateTrackingMap());
         }
 
         /// <summary>

@@ -1,0 +1,18 @@
+﻿using System;
+using SchTech.Core.DataAccess;
+using SchTech.Entities.ConcreteTypes;
+
+namespace SchTech.DataAccess.Abstract
+{
+    public interface ILayer2UpdateTrackingDal : IEntityRepository<Layer2UpdateTracking>
+    {
+        Layer2UpdateTracking GetTrackingItemByUid(Guid ingestUuid);
+
+        Layer2UpdateTracking GetTrackingItemByConnectorId(string connectorId);
+
+        string GetLowestLayer2UpdateId();
+
+        string GetLowestTrackerLayer2UpdateId();
+        
+    }
+}

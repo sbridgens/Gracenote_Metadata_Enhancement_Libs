@@ -5,6 +5,7 @@ using SchTech.Web.Manager.Concrete;
 using System;
 using System.IO;
 using System.Linq;
+using SchTech.Configuration.Manager.Schema.GNUpdateTracker;
 
 namespace SchTech.Entities.ConcreteTypes
 {
@@ -62,6 +63,8 @@ namespace SchTech.Entities.ConcreteTypes
         public string GracenoteMappingData { get; private set; }
 
         public string GracenoteProgramData { get; private set; }
+
+        public string GraceNoteUpdateData { get; private set; }
 
         public string GraceNoteSeriesSeasonSpecialsData { get; private set; }
 
@@ -196,6 +199,39 @@ namespace SchTech.Entities.ConcreteTypes
                 Log.Error($"[GetGracenoteMappingData] Error obtaining Gracenote mapping data: {ggmdEx.Message}");
                 if (ggmdEx.InnerException != null)
                     Log.Error($"[GetGracenoteMappingData] Inner exception: {ggmdEx.InnerException.Message}");
+            }
+
+            return false;
+        }
+
+        public bool GetGraceNoteUpdates(string updateId, string apiCall, string resultLimit)
+        {
+            try
+            {
+                //http://on-api.gracenote.com/v3/ProgramMappings?updateId=10938407543&limit=100&api_key=wgu7uhqcqyzspwxj28mxgy4b
+                var updateUrl = $"{GN_UpdateTracker_Config.OnApi}{apiCall}" +
+                             $"?updateId={updateId}" +
+                             $"&limit={resultLimit}" +
+                             $"&api_key={GN_UpdateTracker_Config.ApiKey}";
+
+                GraceNoteUpdateData = null;
+
+                Log.Info($"Calling On API url with Update Value: {updateId} and Limit: {resultLimit}");
+                var webClient = new WebClientManager();
+                GraceNoteUpdateData = webClient.HttpGetRequest(updateUrl);
+                Log.Info("Successfully Called Gracenote OnApi");
+                if (GraceNoteUpdateData != null && webClient.SuccessfulWebRequest)
+                    return true;
+
+                throw new Exception($"Gracenote Update Data: {GraceNoteUpdateData}, " +
+                                    $"Successful Web request: {webClient.SuccessfulWebRequest}," +
+                                    $"Web request response code: {webClient.RequestStatusCode}");
+            }
+            catch (Exception ggnmuex)
+            {
+                Log.Error($"[GetGraceNoteUpdates] Error obtaining Gracenote Update data: {ggnmuex.Message}");
+                if (ggnmuex.InnerException != null)
+                    Log.Error($"[GetGraceNoteUpdates] Inner exception: {ggnmuex.InnerException.Message}");
             }
 
             return false;

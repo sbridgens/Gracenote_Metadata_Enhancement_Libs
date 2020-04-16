@@ -65,8 +65,12 @@
     <Compile Include="Abstract\EntityFramework\IGnImageLookupService.cs" />
     <Compile Include="Abstract\EntityFramework\IGnMappingDataService.cs" />
     <Compile Include="Abstract\EntityFramework\IGnProgramTypeLookupService.cs" />
-    <Compile Include="Abstract\EntityFramework\IGnUpdateTrackerService.cs" />
-    <Compile Include="Concrete\EntityFramework\GnUpdateTrackerManager.cs" />
+    <Compile Include="Abstract\EntityFramework\ILayer2UpdateTrackingService.cs" />
+    <Compile Include="Abstract\EntityFramework\ILayer1UpdateTrackingService.cs" />
+    <Compile Include="Abstract\EntityFramework\IMappingsUpdateTrackingService.cs" />
+    <Compile Include="Concrete\EntityFramework\Layer2UpdateTrackingManager.cs" />
+    <Compile Include="Concrete\EntityFramework\Layer1UpdateTrackingManager.cs" />
+    <Compile Include="Concrete\EntityFramework\MappingsUpdateTrackingManager.cs" />
     <Compile Include="Concrete\ProgramTypes.cs" />
     <Compile Include="Concrete\EntityFramework\AdiEnrichmentManager.cs" />
     <Compile Include="Concrete\EntityFramework\CategoryMappingManager.cs" />

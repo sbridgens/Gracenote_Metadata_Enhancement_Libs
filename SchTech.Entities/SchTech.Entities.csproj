@@ -58,7 +58,9 @@
     <Compile Include="ConcreteTypes\EnrichmentWorkflowEntities.cs" />
     <Compile Include="ConcreteTypes\GnProgramTypeLookup.cs" />
     <Compile Include="ConcreteTypes\GN_Mapping_Data.cs" />
-    <Compile Include="ConcreteTypes\GN_UpdateTracking.cs" />
+    <Compile Include="ConcreteTypes\Layer1UpdateTracking.cs" />
+    <Compile Include="ConcreteTypes\Layer2UpdateTracking.cs" />
+    <Compile Include="ConcreteTypes\MappingsUpdateTracking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
