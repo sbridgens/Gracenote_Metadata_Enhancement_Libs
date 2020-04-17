@@ -1,4 +1,5 @@
 ﻿using System;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
 
@@ -13,6 +14,7 @@ namespace SchTech.DataAccess.Abstract
         string GetLowestGnMappingDataUpdateId();
 
         string GetLowestTrackerMappingUpdateId();
-        
+
+        void UpdateMappingData(Guid uuid, GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping mappingData, string nextUpdateId, string maxUpdateId);
     }
 }

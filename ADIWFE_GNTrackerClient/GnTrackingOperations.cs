@@ -61,11 +61,18 @@ namespace ADIWFE_GNTrackerClient
             { 
                 GracenoteUpdateController updateController = new GracenoteUpdateController();
 
-               // var lowest = updateController.GetLowestMappingValue(true, false);
-               // Log.Info($"Lowest Mapping UpdateId returned: {lowest}");
-               // updateController.GetGracenoteMappingData(lowest);
+                var lowest = updateController.GetLowestMappingValue(true, false);
+                Log.Info($"Lowest Mapping UpdateId returned: {lowest}");
+                updateController.GetGracenoteMappingData(lowest);
 
                 Log.Info($"Number of mappings requiring updates is: {updateController.MappingsRequiringUpdate.Count}");
+
+                updateController.GetGracenoteLayer1Updates(lowest);
+                Log.Info($"Number of Layer1 Item updates is: {updateController.Layer1DataUpdatesRequiredList.Count}");
+
+                updateController.GetGracenoteLayer2Updates(lowest);
+                Log.Info($"Number of Layer2 Item updates is: {updateController.Layer2DataUpdatesRequiredList.Count}");
+
 
             }
             catch (Exception spex)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
@@ -21,7 +22,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                return Get(t => t.GN_ProviderId == gnProviderId);
+                return Get(t => t.GN_ProviderId == gnProviderId && t.RequiresEnrichment == false);
             }
         }
 
@@ -42,6 +43,20 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 return minVal.Mapping_UpdateId;
             }
         }
-        
+
+        public void UpdateMappingData(Guid uuid, GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping mappingData, string nextUpdateId, string maxUpdateId)
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var rowdata = Get(i => i.IngestUUID == uuid);
+                rowdata.Mapping_UpdateId = mappingData.updateId;
+                rowdata.Mapping_UpdateDate = DateTime.Now;
+                rowdata.Mapping_NextUpdateId = nextUpdateId;
+                rowdata.Mapping_MaxUpdateId = maxUpdateId;
+                rowdata.UpdatesChecked = DateTime.Now;
+                rowdata.RequiresEnrichment = true;
+                Update(rowdata);
+            }
+        }
     }
 }

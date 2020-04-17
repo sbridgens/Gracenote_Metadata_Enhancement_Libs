@@ -41,6 +41,11 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _layer2TrackingDal.Delete(entity);
         }
 
+        public void SetLayer2RequiresUpdate(Layer2UpdateTracking rowData, bool updateValue)
+        {
+            _layer2TrackingDal.SetLayer2RequiresUpdate(rowData, updateValue);
+        }
+
         public Layer2UpdateTracking GetTrackingItemByUid(Guid ingestUuid)
         {
             return _layer2TrackingDal.GetTrackingItemByUid(ingestUuid);
@@ -49,6 +54,11 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
         public Layer2UpdateTracking GetTrackingItemByConnectorId(string connectorId)
         {
             return _layer2TrackingDal.GetTrackingItemByConnectorId(connectorId);
+        }
+
+        public Layer2UpdateTracking GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId)
+        {
+            return _layer2TrackingDal.GetTrackingItemByConnectorIdAndRootId(connectorId, rootId);
         }
 
         public string GetLowestLayer2UpdateId()

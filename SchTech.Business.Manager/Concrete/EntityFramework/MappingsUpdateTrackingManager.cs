@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.Entities.ConcreteTypes;
@@ -59,6 +60,11 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
         public string GetLowestTrackerMappingUpdateId()
         {
             return _updateTrackingDal.GetLowestGnMappingDataUpdateId();
+        }
+
+        public void UpdateMappingData(Guid uuid, GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping mappingData, string nextUpdateId, string maxUpdateId)
+        {
+            _updateTrackingDal.UpdateMappingData(uuid, mappingData, nextUpdateId, maxUpdateId);
         }
     }
 }

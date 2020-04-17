@@ -13,6 +13,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             HasKey(x => x.Id);
             
             Property(x => x.IngestUUID).HasColumnName("IngestUUID");
+            Property(x => x.GN_Paid).HasColumnName("GN_Paid");
             Property(x => x.GN_connectorId).HasColumnName("GN_connectorId");
             Property(x => x.Layer2_UpdateId).HasColumnName("Layer2_UpdateId");
             Property(x => x.Layer2_UpdateDate).HasColumnName("Layer2_UpdateDate");
