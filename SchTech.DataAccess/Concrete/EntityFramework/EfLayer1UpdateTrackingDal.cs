@@ -37,13 +37,32 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 var rowData = Get(t => t.GN_TMSID == tmsId && t.Layer1_RootId == rootId && t.RequiresEnrichment == false);
 
-                if (mapContext.MappingsUpdateTracking.FirstOrDefault(m => m.Mapping_RootId == rootId && m.RequiresEnrichment == false) == null)
+                if (rowData == null)
+                    return null;
+
+                var mappingFalse = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
+                    m.IngestUUID == rowData.IngestUUID &&
+                    m.RequiresEnrichment == false);
+
+                var l2data = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 =>
+                    l1.IngestUUID == rowData.IngestUUID &&
+                    l1.RequiresEnrichment == false);
+
+                if (mappingFalse != null)
                 {
-                    return rowData;
+                    mappingFalse.RequiresEnrichment = true;
+                    mapContext.SaveChanges();
                 }
 
-                SetLayer1RequiresUpdate(rowData,true);
-                return null;
+                if (l2data != null)
+                {
+                    l2data.RequiresEnrichment = true;
+                    mapContext.SaveChanges();
+                }
+
+                SetLayer1RequiresUpdate(rowData, true);
+                return rowData;
+
             }
         }
 
