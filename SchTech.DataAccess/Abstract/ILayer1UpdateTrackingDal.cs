@@ -1,4 +1,5 @@
 ﻿using System;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
 
@@ -17,6 +18,8 @@ namespace SchTech.DataAccess.Abstract
         string GetLowestLayer1UpdateId();
 
         string GetLowestTrackerLayer1UpdateId();
-        
+
+        void UpdateLayer1Data(Guid uuid, GnApiProgramsSchema.programsProgram programData,
+            string nextUpdateId, string maxUpdateId);
     }
 }

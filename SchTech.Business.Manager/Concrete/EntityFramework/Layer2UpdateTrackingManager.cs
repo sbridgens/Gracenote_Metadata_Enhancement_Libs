@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.Entities.ConcreteTypes;
@@ -70,7 +71,10 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
         {
             return _layer2TrackingDal.GetLowestTrackerLayer2UpdateId();
         }
-        
-        
+
+        public void UpdateLayer2Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)
+        {
+            _layer2TrackingDal.UpdateLayer2Data(uuid, programData, nextUpdateId, maxUpdateId);
+        }
     }
 }

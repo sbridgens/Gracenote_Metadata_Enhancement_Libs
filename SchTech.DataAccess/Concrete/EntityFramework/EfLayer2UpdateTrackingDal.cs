@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
@@ -81,6 +82,22 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 var minVal = mapContext.MappingsUpdateTracking.OrderBy(u => u.Mapping_UpdateId).First();
                 return minVal.Mapping_UpdateId;
+            }
+        }
+
+        public void UpdateLayer2Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var rowData = Get(l1 => l1.IngestUUID == uuid);
+
+                rowData.Layer2_UpdateId = programData.updateId;
+                rowData.Layer2_UpdateDate = DateTime.Now;
+                rowData.Layer2_NextUpdateId = nextUpdateId;
+                rowData.Layer2_MaxUpdateId = maxUpdateId;
+                rowData.UpdatesChecked = DateTime.Now;
+                rowData.RequiresEnrichment = true;
+                Update(rowData);
             }
         }
     }

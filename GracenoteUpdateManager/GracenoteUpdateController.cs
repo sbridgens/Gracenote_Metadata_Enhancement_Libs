@@ -166,17 +166,22 @@ namespace GracenoteUpdateManager
                      select programs).ToList();
 
                 ApiManager.CoreProgramData = null;
-                
 
-                //check if any of the above are in the db?
-                foreach (var programMapping in from programMapping 
-                        in ApiManager.UpdateProgramData
-                        let layer1Exists = _layer1TrackingService.GetTrackingItemByTmsIdAndRootId(programMapping.TMSId, programMapping.rootId)
-                        where layer1Exists != null
-                        select programMapping)
+                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
+                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
+                
+                foreach (var programMapping in ApiManager.UpdateProgramData)
                 {
+                    var layer1Exists = _layer1TrackingService.GetTrackingItemByTmsIdAndRootId(programMapping.TMSId, programMapping.rootId);
+
+                    if(layer1Exists == null)
+                        continue;
+
                     Log.Info($"Layer1 TMSID: {programMapping.TMSId} with RootId: {programMapping.rootId} EXISTS IN THE DB Requires Update, Update id: {programMapping.updateId}");
                     Layer1DataUpdatesRequiredList.Add(programMapping);
+
+                    Log.Info($"Updating Layer1UpdateTracking Table with new Layer1 data for IngestUUID: { layer1Exists.IngestUUID} and TmsID: {layer1Exists.GN_TMSID}");
+                    _layer1TrackingService.UpdateLayer1Data(layer1Exists.IngestUUID, programMapping, nextUpdateId.ToString(), maxUpdateId.ToString());
                 }
 
                 //mappings requiring updates calculated and can be used to generate adi updates
@@ -215,16 +220,22 @@ namespace GracenoteUpdateManager
 
                 ApiManager.CoreProgramData = null;
 
+                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
+                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
 
-                //check if any of the above are in the db?
-                foreach (var programMapping in from programMapping
-                        in ApiManager.UpdateProgramData
-                                               let layer2Exists = _layer2TrackingService.GetTrackingItemByConnectorIdAndRootId(programMapping.connectorId, programMapping.rootId)
-                                               where layer2Exists != null
-                                               select programMapping)
+                foreach (var programMapping in ApiManager.UpdateProgramData)
                 {
-                    Log.Info($"Layer2 ConnectorId: {programMapping.connectorId} with RootId: {programMapping.rootId} EXISTS IN THE DB Requires Update, Update id: {programMapping.updateId}");
+                    var layer2Exists =
+                        _layer2TrackingService.GetTrackingItemByConnectorIdAndRootId(programMapping.connectorId, programMapping.rootId);
+
+                    if (layer2Exists == null)
+                        continue;
+
+                    Log.Info($"Layer1 TMSID: {programMapping.TMSId} with RootId: {programMapping.rootId} EXISTS IN THE DB Requires Update, Update id: {programMapping.updateId}");
                     Layer2DataUpdatesRequiredList.Add(programMapping);
+
+                    Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { layer2Exists.IngestUUID} and ConnectorId: {layer2Exists.GN_connectorId}");
+                    _layer2TrackingService.UpdateLayer2Data(layer2Exists.IngestUUID, programMapping, nextUpdateId.ToString(), maxUpdateId.ToString());
                 }
 
                 //mappings requiring updates calculated and can be used to generate adi updates
