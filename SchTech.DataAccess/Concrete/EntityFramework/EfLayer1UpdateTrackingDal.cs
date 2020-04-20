@@ -92,7 +92,6 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 var rowData = Get(l1 => l1.IngestUUID == uuid);
 
                 rowData.Layer1_UpdateId = programData.updateId;
-                rowData.Layer1_UpdateDate = DateTime.Now;
                 rowData.Layer1_NextUpdateId = nextUpdateId;
                 rowData.Layer1_MaxUpdateId = maxUpdateId;
                 rowData.UpdatesChecked = DateTime.Now;
