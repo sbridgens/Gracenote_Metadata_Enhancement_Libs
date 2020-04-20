@@ -7,7 +7,7 @@ using SchTech.Entities.ConcreteTypes;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {
-    public class GnProgramTypeLookupManager : IGnProgramTypeLookupService
+    public sealed class GnProgramTypeLookupManager : IGnProgramTypeLookupService
     {
         private readonly IGnProgramTypeLookupDal _gnProgramTypeLookupDal;
         

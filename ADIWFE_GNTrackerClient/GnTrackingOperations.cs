@@ -17,6 +17,8 @@ namespace ADIWFE_GNTrackerClient
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(GnTrackingOperations));
         private EfMappingsUpdateTrackingDal UpdateTrackerDal { get; set; }
+        private static long LowestUpdateId { get; set; }
+        private static long CurrentUpdateId { get; set; }
 
         public static void LogError(string functionName, string message, Exception ex)
         {
@@ -61,19 +63,32 @@ namespace ADIWFE_GNTrackerClient
             { 
                 GracenoteUpdateController updateController = new GracenoteUpdateController();
 
-                var lowest = updateController.GetLowestMappingValue(true, false);
-                Log.Info($"Lowest Mapping UpdateId returned: {lowest}");
-                updateController.GetGracenoteMappingData(lowest);
+
+                if(CurrentUpdateId==0)
+                    LowestUpdateId = Convert.ToInt64(updateController.GetLowestMappingValue(true, false));
+                if (CurrentUpdateId != 0)
+                {
+                    if (LowestUpdateId <= CurrentUpdateId)
+                    {
+                        LowestUpdateId = ++CurrentUpdateId;
+                    }
+                }
+
+                Log.Info($"Lowest Mapping UpdateId returned: {LowestUpdateId}");
+                updateController.GetGracenoteMappingData(LowestUpdateId.ToString());
+                //TODO: Get max update for mappings here!
 
                 Log.Info($"Number of mappings requiring updates is: {updateController.MappingsRequiringUpdate.Count}");
 
-                updateController.GetGracenoteLayer1Updates(lowest);
+                updateController.GetGracenoteLayer1Updates(LowestUpdateId.ToString());
                 Log.Info($"Number of Layer1 Item updates is: {updateController.Layer1DataUpdatesRequiredList.Count}");
 
-                updateController.GetGracenoteLayer2Updates(lowest);
+                //TODO: Get max update for layer1&2 here as they share the same call!
+                updateController.GetGracenoteLayer2Updates(LowestUpdateId.ToString());
                 Log.Info($"Number of Layer2 Item updates is: {updateController.Layer2DataUpdatesRequiredList.Count}");
-
-
+                
+                CurrentUpdateId = LowestUpdateId;
+                //TODO: Set a max mapping and layer update id, when the iterator is reached then start from the beginning and call db for lowest value.
             }
             catch (Exception spex)
             {

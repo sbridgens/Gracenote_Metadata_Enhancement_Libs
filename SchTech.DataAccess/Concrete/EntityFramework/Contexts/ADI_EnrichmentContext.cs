@@ -30,7 +30,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
         public virtual Microsoft.EntityFrameworkCore.DbSet<MappingsUpdateTracking> MappingsUpdateTracking { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<Layer1UpdateTracking> Layer1UpdateTracking { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<Layer2UpdateTracking> Layer2UpdateTracking { get; set; }
-        
+        public virtual Microsoft.EntityFrameworkCore.DbSet<LatestUpdateIds> LatestUpdateIds { get; set; }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (optionsBuilder.IsConfigured)
@@ -53,6 +55,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
             _modelBuilder.Configurations.Add(new MappingsUpdateTrackingMap());
             _modelBuilder.Configurations.Add(new Layer1UpdateTrackingMap());
             _modelBuilder.Configurations.Add(new Layer2UpdateTrackingMap());
+            _modelBuilder.Configurations.Add(new LatestUpdateIdsMap());
         }
 
         /// <summary>

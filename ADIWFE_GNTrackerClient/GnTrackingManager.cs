@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using log4net;
-using SchTech.Configuration.Manager.Schema.ADIWFE;
+using SchTech.Configuration.Manager.Schema.GNUpdateTracker;
 using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace ADIWFE_GNTrackerClient
@@ -80,14 +80,23 @@ namespace ADIWFE_GNTrackerClient
 
         private void StartTrackingEngine()
         {
+            var canExecute = DateTime.Now;
+            var dtNow = DateTime.Now.AddMinutes(1);
+
             while (IsRunning)
             {
                 try
                 {
-                    EfAdiEnrichmentDal.IsWorkflowProcessing = false;
-                    GnTrackingOperations.StartOperations();
-                    Thread.Sleep(Convert.ToInt32(ADIWF_Config.PollIntervalInSeconds) * 1000);
+                    if(!EfAdiEnrichmentDal.IsWorkflowProcessing && canExecute <= dtNow)
+                    {
+                        EfAdiEnrichmentDal.IsWorkflowProcessing = false;
+                        GnTrackingOperations.StartOperations();
+                        canExecute = DateTime.Now.AddMinutes(Convert.ToInt32(GN_UpdateTracker_Config.PollIntervalInMinutes));
+                        Log.Info($"Next Poll will occur at: {canExecute}");
+                    }
 
+                    Thread.Sleep(30000);
+                    dtNow = DateTime.Now;
                 }
                 catch (Exception saeEx)
                 {
