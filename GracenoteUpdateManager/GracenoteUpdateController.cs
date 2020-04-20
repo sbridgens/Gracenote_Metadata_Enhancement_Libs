@@ -158,17 +158,19 @@ namespace GracenoteUpdateManager
 
                 var serializeMappingData = new XmlApiSerializationHelper<GnApiProgramsSchema.@on>();
                 ApiManager.CoreProgramData = serializeMappingData.Read(WorkflowEntities.GraceNoteUpdateData);
-                
+
+                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
+                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
+
+
                 ApiManager.UpdateProgramData =
-                    (from programs in ApiManager.CoreProgramData.programs
+                    (from programs in ApiManager.CoreProgramData?.programs
                      let tmsId = programs.TMSId
                      where tmsId != null
                      select programs).ToList();
 
                 ApiManager.CoreProgramData = null;
 
-                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
-                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
                 
                 foreach (var programMapping in ApiManager.UpdateProgramData)
                 {
@@ -212,16 +214,17 @@ namespace GracenoteUpdateManager
                 var serializeMappingData = new XmlApiSerializationHelper<GnApiProgramsSchema.@on>();
                 ApiManager.CoreProgramData = serializeMappingData.Read(WorkflowEntities.GraceNoteUpdateData);
 
+                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
+                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
+
                 ApiManager.UpdateProgramData =
-                    (from programs in ApiManager.CoreProgramData.programs
+                    (from programs in ApiManager.CoreProgramData?.programs
                      let tmsId = programs.TMSId
                      where tmsId != null
                      select programs).ToList();
 
                 ApiManager.CoreProgramData = null;
 
-                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
-                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
 
                 foreach (var programMapping in ApiManager.UpdateProgramData)
                 {
