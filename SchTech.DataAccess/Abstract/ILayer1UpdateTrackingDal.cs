@@ -16,9 +16,7 @@ namespace SchTech.DataAccess.Abstract
         Layer1UpdateTracking GetTrackingItemByTmsIdAndRootId(string tmsId, string rootId);
 
         string GetLowestLayer1UpdateId();
-
-        string GetLowestTrackerLayer1UpdateId();
-
+        
         void UpdateLayer1Data(Guid uuid, GnApiProgramsSchema.programsProgram programData,
             string nextUpdateId, string maxUpdateId);
     }

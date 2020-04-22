@@ -11,9 +11,11 @@ namespace SchTech.DataAccess.Abstract
 
         MappingsUpdateTracking GetTrackingItemByPidPaid(string gnProviderId);
 
-        string GetLowestGnMappingDataUpdateId();
+        long GetLastUpdateIdFromLatestUpdateIds();
 
-        string GetLowestTrackerMappingUpdateId();
+        string GetLowestUpdateIdFromMappingTable();
+
+        string GetLowestUpdateIdFromMappingTrackingTable();
 
         void UpdateMappingData(Guid uuid, GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping mappingData, string nextUpdateId, string maxUpdateId);
     }

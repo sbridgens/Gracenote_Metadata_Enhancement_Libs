@@ -27,11 +27,12 @@ namespace GracenoteUpdateManager
         private readonly IMappingsUpdateTrackingService _mappingsTrackerService;
         private readonly ILayer1UpdateTrackingService _layer1TrackingService;
         private readonly ILayer2UpdateTrackingService _layer2TrackingService;
-
         public List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping> MappingsRequiringUpdate { get; private set; }
-        
         public List<GnApiProgramsSchema.programsProgram> Layer1DataUpdatesRequiredList { get; private set; }
         public List<GnApiProgramsSchema.programsProgram> Layer2DataUpdatesRequiredList { get; private set; }
+
+        public static long NextMappingUpdateId { get; private set; }
+        public static long MaxMappingUpdateId { get; private set; }
 
         /*TODO
             1: Create db types and mappings = Done
@@ -65,21 +66,38 @@ namespace GracenoteUpdateManager
                           $" {ex.InnerException.Message}");
         }
 
-        public string GetLowestMappingValue(bool checkMapping, bool checkLayer1)
+        public long GetLowestMappingUpdateId()
         {
             try
             {
-                return checkMapping
-                    ? _mappingsTrackerService.GetLowestGnMappingDataUpdateId()
-                    : (checkLayer1
-                        ? _layer1TrackingService.GetLowestLayer1UpdateId()
-                        : _layer2TrackingService.GetLowestLayer2UpdateId());
+                //Get from tracking table but fallback to mapping if there is no entry
+                var updateId = _mappingsTrackerService.GetLastUpdateIdFromLatestUpdateIds();
+
+                if(updateId == 0)
+                       updateId = Convert.ToInt64(_mappingsTrackerService.GetLowestUpdateIdFromMappingTrackingTable() ??
+                                                  _mappingsTrackerService.GetLowestUpdateIdFromMappingTable());
+
+                return updateId;
             }
             catch (Exception gmvex)
             {
                 LogError("GetLowestMappingValue",
-                    "Error Encountered Obtaining lowest db mapping value", gmvex);
-                return string.Empty;
+                    "Error Encountered Obtaining lowest db mapping Update ID", gmvex);
+                return 0;
+            }
+        }
+
+        public long GetLowestLayer1UpdateId()
+        {
+            try
+            {
+                return Convert.ToInt64(_layer1TrackingService.GetLowestLayer1UpdateId());
+            }
+            catch (Exception gmvex)
+            {
+                LogError("GetLowestLayer1UpdateId",
+                    "Error Encountered Obtaining lowest db Layer1 Update ID", gmvex);
+                return 0;
             }
         }
 
@@ -87,22 +105,37 @@ namespace GracenoteUpdateManager
         {
             try
             {
+                //Create a new List
                 MappingsRequiringUpdate = new List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping>();
                 
 
-
+                //Call the Gn api with a limit of 1000 for mapping updates
                 if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "ProgramMappings","1000"))
                 {
-                    Log.Error("Package Mapping data is Null cannot process package!");
+                    Log.Info($"No Mapping Updates for UpdateId: {dbUpdateId}");
                     return false;
                 }
 
+                //Serialize the results set
                 var serializeMappingData = new XmlApiSerializationHelper<GnOnApiProgramMappingSchema.@on>();
                 ApiManager.CoreGnMappingData = serializeMappingData.Read(WorkflowEntities.GraceNoteUpdateData);
 
-                var nextUpdateId = ApiManager.CoreGnMappingData?.header.streamData.nextUpdateId;
-                var maxUpdateId = ApiManager.CoreGnMappingData?.header.streamData.maxUpdateId;
+                //Obtain Next and Max update ids used for iteration and max workflow calls
+                MaxMappingUpdateId = ApiManager.CoreGnMappingData?.header.streamData.maxUpdateId ?? 0;
+                Log.Info($"Max Update ID: {MaxMappingUpdateId}");
 
+                NextMappingUpdateId = ApiManager.CoreGnMappingData?.header.streamData.nextUpdateId ?? 0;
+                Log.Info($"Next Update ID: {NextMappingUpdateId}");
+
+                if (NextMappingUpdateId == 0)
+                {
+                    //No next id so we reached the max.
+                    Log.Info($"Workflow for Mapping updates has reached the Maximum Update Id, Setting Next updateid to Maximum Id: {MaxMappingUpdateId}");
+                    NextMappingUpdateId = MaxMappingUpdateId;
+                }
+
+                //Parse the mapping results and keep only the items that relate to the current ingest platform
+                //only valid pid paid values starting with TITL belong to the current platform.
                 ApiManager.UpdateMappingsData = 
                     (from mapping in ApiManager.CoreGnMappingData?.programMappings.programMapping
                         let paid = mapping.link.FirstOrDefault(t => t.idType.ToLower().Equals("paid"))
@@ -110,28 +143,35 @@ namespace GracenoteUpdateManager
                         where paid.Value.ToLower().StartsWith("titl")
                         select mapping).ToList();
                 
+                //nullify the api results to cleanup resources
                 ApiManager.CoreGnMappingData = null;
 
-                //check if any of the above are in the db?
+                //check if any of the filtered results are currently in the db if so they likely require an update
                 foreach (var programMapping in ApiManager.UpdateMappingsData)
                 {
+                    //obtain the provider id value for checks on the db
                     var providerId = programMapping.link.FirstOrDefault(p => p.idType.ToLower().Equals("providerid"))?.Value;
-
+                    //continue if null
                     if (string.IsNullOrEmpty(providerId))
                         continue;
+                    //pid paid exists in the db based on providerid value
                     var exists = _mappingsTrackerService?.GetTrackingItemByPidPaid(providerId);
-
+                    //continue if null
                     if (exists == null)
                         continue;
 
                     Log.Info($"Mapping PIDPAID: {providerId} EXISTS IN THE DB Requires Update, Update id: {programMapping.updateId}");
+                    //update the the list for programs requiring adi updates
                     MappingsRequiringUpdate.Add(programMapping);
 
                     Log.Info($"Updating MappingsUpdateTracking Table with new mapping data for IngestUUID: {exists.IngestUUID} and PIDPAID: {exists.GN_ProviderId}");
-                    _mappingsTrackerService.UpdateMappingData(exists.IngestUUID, programMapping, nextUpdateId.ToString(), maxUpdateId.ToString());
+                    //set the tracker service to flag the related asset as requiring an update.
+                    //this flag will be used to trigger the adi creation service to generate a valid update against the correct ingestuuid.
+                    
+                    _mappingsTrackerService.UpdateMappingData(exists.IngestUUID, programMapping, NextMappingUpdateId.ToString(), MaxMappingUpdateId.ToString());
                 }
 
-                //mappings requiring updates calculated and can be used to generate adi updates
+                //mappings requiring updates finished being calculated and can now be used to generate adi updates
                 return true;
             }
             catch (Exception ggmdex)

@@ -67,11 +67,6 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _layer1TrackingDal.GetLowestLayer1UpdateId();
         }
         
-        public string GetLowestTrackerLayer1UpdateId()
-        {
-            return _layer1TrackingDal.GetLowestTrackerLayer1UpdateId();
-        }
-
         public void UpdateLayer1Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)
         {
             _layer1TrackingDal.UpdateLayer1Data(uuid, programData, nextUpdateId, maxUpdateId);

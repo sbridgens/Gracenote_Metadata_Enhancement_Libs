@@ -93,6 +93,14 @@
       <Project>{326210A7-92B9-43DC-A87D-6E6ACEB164FE}</Project>
       <Name>SchTech.Configuration.Manager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SchTech.Core\SchTech.Core.csproj">
+      <Project>{45D7D10A-D8B6-4381-995B-44F8E2E3D500}</Project>
+      <Name>SchTech.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SchTech.Entities\SchTech.Entities.csproj">
+      <Project>{FBEC6C57-4653-415B-86C0-31545F92E285}</Project>
+      <Name>SchTech.Entities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">

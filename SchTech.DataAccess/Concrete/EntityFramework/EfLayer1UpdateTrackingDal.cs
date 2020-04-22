@@ -75,16 +75,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 return minVal.Layer1_UpdateId;
             }
         }
-
-        public string GetLowestTrackerLayer1UpdateId()
-        {
-            using (var mapContext = new ADI_EnrichmentContext())
-            {
-                var minVal = mapContext.MappingsUpdateTracking.OrderBy(u => u.Mapping_UpdateId).First();
-                return minVal.Mapping_UpdateId;
-            }
-        }
-
+        
         public void UpdateLayer1Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)
         {
             using (var mapContext = new ADI_EnrichmentContext())

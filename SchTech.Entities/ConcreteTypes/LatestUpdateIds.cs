@@ -10,8 +10,8 @@ namespace SchTech.Entities.ConcreteTypes
     public class LatestUpdateIds : IEntity
     {
         public int id { get; set; }
-        public long LastMappingUpdateIdChecked { get; set; }
-        public long LastLayer1UpdateIdChecked { get; set; }
-        public long LastLayer2UpdateIdChecked { get; set; }
+        public Int64 LastMappingUpdateIdChecked { get; set; }
+        public Int64 LastLayer1UpdateIdChecked { get; set; }
+        public Int64 LastLayer2UpdateIdChecked { get; set; }
     }
 }

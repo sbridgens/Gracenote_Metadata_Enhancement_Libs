@@ -52,14 +52,19 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _updateTrackingDal.GetTrackingItemByPidPaid(gnProviderId);
         }
 
-        public string GetLowestGnMappingDataUpdateId()
+        public long GetLastUpdateIdFromLatestUpdateIds()
         {
-            return _updateTrackingDal.GetLowestGnMappingDataUpdateId();
+            return _updateTrackingDal.GetLastUpdateIdFromLatestUpdateIds();
         }
 
-        public string GetLowestTrackerMappingUpdateId()
+        public string GetLowestUpdateIdFromMappingTable()
         {
-            return _updateTrackingDal.GetLowestGnMappingDataUpdateId();
+            return _updateTrackingDal.GetLowestUpdateIdFromMappingTable();
+        }
+
+        public string GetLowestUpdateIdFromMappingTrackingTable()
+        {
+            return _updateTrackingDal.GetLowestUpdateIdFromMappingTrackingTable();
         }
 
         public void UpdateMappingData(Guid uuid, GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping mappingData, string nextUpdateId, string maxUpdateId)
