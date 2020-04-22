@@ -101,7 +101,7 @@ namespace GracenoteUpdateManager
             }
         }
 
-        public bool GetGracenoteMappingData(string dbUpdateId)
+        public bool GetGracenoteMappingData(string dbUpdateId, string apiLimit)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace GracenoteUpdateManager
                 
 
                 //Call the Gn api with a limit of 1000 for mapping updates
-                if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "ProgramMappings","1000"))
+                if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "ProgramMappings",apiLimit))
                 {
                     Log.Info($"No Mapping Updates for UpdateId: {dbUpdateId}");
                     return false;

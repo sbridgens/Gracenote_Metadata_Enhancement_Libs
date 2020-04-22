@@ -22,6 +22,10 @@ namespace SchTech.Configuration.Manager.Schema.GNUpdateTracker
         public static string Database_Name { get; set; }
         [XmlElement(ElementName = "Integrated_Security")]
         public static string Integrated_Security { get; set; }
+        [XmlElement(ElementName = "ApiMappingsLimit")]
+        public static string ApiMappingsLimit { get; set; }
+        [XmlElement(ElementName = "ApiLayer1and2Limit")]
+        public static string ApiLayer1and2Limit { get; set; }
         [XmlElement(ElementName = "PollIntervalInMinutes")]
         public static string PollIntervalInMinutes { get; set; }
     }

@@ -84,7 +84,6 @@ namespace ADIWFE_GNTrackerClient
                 //initialise lowestupdateid
                 var lowestUpdateId = GracenoteUpdateController.NextMappingUpdateId;
                 //checks the last updateid checked in the LatestUpdateIds db table
-                var mapId = UpdateIdsDal.Get(v => v.LastMappingUpdateIdChecked != 0);
 
                 //if no next updateid then obtain values from db
                 if (lowestUpdateId == 0)
@@ -98,7 +97,7 @@ namespace ADIWFE_GNTrackerClient
                         Log.Info(
                             $"No entry found in the LatestUpdateIds db table, adding new row with Mapping Update Id: {lowestUpdateId} and 0 for the Layer1/2 columns" +
                             $" these will update during workflow.");
-                        mapId = new LatestUpdateIds
+                        var mapId = new LatestUpdateIds
                         {
                             //use the lowest updateid
                             LastMappingUpdateIdChecked = lowestUpdateId,
@@ -116,7 +115,7 @@ namespace ADIWFE_GNTrackerClient
                 //Log the lowest update id
                 Log.Info($"Mapping UpdateId being used for Updates Call to Gracenote: {lowestUpdateId}");
                 //Call the GN OnApi function to retrieve the Mapping updates.
-                UpdateController.GetGracenoteMappingData(lowestUpdateId.ToString());
+                UpdateController.GetGracenoteMappingData(lowestUpdateId.ToString(), GN_UpdateTracker_Config.ApiMappingsLimit);
 
                 Log.Info(
                     $"Number of mappings requiring updates is: {UpdateController.MappingsRequiringUpdate.Count}");
