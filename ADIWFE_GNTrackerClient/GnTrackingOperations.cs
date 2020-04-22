@@ -29,7 +29,7 @@ namespace ADIWFE_GNTrackerClient
                           $" {ex.InnerException.Message}");
         }
 
-        public bool LoadAppConfig()
+        public static bool LoadAppConfig()
         {
 
             Log.Info("Loading application configuration");
@@ -128,16 +128,16 @@ namespace ADIWFE_GNTrackerClient
             }
         }
 
-        private void CheckMaxUpdates(long lowestUpdateId)
+        private static void CheckMaxUpdates(long lowestUpdateId)
         {
             try
             {
                 //Check if the current updateid is equal to the max updateid and log
-                if (lowestUpdateId == GracenoteUpdateController.MaxMappingUpdateId)
-                {
-                    Log.Info($"Workflow has reached the Maximum Gracenote Mapping UpdateId: {GracenoteUpdateController.MaxMappingUpdateId}");
-                    Log.Info($"Continuing to check if a next update id is available and if there are updates including in this id?");
-                }
+                if (lowestUpdateId != GracenoteUpdateController.MaxMappingUpdateId)
+                    return;
+
+                Log.Info($"Workflow has reached the Maximum Gracenote Mapping UpdateId: {GracenoteUpdateController.MaxMappingUpdateId}");
+                Log.Info($"Continuing to check if a next update id is available and if there are updates including in this id?");
             }
             catch (Exception cmuException)
             {
