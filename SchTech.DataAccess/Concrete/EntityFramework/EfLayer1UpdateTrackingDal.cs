@@ -67,7 +67,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        public string GetLowestLayer1UpdateId()
+        public long GetLastUpdateIdFromLatestUpdateIds()
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var val = mapContext.LatestUpdateIds.FirstOrDefault();
+                return val?.LastLayer1UpdateIdChecked ?? 0;
+            }
+        }
+
+        public string GetLowestUpdateIdFromLayer1UpdateTrackingTable()
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
@@ -75,7 +84,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 return minVal.Layer1_UpdateId;
             }
         }
-        
+
+        public string GetLowestUpdateIdFromMappingTrackingTable()
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var minVal = mapContext.GN_Mapping_Data.OrderBy(u => u.GN_updateId).First();
+                return minVal.GN_updateId;
+            }
+        }
+
         public void UpdateLayer1Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)
         {
             using (var mapContext = new ADI_EnrichmentContext())

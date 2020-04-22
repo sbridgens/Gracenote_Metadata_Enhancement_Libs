@@ -62,9 +62,19 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _layer1TrackingDal.GetTrackingItemByTmsIdAndRootId(tmsId, rootId);
         }
 
-        public string GetLowestLayer1UpdateId()
+        public long GetLastUpdateIdFromLatestUpdateIds()
         {
-            return _layer1TrackingDal.GetLowestLayer1UpdateId();
+            return _layer1TrackingDal.GetLastUpdateIdFromLatestUpdateIds();
+        }
+
+        public string GetLowestUpdateIdFromLayer1UpdateTrackingTable()
+        {
+            return _layer1TrackingDal.GetLowestUpdateIdFromLayer1UpdateTrackingTable();
+        }
+
+        public string GetLowestUpdateIdFromMappingTrackingTable()
+        {
+            return _layer1TrackingDal.GetLowestUpdateIdFromMappingTrackingTable();
         }
         
         public void UpdateLayer1Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)

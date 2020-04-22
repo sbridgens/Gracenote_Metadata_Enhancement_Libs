@@ -29,7 +29,7 @@ namespace ADIWFE_GNTrackerClient
                           $" {ex.InnerException.Message}");
         }
 
-        public static bool LoadAppConfig()
+        public bool LoadAppConfig()
         {
 
             Log.Info("Loading application configuration");
@@ -70,6 +70,16 @@ namespace ADIWFE_GNTrackerClient
                     Log.Info("Mapping updates check successful");
                 }
 
+                if (CheckAndProcessProgramUpdates(1))
+                {
+                    Log.Info("Layer1 updates check successful"); 
+
+                }
+                if (CheckAndProcessProgramUpdates(2))
+                {
+                    Log.Info("Layer2 updates check successful");
+
+                }
             }
             catch (Exception spex)
             {
@@ -101,7 +111,7 @@ namespace ADIWFE_GNTrackerClient
                         {
                             //use the lowest updateid
                             LastMappingUpdateIdChecked = lowestUpdateId,
-                            //set to 0 for initialisation
+                            //set to Mapping Update for initialisation
                             LastLayer1UpdateIdChecked = 0,
                             LastLayer2UpdateIdChecked = 0
                         };
@@ -110,15 +120,14 @@ namespace ADIWFE_GNTrackerClient
                     }
                 }
                 //Check in order to log if we have reached max update id.
-
-                CheckMaxUpdates(lowestUpdateId);
+                CheckMaxUpdates(lowestUpdateId, "Mapping");
                 //Log the lowest update id
                 Log.Info($"Mapping UpdateId being used for Updates Call to Gracenote: {lowestUpdateId}");
                 //Call the GN OnApi function to retrieve the Mapping updates.
                 UpdateController.GetGracenoteMappingData(lowestUpdateId.ToString(), GN_UpdateTracker_Config.ApiMappingsLimit);
-
                 Log.Info(
                     $"Number of mappings requiring updates is: {UpdateController.MappingsRequiringUpdate.Count}");
+                UpdateLatestUpdateId();
                 return true;
             }
             catch (Exception capmuEx)
@@ -128,7 +137,52 @@ namespace ADIWFE_GNTrackerClient
             }
         }
 
-        private static void CheckMaxUpdates(long lowestUpdateId)
+        private void UpdateLatestUpdateId()
+        {
+            var updateTracker = UpdateIdsDal.Get(u => true);
+            updateTracker.LastMappingUpdateIdChecked = GracenoteUpdateController.NextMappingUpdateId;
+            updateTracker.LastLayer1UpdateIdChecked = GracenoteUpdateController.NextLayer1UpdateId;
+            updateTracker.LastLayer2UpdateIdChecked = GracenoteUpdateController.NextLayer2UpdateId;
+            UpdateIdsDal.Update(updateTracker);
+        }
+
+        private bool CheckAndProcessProgramUpdates(int layerId)
+        {
+            try
+            {
+                //initialise lowestupdateid
+                var lowestUpdateId = layerId == 1
+                    ? GracenoteUpdateController.NextLayer1UpdateId
+                    : GracenoteUpdateController.NextLayer2UpdateId;
+
+                if (lowestUpdateId == 0)
+                {
+                    lowestUpdateId = layerId == 1 ? UpdateController.GetLowestLayer1UpdateId() : 
+                                                    UpdateController.GetLowestLayer2UpdateId();
+                }
+                //Check Max Id for current layer
+                CheckMaxUpdates(lowestUpdateId, $"Layer{layerId}");
+
+                //Log the lowest update id
+                Log.Info($"Layer{layerId} UpdateId being used for Updates Call to Gracenote: {lowestUpdateId}");
+
+                //Call the GN OnApi function to retrieve the Mapping updates.
+                UpdateController.GetGracenoteProgramUpdates(lowestUpdateId.ToString(),  GN_UpdateTracker_Config.ApiLayer1and2Limit, layerId);
+
+                Log.Info(
+                    $"Number of Layer{layerId} Programs requiring updates is: {UpdateController.ProgramDataUpdatesRequiredList.Count}");
+                //Update the tracking id table.
+                UpdateLatestUpdateId();
+                return true;
+            }
+            catch (Exception cappuex)
+            {
+                LogError("CheckAndProcessProgramUpdates", $"Error during Parsing of {layerId} Updates", cappuex);
+                return false;
+            }
+        }
+
+        private static void CheckMaxUpdates(long lowestUpdateId, string level)
         {
             try
             {
@@ -136,12 +190,12 @@ namespace ADIWFE_GNTrackerClient
                 if (lowestUpdateId != GracenoteUpdateController.MaxMappingUpdateId)
                     return;
 
-                Log.Info($"Workflow has reached the Maximum Gracenote Mapping UpdateId: {GracenoteUpdateController.MaxMappingUpdateId}");
+                Log.Info($"Workflow has reached the Maximum Gracenote {level} UpdateId: {GracenoteUpdateController.MaxMappingUpdateId}");
                 Log.Info($"Continuing to check if a next update id is available and if there are updates including in this id?");
             }
             catch (Exception cmuException)
             {
-                LogError("CheckMaxUpdates", "Error While carrying out Max Updates Check", cmuException);
+                LogError("CheckMaxUpdates", $"Error While carrying out Max Updates Check for level: {level} and updateId: {lowestUpdateId}", cmuException);
             }
         }
     }

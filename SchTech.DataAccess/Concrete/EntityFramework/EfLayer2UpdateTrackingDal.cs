@@ -89,7 +89,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = Get(l1 => l1.IngestUUID == uuid);
+                var rowData = Get(l2 => l2.IngestUUID == uuid);
 
                 rowData.Layer2_UpdateId = programData.updateId;
                 rowData.Layer2_NextUpdateId = nextUpdateId;

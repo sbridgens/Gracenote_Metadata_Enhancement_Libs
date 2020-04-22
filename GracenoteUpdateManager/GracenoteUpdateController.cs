@@ -27,25 +27,17 @@ namespace GracenoteUpdateManager
         private readonly IMappingsUpdateTrackingService _mappingsTrackerService;
         private readonly ILayer1UpdateTrackingService _layer1TrackingService;
         private readonly ILayer2UpdateTrackingService _layer2TrackingService;
+
         public List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping> MappingsRequiringUpdate { get; private set; }
-        public List<GnApiProgramsSchema.programsProgram> Layer1DataUpdatesRequiredList { get; private set; }
-        public List<GnApiProgramsSchema.programsProgram> Layer2DataUpdatesRequiredList { get; private set; }
+        public List<GnApiProgramsSchema.programsProgram> ProgramDataUpdatesRequiredList { get; private set; }
 
         public static long NextMappingUpdateId { get; private set; }
         public static long MaxMappingUpdateId { get; private set; }
-
-        /*TODO
-            1: Create db types and mappings = Done
-            2: Create logic to parse db and process data from [GN_UpdateTracking] table
-            3: Call http://on-api.gracenote.com/v3/ProgramMappings?updateId=10938407543&limit=100&api_key=wgu7uhqcqyzspwxj28mxgy4b with lowest update id from point 2
-            4: parse call results and grab all pidpaid items matching platform
-            5: check db for pid paid values, if match update the tracker db row for update.
-            6: call http://on-api.gracenote.com/v3/Programs?updateId=10938407543&limit=100&api_key=wgu7uhqcqyzspwxj28mxgy4b which returns layer1 & 2 data
-            7: Parse call results and check rootids from 4 in tracking table against results
-            8: Link episode with sho data for layer 2 calls
-            9: any matches update the db row for update if an update has not been flagged
-         */
-
+        public static long NextLayer1UpdateId { get; private set; }
+        public static long MaxLayer1UpdateId { get; private set; }
+        public static long NextLayer2UpdateId { get; private set; }
+        public static long MaxLayer2UpdateId { get; private set; }
+        
         public GracenoteUpdateController()
         {
             _mappingsTrackerService = new MappingsUpdateTrackingManager(new EfMappingsUpdateTrackingDal());
@@ -91,7 +83,15 @@ namespace GracenoteUpdateManager
         {
             try
             {
-                return Convert.ToInt64(_layer1TrackingService.GetLowestLayer1UpdateId());
+                //1: Get from lastupdate table
+                //2: Get from tracking table
+                //3: Use lowest mapping updateid.
+                var updateId = _layer1TrackingService.GetLastUpdateIdFromLatestUpdateIds();
+
+                if (updateId == 0)
+                    updateId = Convert.ToInt64(_layer1TrackingService.GetLowestUpdateIdFromLayer1UpdateTrackingTable() ??
+                                               _layer1TrackingService.GetLowestUpdateIdFromMappingTrackingTable());
+                return updateId;
             }
             catch (Exception gmvex)
             {
@@ -99,6 +99,31 @@ namespace GracenoteUpdateManager
                     "Error Encountered Obtaining lowest db Layer1 Update ID", gmvex);
                 return 0;
             }
+        }
+
+        public long GetLowestLayer2UpdateId()
+        {
+            return 0;
+        }
+
+
+
+        private void BuildLayer1UpdatesList()
+        {
+            ApiManager.UpdateProgramData =
+                (from programs in ApiManager.CoreProgramData?.programs
+                    let tmsId = programs.TMSId
+                    where tmsId != null
+                    select programs).ToList();
+        }
+
+        private void BuildLayer2UpdatesList()
+        {
+            ApiManager.UpdateProgramData =
+                (from programs in ApiManager.CoreProgramData?.programs
+                    let connectorId = programs.connectorId
+                    where connectorId != null
+                    select programs).ToList();
         }
 
         public bool GetGracenoteMappingData(string dbUpdateId, string apiLimit)
@@ -170,7 +195,7 @@ namespace GracenoteUpdateManager
                     
                     _mappingsTrackerService.UpdateMappingData(exists.IngestUUID, programMapping, NextMappingUpdateId.ToString(), MaxMappingUpdateId.ToString());
                 }
-
+                
                 //mappings requiring updates finished being calculated and can now be used to generate adi updates
                 return true;
             }
@@ -183,47 +208,70 @@ namespace GracenoteUpdateManager
             }
         }
 
-        public bool GetGracenoteLayer1Updates(string dbUpdateId)
+        public bool GetGracenoteProgramUpdates(string dbUpdateId, string limit,  int layer)
         {
             try
             {
-                Layer1DataUpdatesRequiredList = new List<GnApiProgramsSchema.programsProgram>();
+                //initialise a new programs list
+                ProgramDataUpdatesRequiredList = new List<GnApiProgramsSchema.programsProgram>();
 
-
-                if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "Programs", "100"))
+                //call the programs api with set limit
+                if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "Programs", limit))
                 {
-                    Log.Error("Package Layer1 data is Null cannot process package!");
+                    //no layer data returned check errors
+                    Log.Error($"Package Layer{layer} data is Null cannot process package!");
                     return false;
                 }
 
+                //serialise returned gracenote program data
                 var serializeMappingData = new XmlApiSerializationHelper<GnApiProgramsSchema.@on>();
                 ApiManager.CoreProgramData = serializeMappingData.Read(WorkflowEntities.GraceNoteUpdateData);
 
-                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
-                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
+                //store maxid as local variable in order to set correct layer data
+                var maxid = ApiManager.CoreProgramData?.header.streamData.maxUpdateId ?? 0;
+                Log.Info($"Max Update ID for Layer{layer}: {maxid}");
+                //store nextid as local variable in order to set correct layer data
+                var nextId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId ?? 0;
+                Log.Info($"Next Update ID for Layer{layer}: {nextId}");
+                
 
-
-                ApiManager.UpdateProgramData =
-                    (from programs in ApiManager.CoreProgramData?.programs
-                     let tmsId = programs.TMSId
-                     where tmsId != null
-                     select programs).ToList();
+                switch (layer)
+                {
+                    //build correct program lists based on layer id
+                    case 1:
+                        MaxLayer1UpdateId = maxid;
+                        NextLayer1UpdateId = nextId;
+                        if (nextId == 0)
+                        {
+                            Log.Info($"Workflow for Layer{layer} updates has reached the Maximum Update Id, Setting Next updateid to Maximum Id: {maxid}");
+                            NextLayer1UpdateId = maxid;
+                        }
+                        BuildLayer1UpdatesList();
+                        break;
+                    default:
+                        MaxLayer2UpdateId = maxid;
+                        NextLayer2UpdateId = nextId;
+                        if (nextId == 0)
+                        {
+                            Log.Info($"Workflow for Layer{layer} updates has reached the Maximum Update Id, Setting Next updateid to Maximum Id: {maxid}");
+                            NextLayer2UpdateId = maxid;
+                        }
+                        BuildLayer2UpdatesList();
+                        break;
+                }
 
                 ApiManager.CoreProgramData = null;
-
-                
-                foreach (var programMapping in ApiManager.UpdateProgramData)
+                foreach (var programData in ApiManager.UpdateProgramData)
                 {
-                    var layer1Exists = _layer1TrackingService.GetTrackingItemByTmsIdAndRootId(programMapping.TMSId, programMapping.rootId);
-
-                    if(layer1Exists == null)
-                        continue;
-
-                    Log.Info($"Layer1 TMSID: {programMapping.TMSId} with RootId: {programMapping.rootId} EXISTS IN THE DB Requires Update, Update id: {programMapping.updateId}");
-                    Layer1DataUpdatesRequiredList.Add(programMapping);
-
-                    Log.Info($"Updating Layer1UpdateTracking Table with new Layer1 data for IngestUUID: { layer1Exists.IngestUUID} and TmsID: {layer1Exists.GN_TMSID}");
-                    _layer1TrackingService.UpdateLayer1Data(layer1Exists.IngestUUID, programMapping, nextUpdateId.ToString(), maxUpdateId.ToString());
+                    switch (layer)
+                    {
+                        case 1:
+                            ParseLayer1Updates(programData);
+                            break;
+                        default:
+                            ParseLayer2Updates(programData);
+                            break;
+                    }
                 }
 
                 //mappings requiring updates calculated and can be used to generate adi updates
@@ -238,59 +286,35 @@ namespace GracenoteUpdateManager
             }
         }
 
-        public bool GetGracenoteLayer2Updates(string dbUpdateId)
+        private void ParseLayer1Updates(GnApiProgramsSchema.programsProgram programData)
         {
-            try
-            {
-                Layer2DataUpdatesRequiredList = new List<GnApiProgramsSchema.programsProgram>();
+            var programExistsInDb =
+                _layer1TrackingService.GetTrackingItemByTmsIdAndRootId(programData.TMSId, programData.rootId);
 
+            if(programExistsInDb == null)
+                return;
 
-                if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "Programs", "100"))
-                {
-                    Log.Error("Package Layer2 data is Null cannot process package!");
-                    return false;
-                }
+            Log.Info($"Layer1 TMSID: {programData.TMSId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
+            ProgramDataUpdatesRequiredList.Add(programData);
 
-                var serializeMappingData = new XmlApiSerializationHelper<GnApiProgramsSchema.@on>();
-                ApiManager.CoreProgramData = serializeMappingData.Read(WorkflowEntities.GraceNoteUpdateData);
+            Log.Info($"Updating Layer1UpdateTracking Table with new Layer1 data for IngestUUID: { programExistsInDb.IngestUUID} and TmsID: {programExistsInDb.GN_TMSID}");
+            _layer1TrackingService.UpdateLayer1Data(programExistsInDb.IngestUUID, programData, NextLayer1UpdateId.ToString(), MaxLayer1UpdateId.ToString());
+        }
 
-                var nextUpdateId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId;
-                var maxUpdateId = ApiManager.CoreProgramData?.header.streamData.maxUpdateId;
+        private void ParseLayer2Updates(GnApiProgramsSchema.programsProgram programData)
+        {
+            var programExistsInDb =
+                _layer2TrackingService.GetTrackingItemByConnectorIdAndRootId(programData.connectorId,
+                    programData.rootId);
 
-                ApiManager.UpdateProgramData =
-                    (from programs in ApiManager.CoreProgramData?.programs
-                     let tmsId = programs.TMSId
-                     where tmsId != null
-                     select programs).ToList();
+            if(programExistsInDb == null)
+                return;
 
-                ApiManager.CoreProgramData = null;
+            Log.Info($"Layer2 ConnectorId: {programData.connectorId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
+            ProgramDataUpdatesRequiredList.Add(programData);
 
-
-                foreach (var programMapping in ApiManager.UpdateProgramData)
-                {
-                    var layer2Exists =
-                        _layer2TrackingService.GetTrackingItemByConnectorIdAndRootId(programMapping.connectorId, programMapping.rootId);
-
-                    if (layer2Exists == null)
-                        continue;
-
-                    Log.Info($"Layer1 TMSID: {programMapping.TMSId} with RootId: {programMapping.rootId} EXISTS IN THE DB Requires Update, Update id: {programMapping.updateId}");
-                    Layer2DataUpdatesRequiredList.Add(programMapping);
-
-                    Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { layer2Exists.IngestUUID} and ConnectorId: {layer2Exists.GN_connectorId}");
-                    _layer2TrackingService.UpdateLayer2Data(layer2Exists.IngestUUID, programMapping, nextUpdateId.ToString(), maxUpdateId.ToString());
-                }
-
-                //mappings requiring updates calculated and can be used to generate adi updates
-                return true;
-            }
-            catch (Exception ggl2Uex)
-            {
-                LogError(
-                    "GetGracenoteLayer2Updates",
-                    "Error During Parsing of GetGracenote Layer2 Data", ggl2Uex);
-                return false;
-            }
+            Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { programExistsInDb.IngestUUID} and ConnectorId: {programExistsInDb.GN_connectorId}");
+            _layer2TrackingService.UpdateLayer2Data(programExistsInDb.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
         }
     }
 }
