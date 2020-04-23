@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
@@ -13,7 +14,7 @@ namespace SchTech.DataAccess.Abstract
 
         Layer1UpdateTracking GetTrackingItemByTmsId(string tmsId);
 
-        Layer1UpdateTracking GetTrackingItemByTmsIdAndRootId(string tmsId, string rootId);
+        List<Layer1UpdateTracking> GetTrackingItemByTmsIdAndRootId(string tmsId, string rootId);
 
         long GetLastUpdateIdFromLatestUpdateIds();
 

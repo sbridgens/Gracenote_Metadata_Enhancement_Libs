@@ -290,15 +290,18 @@ namespace GracenoteUpdateManager
         {
             var programExistsInDb =
                 _layer1TrackingService.GetTrackingItemByTmsIdAndRootId(programData.TMSId, programData.rootId);
-
+            
             if(programExistsInDb == null)
                 return;
 
             Log.Info($"Layer1 TMSID: {programData.TMSId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
             ProgramDataUpdatesRequiredList.Add(programData);
 
-            Log.Info($"Updating Layer1UpdateTracking Table with new Layer1 data for IngestUUID: { programExistsInDb.IngestUUID} and TmsID: {programExistsInDb.GN_TMSID}");
-            _layer1TrackingService.UpdateLayer1Data(programExistsInDb.IngestUUID, programData, NextLayer1UpdateId.ToString(), MaxLayer1UpdateId.ToString());
+            foreach (var row in programExistsInDb)
+            {
+                Log.Info($"Updating Layer1UpdateTracking Table with new Layer1 data for IngestUUID: { row.IngestUUID} and TmsID: {row.GN_TMSID}");
+                _layer1TrackingService.UpdateLayer1Data(row.IngestUUID, programData, NextLayer1UpdateId.ToString(), MaxLayer1UpdateId.ToString());
+            }
         }
 
         private void ParseLayer2Updates(GnApiProgramsSchema.programsProgram programData)

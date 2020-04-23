@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess.EntityFramework;
@@ -32,36 +33,30 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        public Layer1UpdateTracking GetTrackingItemByTmsIdAndRootId(string tmsId, string rootId)
+        public List<Layer1UpdateTracking> GetTrackingItemByTmsIdAndRootId(string tmsId, string rootId)
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = Get(t => t.GN_TMSID == tmsId && t.Layer1_RootId == rootId && t.RequiresEnrichment == false);
+                var rowData = GetList(t => t.GN_TMSID == tmsId && t.Layer1_RootId == rootId && t.RequiresEnrichment == false);
 
-                if (rowData == null)
+                if (rowData.Count == 0)
                     return null;
 
-                var mappingFalse = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
-                    m.IngestUUID == rowData.IngestUUID &&
-                    m.RequiresEnrichment == false);
-
-                var l2data = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 =>
-                    l1.IngestUUID == rowData.IngestUUID &&
-                    l1.RequiresEnrichment == false);
-
-                if (mappingFalse != null)
+                foreach (var row in rowData)
                 {
-                    mappingFalse.RequiresEnrichment = true;
-                    mapContext.SaveChanges();
+                    var mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
+                        m.IngestUUID == row.IngestUUID && m.RequiresEnrichment == false);
+
+                    var l2data = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 =>
+                        l1.IngestUUID == row.IngestUUID &&
+                        l1.RequiresEnrichment == false);
+
+                    if (mapdata != null && l2data != null)
+                    {
+                        SetLayer1RequiresUpdate(row, true);
+                    }
                 }
 
-                if (l2data != null)
-                {
-                    l2data.RequiresEnrichment = true;
-                    mapContext.SaveChanges();
-                }
-
-                SetLayer1RequiresUpdate(rowData, true);
                 return rowData;
 
             }
@@ -99,7 +94,6 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             using (var mapContext = new ADI_EnrichmentContext())
             {
                 var rowData = Get(l1 => l1.IngestUUID == uuid);
-
                 rowData.Layer1_UpdateId = programData.updateId;
                 rowData.Layer1_NextUpdateId = nextUpdateId;
                 rowData.Layer1_MaxUpdateId = maxUpdateId;

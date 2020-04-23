@@ -49,20 +49,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     l1.IngestUUID == rowData.IngestUUID &&
                     l1.RequiresEnrichment == false);
 
-                if (layer1False != null)
+                if (mappingFalse != null && layer1False != null)
                 {
-                    layer1False.RequiresEnrichment = true;
-                    mapContext.SaveChanges();
+                    SetLayer2RequiresUpdate(rowData, true);
                 }
 
-                if (mappingFalse != null)
-                {
-                    mappingFalse.RequiresEnrichment = true;
-                    mapContext.SaveChanges();
-                }
-
-
-                SetLayer2RequiresUpdate(rowData, true);
                 return rowData;
             }
         }
