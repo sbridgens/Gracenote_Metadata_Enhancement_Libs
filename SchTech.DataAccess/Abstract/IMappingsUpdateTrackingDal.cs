@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
@@ -10,6 +11,8 @@ namespace SchTech.DataAccess.Abstract
         MappingsUpdateTracking GetTrackingItemByUid(Guid ingestUuid);
 
         MappingsUpdateTracking GetTrackingItemByPidPaid(string gnProviderId);
+
+        List<MappingsUpdateTracking> GetPackagesRequiringEnrichment();
 
         long GetLastUpdateIdFromLatestUpdateIds();
 

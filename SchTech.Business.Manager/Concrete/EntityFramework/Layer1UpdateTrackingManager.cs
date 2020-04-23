@@ -62,6 +62,11 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _layer1TrackingDal.GetTrackingItemByTmsIdAndRootId(tmsId, rootId);
         }
 
+        public List<Layer1UpdateTracking> GetPackagesRequiringEnrichment()
+        {
+            return _layer1TrackingDal.GetPackagesRequiringEnrichment();
+        }
+
         public long GetLastUpdateIdFromLatestUpdateIds()
         {
             return _layer1TrackingDal.GetLastUpdateIdFromLatestUpdateIds();

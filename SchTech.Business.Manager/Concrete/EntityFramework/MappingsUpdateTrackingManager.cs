@@ -52,6 +52,11 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _updateTrackingDal.GetTrackingItemByPidPaid(gnProviderId);
         }
 
+        public List<MappingsUpdateTracking> GetPackagesRequiringEnrichment()
+        {
+            return _updateTrackingDal.GetPackagesRequiringEnrichment();
+        }
+
         public long GetLastUpdateIdFromLatestUpdateIds()
         {
             return _updateTrackingDal.GetLastUpdateIdFromLatestUpdateIds();

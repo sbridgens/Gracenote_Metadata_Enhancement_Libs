@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Core.DataAccess.EntityFramework;
@@ -24,6 +25,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 return Get(t => t.GN_ProviderId == gnProviderId && t.RequiresEnrichment == false);
             }
+        }
+
+        public List<MappingsUpdateTracking> GetPackagesRequiringEnrichment()
+        {
+            return GetList(r => r.RequiresEnrichment);
         }
 
         public long GetLastUpdateIdFromLatestUpdateIds()

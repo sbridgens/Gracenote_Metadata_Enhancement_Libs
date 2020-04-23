@@ -62,6 +62,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
+        public List<Layer1UpdateTracking> GetPackagesRequiringEnrichment()
+        {
+            return GetList(r => r.RequiresEnrichment);
+        }
+
         public long GetLastUpdateIdFromLatestUpdateIds()
         {
             using (var mapContext = new ADI_EnrichmentContext())

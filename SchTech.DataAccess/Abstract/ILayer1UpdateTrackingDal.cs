@@ -16,6 +16,8 @@ namespace SchTech.DataAccess.Abstract
 
         List<Layer1UpdateTracking> GetTrackingItemByTmsIdAndRootId(string tmsId, string rootId);
 
+        List<Layer1UpdateTracking> GetPackagesRequiringEnrichment();
+
         long GetLastUpdateIdFromLatestUpdateIds();
 
         string GetLowestUpdateIdFromLayer1UpdateTrackingTable();

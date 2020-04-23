@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess;
 using SchTech.Entities.ConcreteTypes;
@@ -14,6 +15,8 @@ namespace SchTech.DataAccess.Abstract
         Layer2UpdateTracking GetTrackingItemByConnectorId(string connectorId);
 
         Layer2UpdateTracking GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId);
+
+        List<Layer2UpdateTracking> GetPackagesRequiringEnrichment();
 
         string GetLowestLayer2UpdateId();
 

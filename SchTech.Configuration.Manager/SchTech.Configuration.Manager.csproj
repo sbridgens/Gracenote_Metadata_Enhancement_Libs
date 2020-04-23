@@ -58,6 +58,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Schema\AdiGenerator\Adi_Generator_Config.cs" />
     <Compile Include="Schema\ADIWFE\AdiEnrichment_Config.cs" />
     <Compile Include="Schema\GNUpdateTracker\UpdateTracker_Config.cs" />
   </ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess.EntityFramework;
@@ -56,6 +57,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                 return rowData;
             }
+        }
+
+        public List<Layer2UpdateTracking> GetPackagesRequiringEnrichment()
+        {
+            return GetList(r => r.RequiresEnrichment);
         }
 
         public string GetLowestLayer2UpdateId()
