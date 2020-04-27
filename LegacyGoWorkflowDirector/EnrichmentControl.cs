@@ -225,7 +225,7 @@ namespace LegacyGoWorkflowDirector
 
             if (IsPackageAnUpdate && adiMajor != null)
             {
-                if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor))
+                if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor, adiMajor.VersionMinor))
                     return false;
 
                 Log.Info("Package is confirmed as a valid Update Package");

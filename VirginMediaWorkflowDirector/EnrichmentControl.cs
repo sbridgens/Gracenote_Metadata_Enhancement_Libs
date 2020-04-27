@@ -36,8 +36,8 @@ namespace VirginMediaWorkflowDirector
         private IAdiEnrichmentService _adiDataService;
 
         private readonly IGnImageLookupService _gnImageLookupService;
-
         private readonly IGnMappingDataService _gnMappingDataService;
+        private readonly ILayer1UpdateTrackingService _layer1UpdateTrackingService;
 
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         private AdiContentController AdiContentManager { get; }
@@ -62,6 +62,7 @@ namespace VirginMediaWorkflowDirector
             _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
             _gnImageLookupService = new GnImageLookupManager(new EfGnImageLookupDal());
             _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
+            _layer1UpdateTrackingService = new Layer1UpdateTrackingManager(new EfLayer1UpdateTrackingDal());
             GnMappingData = new GN_Mapping_Data();
         }
 
@@ -237,7 +238,7 @@ namespace VirginMediaWorkflowDirector
             }
 
             if (adiData?.VersionMajor != null)
-                IsPackageAnUpdate = EnhancementDataValidator.ValidateVersionMajor(adiData.VersionMajor, IsTvodPackage);
+                IsPackageAnUpdate = EnhancementDataValidator.ValidateVersionMajor(adiData.VersionMajor, adiData.VersionMinor, IsTvodPackage);
 
             if (IsPackageAnUpdate && adiData != null)
             {
@@ -384,8 +385,18 @@ namespace VirginMediaWorkflowDirector
                 {
                     if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
                     {
-                        Log.Info($"TMSID Mismatch updating db with new value.");
+                        Log.Info($"TMSID Mismatch updating ADI_Data and Layer1UpdateTracking Table with new value.");
                         GnMappingData.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
+                        //Update All TMSID's in the Layer1 tracking table with the tmsid update
+                        var layer1Data =
+                            _layer1UpdateTrackingService.GetList(t => t.GN_TMSID == GnMappingData.GN_TMSID);
+
+                        foreach (var l1Item in layer1Data)
+                        {
+                            Log.Info($"Updating TMSID {l1Item.GN_TMSID} in the Layer1 table with ingestUUID: {l1Item.IngestUUID} with new TmsID: {WorkflowEntities.GraceNoteTmsId}");
+                            l1Item.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
+                            _layer1UpdateTrackingService.Update(l1Item);
+                        }
                     }
 
                     Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");

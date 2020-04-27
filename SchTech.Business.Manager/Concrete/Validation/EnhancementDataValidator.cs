@@ -18,7 +18,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
         public static bool UpdateVersionFailure { get; set; }
 
-        public static bool ValidateVersionMajor(int? dbVersionMajor, bool isTvod = false)
+        public static bool ValidateVersionMajor(int? dbVersionMajor, int? dbVersionMinor, bool isTvod = false)
         {
             var adiVersionMajor = EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Major;
             var paid = EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
@@ -46,6 +46,16 @@ namespace SchTech.Business.Manager.Concrete.Validation
                 }
                 if (adiVersionMajor == dbVersionMajor)
                 {
+                    Log.Info($"Package Version Major matches DB Version Major, Checking version Minor.");
+
+                    if (ValidateVersionMinor(dbVersionMinor, isTvod))
+                    {
+                        Log.Info($"Confirmed that package with PAID: {paid} is an update. ");
+                        //ensure this is set for media unpack later in workflow
+                        ZipHandler.IsUpdatePackage = true;
+
+                        return true;
+                    }
                     EnrichmentWorkflowEntities.IsDuplicateIngest = true;
                     Log.Error($"Package for PAID: {paid} already exists, duplicate ingest detected! Failing Enhancement.");
                     return false;
@@ -61,6 +71,42 @@ namespace SchTech.Business.Manager.Concrete.Validation
             Log.Error(
                 $"Package for PAID: {paid} detected as an update does not have a database entry! Failing Enhancement.");
             return true;
+        }
+
+        private static bool ValidateVersionMinor(int? dbVersionMinor, bool isTvod = false)
+        {
+            var adiVersionMinor = EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor;
+            var paid = EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Asset_ID;
+            EnrichmentWorkflowEntities.IsDuplicateIngest = false;
+            UpdateVersionFailure = false;
+
+            Log.Info($"[Version Information] DB Version Minor: {dbVersionMinor}, ADI Version Minor: {adiVersionMinor}");
+
+            if (adiVersionMinor > dbVersionMinor)
+            {
+                if (EnrichmentWorkflowEntities.AdiFile.Asset.Asset?
+                        .FirstOrDefault()?.Content == null || isTvod)
+                {
+                    //ensure this is set for media unpack later in workflow
+                    ZipHandler.IsUpdatePackage = true;
+
+                    return true;
+                }
+
+                Log.Error("Metadata update contains a media section, failing ingest.");
+                return false;
+            }
+            if (adiVersionMinor == dbVersionMinor)
+            {
+                EnrichmentWorkflowEntities.IsDuplicateIngest = true;
+                Log.Error($"Package for PAID: {paid} already exists, duplicate ingest detected! Failing Enhancement.");
+                return false;
+            }
+
+            UpdateVersionFailure = true;
+            Log.Error(
+                $"Package for PAID: {paid} detected as an update but does not have a higher Version Minor! Failing Enhancement.");
+            return false;
         }
 
         public static bool IsProgramOneOffSpecial(GnApiProgramsSchema.programsProgram programData)

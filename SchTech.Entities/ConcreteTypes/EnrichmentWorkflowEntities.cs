@@ -78,6 +78,8 @@ namespace SchTech.Entities.ConcreteTypes
 
         public int AdiVersionMajor { get; private set; }
 
+        public int AdiVersionMinor { get; private set; }
+
         public int SeasonId { get; set; }
 
         public bool IsDateTime(string txtDate) => DateTime.TryParse(txtDate, out _);
@@ -117,14 +119,17 @@ namespace SchTech.Entities.ConcreteTypes
 
                 Log.Info("ADI Loaded correctly and will continue processing.");
 
-                if(!isUpdate && AdiFile != null)
+                if(AdiFile != null && !isUpdate)
                 {
                     AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
+                    AdiVersionMinor = AdiFile.Metadata.AMS.Version_Minor;
                 }
-                else
+                else if(isUpdate && UpdateAdi != null)
                 {
                     AdiVersionMajor = UpdateAdi.Metadata.AMS.Version_Major;
+                    AdiVersionMinor = UpdateAdi.Metadata.AMS.Version_Minor;
                 }
+
                 Log.Info($"Asset Version Major: {AdiVersionMajor}");
                 return true;
 
