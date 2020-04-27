@@ -319,5 +319,37 @@ namespace GracenoteUpdateManager
             Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { programExistsInDb.IngestUUID} and ConnectorId: {programExistsInDb.GN_connectorId}");
             _layer2TrackingService.UpdateLayer2Data(programExistsInDb.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
         }
+
+        public static int GetAdiVersionMinor()
+        {
+            return EnrichmentWorkflowEntities.UpdateAdi.Metadata.AMS.Version_Minor;
+        }
+
+        public static bool UpdateAllVersionMinorValues(int newVersionMinor)
+        {
+            try
+            {
+                //set main ams version minor
+                EnrichmentWorkflowEntities.UpdateAdi.Metadata.AMS.Version_Minor = newVersionMinor;
+                //set titl data ams version minor
+                EnrichmentWorkflowEntities.UpdateAdi.Asset.Metadata.AMS.Version_Minor = newVersionMinor;
+
+                //iterate any asset sections and update the version minor
+                foreach (var item in EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.ToList()
+                    .Where(item => item.Metadata.AMS.Version_Minor != newVersionMinor))
+                    item.Metadata.AMS.Version_Minor = newVersionMinor;
+
+                return true;
+            }
+            catch (Exception uavmvEx)
+            {
+                Log.Error("[UpdateAllVersionMinorValues] Error during update of version Minor" +
+                          $": {uavmvEx.Message}");
+
+                if (uavmvEx.InnerException != null)
+                    Log.Error($"[UpdateAllVersionMinorValues] Inner Exception: {uavmvEx.InnerException.Message}");
+                return false;
+            }
+        }
     }
 }

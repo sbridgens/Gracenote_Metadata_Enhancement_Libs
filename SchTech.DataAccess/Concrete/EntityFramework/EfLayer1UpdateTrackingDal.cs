@@ -42,19 +42,23 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 if (rowData.Count == 0)
                     return null;
 
-                foreach (var row in rowData)
-                {
-                    var mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
-                        m.IngestUUID == row.IngestUUID && m.RequiresEnrichment == false);
-
-                    var l2data = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 =>
-                        l1.IngestUUID == row.IngestUUID &&
-                        l1.RequiresEnrichment == false);
-
-                    if (mapdata != null && l2data != null)
+                foreach (var row in rowData
+                    .Select(row => new
                     {
-                        SetLayer1RequiresUpdate(row, true);
-                    }
+                        row,
+                        mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
+                            m.IngestUUID == row.IngestUUID && m.RequiresEnrichment == false)
+                    })
+                    .Select(@t => new
+                    {
+                        @t,
+                        l1data = mapContext.Layer2UpdateTracking.FirstOrDefault(l2 =>
+                            l2.IngestUUID == @t.row.IngestUUID && l2.RequiresEnrichment == false)
+                    })
+                    .Where(@t => @t.@t.mapdata != null && @t.l1data != null)
+                    .Select(@t => @t.@t.row))
+                {
+                    SetLayer1RequiresUpdate(row, true);
                 }
 
                 return rowData;

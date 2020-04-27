@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Remotion.Linq.Clauses.ResultOperators;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
@@ -23,7 +24,23 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                return Get(t => t.GN_ProviderId == gnProviderId && t.RequiresEnrichment == false);
+                var rowData = Get(t => t.GN_ProviderId == gnProviderId && t.RequiresEnrichment == false);
+
+                if (rowData == null)
+                    return null;
+
+                var layer1False = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 =>
+                    l1.IngestUUID == rowData.IngestUUID && l1.RequiresEnrichment == false);
+
+                var layer2False = mapContext.Layer2UpdateTracking.FirstOrDefault(l2 =>
+                    l2.IngestUUID == rowData.IngestUUID && l2.RequiresEnrichment == false);
+
+                if (layer1False != null && layer2False != null)
+                {
+                    return rowData;
+                }
+
+                return null;
             }
         }
 

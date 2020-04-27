@@ -50,7 +50,7 @@ namespace SchTech.Entities.ConcreteTypes
 
         public FileInfo CurrentPackage { get; set; }
 
-        public string CurrentWorkingDirectory { get; private set; }
+        public string CurrentWorkingDirectory { get; set; }
 
         public string TitlPaidValue { get; set; }
 
@@ -112,12 +112,19 @@ namespace SchTech.Entities.ConcreteTypes
                     UpdateAdi = new ADI();
                     UpdateAdi = XmlSerializer.Read(adiData);
                 }
-                if (AdiFile == null)
+                if (!isUpdate && AdiFile == null)
                     throw new Exception("Adi file is null check namespaces and adi document structure?");
 
                 Log.Info("ADI Loaded correctly and will continue processing.");
-                AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
-                
+
+                if(!isUpdate && AdiFile != null)
+                {
+                    AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
+                }
+                else
+                {
+                    AdiVersionMajor = UpdateAdi.Metadata.AMS.Version_Major;
+                }
                 Log.Info($"Asset Version Major: {AdiVersionMajor}");
                 return true;
 
@@ -143,8 +150,9 @@ namespace SchTech.Entities.ConcreteTypes
 
         public static bool CheckIfTvodAsset()
         {
-            var first = AdiFile.Asset.Asset?.FirstOrDefault();
-
+            ADIAssetAsset first = null;
+            first = AdiFile != null ? AdiFile.Asset.Asset?.FirstOrDefault() : UpdateAdi.Asset.Asset?.FirstOrDefault();
+            
             if (first == null || !first.Metadata.AMS.Product.ToLower().Contains("tvod"))
                 return false;
 
