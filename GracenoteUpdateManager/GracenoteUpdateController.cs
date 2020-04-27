@@ -163,6 +163,7 @@ namespace GracenoteUpdateManager
                 //only valid pid paid values starting with TITL belong to the current platform.
                 ApiManager.UpdateMappingsData = 
                     (from mapping in ApiManager.CoreGnMappingData?.programMappings.programMapping
+                        where mapping.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped
                         let paid = mapping.link.FirstOrDefault(t => t.idType.ToLower().Equals("paid"))
                         where paid != null
                         where paid.Value.ToLower().StartsWith("titl")

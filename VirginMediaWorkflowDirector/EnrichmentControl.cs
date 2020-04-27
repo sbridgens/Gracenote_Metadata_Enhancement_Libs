@@ -37,7 +37,9 @@ namespace VirginMediaWorkflowDirector
 
         private readonly IGnImageLookupService _gnImageLookupService;
         private readonly IGnMappingDataService _gnMappingDataService;
+        private readonly IMappingsUpdateTrackingService _mappingsUpdateTrackingService;
         private readonly ILayer1UpdateTrackingService _layer1UpdateTrackingService;
+        private readonly ILayer2UpdateTrackingService _layer2UpdateTrackingService;
 
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         private AdiContentController AdiContentManager { get; }
@@ -62,7 +64,9 @@ namespace VirginMediaWorkflowDirector
             _adiDataService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
             _gnImageLookupService = new GnImageLookupManager(new EfGnImageLookupDal());
             _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
+            _mappingsUpdateTrackingService = new MappingsUpdateTrackingManager(new EfMappingsUpdateTrackingDal());
             _layer1UpdateTrackingService = new Layer1UpdateTrackingManager(new EfLayer1UpdateTrackingDal());
+            _layer2UpdateTrackingService = new Layer2UpdateTrackingManager(new EfLayer2UpdateTrackingDal());
             GnMappingData = new GN_Mapping_Data();
         }
 
@@ -381,37 +385,37 @@ namespace VirginMediaWorkflowDirector
             {
                 GnMappingData = _gnMappingDataService.ReturnMapData(WorkflowEntities.IngestUuid);
 
-                if (GnMappingData != null)
+                if (GnMappingData == null)
+                    throw new NullReferenceException(
+                        $"Failed to update the GN Mapping table no Data received for IngestUuid:{WorkflowEntities.IngestUuid}! Is this Ingest a genuine Update?");
+
+
+                if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
                 {
-                    if (GnMappingData.GN_TMSID != WorkflowEntities.GraceNoteTmsId)
+                    Log.Info("TMSID Mismatch updating ADI_Data and Layer1UpdateTracking Table with new value.");
+                    GnMappingData.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
+                    //Update All TMSID's in the Layer1 tracking table with the tmsid update
+                    var layer1Data =
+                        _layer1UpdateTrackingService.GetList(t => t.GN_TMSID == GnMappingData.GN_TMSID);
+
+                    foreach (var l1Item in layer1Data.ToList())
                     {
-                        Log.Info($"TMSID Mismatch updating ADI_Data and Layer1UpdateTracking Table with new value.");
-                        GnMappingData.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
-                        //Update All TMSID's in the Layer1 tracking table with the tmsid update
-                        var layer1Data =
-                            _layer1UpdateTrackingService.GetList(t => t.GN_TMSID == GnMappingData.GN_TMSID);
-
-                        foreach (var l1Item in layer1Data)
-                        {
-                            Log.Info($"Updating TMSID {l1Item.GN_TMSID} in the Layer1 table with ingestUUID: {l1Item.IngestUUID} with new TmsID: {WorkflowEntities.GraceNoteTmsId}");
-                            l1Item.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
-                            _layer1UpdateTrackingService.Update(l1Item);
-                        }
+                        Log.Info($"Updating TMSID in the Layer1 table with ingestUUID: {l1Item.IngestUUID} with new TmsID: {WorkflowEntities.GraceNoteTmsId}");
+                        l1Item.GN_TMSID = WorkflowEntities.GraceNoteTmsId;
+                        _layer1UpdateTrackingService.Update(l1Item);
                     }
-
-                    Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
-                    var mapData = GetGnMappingData();
-                    GnMappingData.GN_Availability_Start = GetAvailability("start", mapData);
-                    GnMappingData.GN_Availability_End = GetAvailability("end", mapData);
-                    GnMappingData.GN_updateId = mapData?.updateId;
-                    _gnMappingDataService.Update(GnMappingData);
-
-
-                    return true;
                 }
 
-                throw new NullReferenceException(
-                    "Failed to update the GN Mapping table! Is this Ingest a genuine Update?");
+                Log.Info("Updating GN_Mapping_Data table with new gracenote mapping data.");
+                var mapData = GetGnMappingData();
+                GnMappingData.GN_Availability_Start = GetAvailability("start", mapData);
+                GnMappingData.GN_Availability_End = GetAvailability("end", mapData);
+                GnMappingData.GN_updateId = mapData?.updateId;
+                _gnMappingDataService.Update(GnMappingData);
+
+
+                return true;
+
             }
             catch (Exception ugmdex)
             {
@@ -1013,6 +1017,19 @@ namespace VirginMediaWorkflowDirector
                     .FirstOrDefault(c => c.Name.ToLower() == "content_filesize")?.Value;
 
                 _adiDataService.Update(AdiData);
+
+                Log.Info("Setting Updates Tracking data.");
+                if (AddOrUpdateMappingTrackingData() &&
+                    AddOrUpdateLayer1TrackingData() &&
+                    AddOrUpdateLayer2TrackingData())
+                {
+                    Log.Info("Successfully Set Tracking Data.");
+                }
+                else
+                {
+                    Log.Error("Failed to Set Tracking Data Check previous log entries.");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -1023,6 +1040,137 @@ namespace VirginMediaWorkflowDirector
             }
 
             return true;
+        }
+
+        private bool AddOrUpdateMappingTrackingData()
+        {
+            try
+            {
+                var mapTracking = _mappingsUpdateTrackingService.Get(m => m.IngestUUID == AdiData.IngestUUID);
+
+                if (mapTracking == null)
+                {
+
+                    mapTracking = new MappingsUpdateTracking
+                    {
+                        IngestUUID =  AdiData.IngestUUID,
+                        GN_ProviderId = AdiData.ProviderId,
+                        Mapping_MaxUpdateId = GnMappingData.GN_updateId,
+                        Mapping_NextUpdateId = GnMappingData.GN_updateId,
+                        Mapping_RootId = GnMappingData.GN_RootID,
+                        Mapping_UpdateDate = DateTime.Now,
+                        Mapping_UpdateId = GnMappingData.GN_updateId,
+                        UpdatesChecked = DateTime.Now,
+                        RequiresEnrichment = false
+                    };
+
+                    _mappingsUpdateTrackingService.Add(mapTracking);
+                }
+                else
+                {
+                    mapTracking.Mapping_UpdateId = GnMappingData.GN_updateId;
+                    mapTracking.UpdatesChecked = DateTime.Now;
+                    mapTracking.Mapping_RootId = GnMappingData.GN_RootID;
+                    mapTracking.RequiresEnrichment = false;
+
+                    _mappingsUpdateTrackingService.Update(mapTracking);
+                }
+                return true;
+            }
+            catch (Exception aoumtdException)
+            {
+                LogError("AddOrUpdateMappingTrackingData", "Failed to Set Mapping Tracking data.", aoumtdException);
+                return false;
+            }
+        }
+
+        private bool AddOrUpdateLayer1TrackingData()
+        {
+            try
+            {
+                var layer1Tracking = _layer1UpdateTrackingService.Get(l => l.IngestUUID == AdiData.IngestUUID);
+
+                if (layer1Tracking == null)
+                {
+
+                    layer1Tracking = new Layer1UpdateTracking
+                    {
+                        IngestUUID = AdiData.IngestUUID,
+                        GN_TMSID = GnMappingData.GN_TMSID,
+                        GN_Paid = GnMappingData.GN_Paid,
+                        Layer1_MaxUpdateId = GnMappingData.GN_updateId,
+                        Layer1_NextUpdateId = GnMappingData.GN_updateId,
+                        Layer1_RootId = GnMappingData.GN_RootID,
+                        Layer1_UpdateDate = DateTime.Now,
+                        Layer1_UpdateId = GnMappingData.GN_updateId,
+                        RequiresEnrichment = false
+                    };
+
+                    _layer1UpdateTrackingService.Add(layer1Tracking);
+                }
+                else
+                {
+                    layer1Tracking.GN_Paid = GnMappingData.GN_Paid;
+                    layer1Tracking.GN_TMSID = GnMappingData.GN_TMSID;
+                    layer1Tracking.Layer1_UpdateId = GnMappingData.GN_updateId;
+                    layer1Tracking.Layer1_RootId = GnMappingData.GN_RootID;
+                    layer1Tracking.UpdatesChecked = DateTime.Now;
+                    layer1Tracking.RequiresEnrichment = false;
+
+                    _layer1UpdateTrackingService.Update(layer1Tracking);
+                }
+                return true;
+            }
+            catch (Exception aoul1TdException)
+            {
+                LogError("AddOrUpdateLayer1TrackingData", "Failed to Set Layer1 Tracking data.", aoul1TdException);
+                return false;
+            }
+        }
+
+        private bool AddOrUpdateLayer2TrackingData()
+        {
+            try
+            {
+                var layer2Tracking = _layer2UpdateTrackingService.Get(l => l.IngestUUID == AdiData.IngestUUID);
+
+                if (layer2Tracking == null)
+                {
+
+                    layer2Tracking = new Layer2UpdateTracking
+                    {
+                        Id = 0,
+                        IngestUUID = AdiData.IngestUUID,
+                        GN_connectorId = GnMappingData.GN_connectorId,
+                        GN_Paid = GnMappingData.GN_Paid,
+                        Layer2_MaxUpdateId = GnMappingData.GN_updateId,
+                        Layer2_NextUpdateId = GnMappingData.GN_updateId,
+                        Layer2_RootId = GnMappingData.GN_RootID,
+                        Layer2_UpdateDate = DateTime.Now,
+                        Layer2_UpdateId = GnMappingData.GN_updateId,
+                        RequiresEnrichment = false
+                    };
+
+                    _layer2UpdateTrackingService.Add(layer2Tracking);
+                }
+                else
+                {
+                    layer2Tracking.GN_Paid = GnMappingData.GN_Paid;
+                    layer2Tracking.GN_connectorId = GnMappingData.GN_connectorId;
+                    layer2Tracking.Layer2_UpdateId = GnMappingData.GN_updateId;
+                    layer2Tracking.Layer2_RootId = GnMappingData.GN_RootID;
+                    layer2Tracking.UpdatesChecked = DateTime.Now;
+                    layer2Tracking.RequiresEnrichment = false;
+
+                    _layer2UpdateTrackingService.Update(layer2Tracking);
+                }
+                return true;
+            }
+            catch (Exception aoul1TdException)
+            {
+                LogError("AddOrUpdateLayer1TrackingData", "Failed to Set Layer1 Tracking data.", aoul1TdException);
+                return false;
+            }
         }
 
         public bool PackageEnrichedAsset()
