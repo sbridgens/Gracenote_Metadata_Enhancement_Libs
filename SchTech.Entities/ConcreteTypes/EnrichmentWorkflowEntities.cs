@@ -323,6 +323,11 @@ namespace SchTech.Entities.ConcreteTypes
             SerializeAdiFile(true, adidata);
         }
 
+        public void SetTitlPaidWithGnTitlPaid(string paidValue)
+        {
+            UpdateAdi.Asset.Metadata.AMS.Asset_ID = paidValue;
+        }
+
         public void SaveAdiFile(string filePath, ADI adiFileContent)
         {
             XmlSerializer = new XmlSerializationManager<ADI>();

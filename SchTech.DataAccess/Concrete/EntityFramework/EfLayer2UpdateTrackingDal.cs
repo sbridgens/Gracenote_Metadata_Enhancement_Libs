@@ -33,29 +33,34 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             }
         }
 
-        public Layer2UpdateTracking GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId)
+        public List<Layer2UpdateTracking> GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId)
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = Get(t => t.GN_connectorId == connectorId && t.Layer2_RootId == rootId && t.RequiresEnrichment == false);
+                var rowData = GetList(t => t.GN_connectorId == connectorId && 
+                                            t.Layer2_RootId == rootId && 
+                                            t.RequiresEnrichment == false);
 
-                if (rowData == null)
+                if (rowData.Count == 0)
                     return null;
 
-                var mappingFalse = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
-                    m.IngestUUID == rowData.IngestUUID &&
-                    m.RequiresEnrichment == false);
-
-                var layer1False = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 =>
-                    l1.IngestUUID == rowData.IngestUUID &&
-                    l1.RequiresEnrichment == false);
-
-                if (mappingFalse != null && layer1False != null)
+                foreach (var row in rowData)
                 {
-                    SetLayer2RequiresUpdate(rowData, true);
+                    var mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
+                        m.IngestUUID == row.IngestUUID);
+
+                    var layer1Data = mapContext.Layer1UpdateTracking.FirstOrDefault(l =>
+                        l.IngestUUID == row.IngestUUID);
+
+                    if(mapdata?.RequiresEnrichment == false && layer1Data?.RequiresEnrichment == false)
+                    {
+                        SetLayer2RequiresUpdate(row, true);
+                        //only return rowdata for items not requiring enrichment in the previous tables
+                        return rowData;
+                    }
                 }
 
-                return rowData;
+                return null;
             }
         }
 
@@ -63,17 +68,17 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             return GetList(r => r.RequiresEnrichment);
         }
-
-        public string GetLowestLayer2UpdateId()
+        
+        public string GetLowestUpdateIdFromLayer2UpdateTrackingTable()
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var minVal = mapContext.Layer1UpdateTracking.OrderBy(u => u.Layer1_UpdateId).First();
-                return minVal.Layer1_UpdateId;
+                var minVal = mapContext.Layer2UpdateTracking.OrderBy(u => u.Layer2_UpdateId).First();
+                return minVal.Layer2_UpdateId;
             }
         }
 
-        public string GetLowestTrackerLayer2UpdateId()
+        public string GetLowestUpdateIdFromMappingTrackingTable()
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
@@ -81,6 +86,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 return minVal.Mapping_UpdateId;
             }
         }
+
+        public long GetLastUpdateIdFromLatestUpdateIds()
+        {
+            using (var mapContext = new ADI_EnrichmentContext())
+            {
+                var val = mapContext.LatestUpdateIds.FirstOrDefault();
+                return val?.LastLayer2UpdateIdChecked ?? 0;
+            }
+        }
+
 
         public void UpdateLayer2Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)
         {

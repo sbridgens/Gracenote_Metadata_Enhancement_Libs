@@ -57,7 +57,7 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _layer2TrackingDal.GetTrackingItemByConnectorId(connectorId);
         }
 
-        public Layer2UpdateTracking GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId)
+        public List<Layer2UpdateTracking> GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId)
         {
             return _layer2TrackingDal.GetTrackingItemByConnectorIdAndRootId(connectorId, rootId);
         }
@@ -67,14 +67,19 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _layer2TrackingDal.GetPackagesRequiringEnrichment();
         }
 
-        public string GetLowestLayer2UpdateId()
+        public string GetLowestUpdateIdFromLayer2UpdateTrackingTable()
         {
-            return _layer2TrackingDal.GetLowestLayer2UpdateId();
+            return _layer2TrackingDal.GetLowestUpdateIdFromLayer2UpdateTrackingTable();
         }
         
-        public string GetLowestTrackerLayer2UpdateId()
+        public string GetLowestUpdateIdFromMappingTrackingTable()
         {
-            return _layer2TrackingDal.GetLowestTrackerLayer2UpdateId();
+            return _layer2TrackingDal.GetLowestUpdateIdFromMappingTrackingTable();
+        }
+
+        public long GetLastUpdateIdFromLatestUpdateIds()
+        {
+            return _layer2TrackingDal.GetLastUpdateIdFromLatestUpdateIds();
         }
 
         public void UpdateLayer2Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)

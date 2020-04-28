@@ -103,7 +103,21 @@ namespace GracenoteUpdateManager
 
         public long GetLowestLayer2UpdateId()
         {
-            return 0;
+            try
+            {
+                var updateId = _layer2TrackingService.GetLastUpdateIdFromLatestUpdateIds();
+
+                if (updateId == 0)
+                    updateId = Convert.ToInt64(_layer2TrackingService.GetLowestUpdateIdFromLayer2UpdateTrackingTable() ??
+                                               _layer2TrackingService.GetLowestUpdateIdFromMappingTrackingTable());
+                return updateId;
+            }
+            catch (Exception gmvex)
+            {
+                LogError("GetLowestLayer2UpdateId",
+                    "Error Encountered Obtaining lowest db Layer2 Update ID", gmvex);
+                return 0;
+            }
         }
 
 
@@ -262,6 +276,7 @@ namespace GracenoteUpdateManager
                 }
 
                 ApiManager.CoreProgramData = null;
+
                 foreach (var programData in ApiManager.UpdateProgramData)
                 {
                     switch (layer)
@@ -282,7 +297,7 @@ namespace GracenoteUpdateManager
             {
                 LogError(
                     "GetGracenoteLayer1Updates",
-                    "Error During Parsing of GetGracenote Layer1 Data", ggl1Uex);
+                    $"Error During Parsing of GetGracenote Layer{layer} Data", ggl1Uex);
                 return false;
             }
         }
@@ -317,8 +332,11 @@ namespace GracenoteUpdateManager
             Log.Info($"Layer2 ConnectorId: {programData.connectorId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
             ProgramDataUpdatesRequiredList.Add(programData);
 
-            Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { programExistsInDb.IngestUUID} and ConnectorId: {programExistsInDb.GN_connectorId}");
-            _layer2TrackingService.UpdateLayer2Data(programExistsInDb.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
+            foreach (var row in programExistsInDb)
+            {
+                Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { row.IngestUUID} and ConnectorId: {row.GN_connectorId}");
+                _layer2TrackingService.UpdateLayer2Data(row.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
+            }
         }
 
         public static int GetAdiVersionMinor()

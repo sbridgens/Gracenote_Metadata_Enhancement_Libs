@@ -24,18 +24,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = Get(t => t.GN_ProviderId == gnProviderId && t.RequiresEnrichment == false);
+                var rowData = Get(t => t.RequiresEnrichment == false && t.GN_ProviderId == gnProviderId);
 
                 if (rowData == null)
                     return null;
 
-                var layer1False = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 =>
-                    l1.IngestUUID == rowData.IngestUUID && l1.RequiresEnrichment == false);
+                var layer1False = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 => l1.IngestUUID == rowData.IngestUUID);
 
-                var layer2False = mapContext.Layer2UpdateTracking.FirstOrDefault(l2 =>
-                    l2.IngestUUID == rowData.IngestUUID && l2.RequiresEnrichment == false);
+                var layer2False = mapContext.Layer2UpdateTracking.FirstOrDefault(l2 => l2.IngestUUID == rowData.IngestUUID);
 
-                if (layer1False != null && layer2False != null)
+                if (layer1False?.RequiresEnrichment == false && layer2False?.RequiresEnrichment == false)
                 {
                     return rowData;
                 }

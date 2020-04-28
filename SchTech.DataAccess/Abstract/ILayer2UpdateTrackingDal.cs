@@ -14,13 +14,15 @@ namespace SchTech.DataAccess.Abstract
 
         Layer2UpdateTracking GetTrackingItemByConnectorId(string connectorId);
 
-        Layer2UpdateTracking GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId);
+        List<Layer2UpdateTracking> GetTrackingItemByConnectorIdAndRootId(string connectorId, string rootId);
 
         List<Layer2UpdateTracking> GetPackagesRequiringEnrichment();
 
-        string GetLowestLayer2UpdateId();
+        string GetLowestUpdateIdFromLayer2UpdateTrackingTable();
 
-        string GetLowestTrackerLayer2UpdateId();
+        string GetLowestUpdateIdFromMappingTrackingTable();
+
+        long GetLastUpdateIdFromLatestUpdateIds();
 
         void UpdateLayer2Data(Guid uuid, GnApiProgramsSchema.programsProgram programData,
             string nextUpdateId, string maxUpdateId);
