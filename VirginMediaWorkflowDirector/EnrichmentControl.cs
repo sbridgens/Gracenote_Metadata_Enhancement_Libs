@@ -569,6 +569,9 @@ namespace VirginMediaWorkflowDirector
             {
                 if (!WorkflowEntities.GetGracenoteProgramData())
                     return false;
+                //ensure this is updated in the current dataset
+                if (AdiContentController.DbImagesNullified)
+                    GnMappingData.GN_Images = string.Empty;
 
                 var serializeEpisodeMovieData =
                     new XmlApiSerializationHelper<GnApiProgramsSchema.@on>();
@@ -585,6 +588,7 @@ namespace VirginMediaWorkflowDirector
                 WorkflowEntities.GraceNoteUpdateId = ApiManager.GetUpdateId();
                 GnMappingData.GN_connectorId = WorkflowEntities.GraceNoteConnectorId;
                 _gnMappingDataService.Update(GnMappingData);
+
                 Log.Info("[GetGracenoteProgramEpisodeData] Successfully update GN Mapping table.");
                 ProgramTypes.SetProgramType(
                     ApiManager.MovieEpisodeProgramData.progType,
@@ -1018,18 +1022,18 @@ namespace VirginMediaWorkflowDirector
 
                 _adiDataService.Update(AdiData);
 
-                Log.Info("Setting Updates Tracking data.");
-                if (AddOrUpdateMappingTrackingData() &&
-                    AddOrUpdateLayer1TrackingData() &&
-                    AddOrUpdateLayer2TrackingData())
-                {
-                    Log.Info("Successfully Set Tracking Data.");
-                }
-                else
-                {
-                    Log.Error("Failed to Set Tracking Data Check previous log entries.");
-                    return false;
-                }
+                //Log.Info("Setting Updates Tracking data.");
+                //if (AddOrUpdateMappingTrackingData() &&
+                //    AddOrUpdateLayer1TrackingData() &&
+                //    AddOrUpdateLayer2TrackingData())
+                //{
+                //    Log.Info("Successfully Set Tracking Data.");
+                //}
+                //else
+                //{
+                //    Log.Error("Failed to Set Tracking Data Check previous log entries.");
+                //    return false;
+                //}
             }
             catch (Exception ex)
             {
@@ -1247,7 +1251,11 @@ namespace VirginMediaWorkflowDirector
                                         $"{WorkflowEntities.TitlPaidValue} was not found in the database?");
 
                 //Serialize previously enriched Adi File to obtain Asset data
-                WorkflowEntities.SerializeAdiFile(true, AdiData.EnrichedAdi);
+
+                if(AdiData.UpdateAdi != null)
+                    WorkflowEntities.SerializeAdiFile(true, AdiData.UpdateAdi, true);
+                else
+                    WorkflowEntities.SerializeAdiFile(true, AdiData.EnrichedAdi);
                 AdiData.TmsId = WorkflowEntities.GraceNoteTmsId;
                 AdiData.VersionMajor = AdiContentController.GetVersionMajor();
                 AdiData.VersionMinor = AdiContentController.GetVersionMinor();
@@ -1266,7 +1274,7 @@ namespace VirginMediaWorkflowDirector
 
                 //AdiContentController.RemoveMovieContentFromUpdate();
                 //Get original asset data and modify new adi.
-                if (!AdiContentController.CopyPreviouslyEnrichedAssetDataToAdi(
+                if (!AdiContentController.CopyPreviouslyEnrichedAssetDataToAdi(AdiData.IngestUUID,
                     ZipHandler.HasPreviewAsset,
                     AdiData.UpdateAdi != null))
                     return false;
@@ -1335,6 +1343,7 @@ namespace VirginMediaWorkflowDirector
                 $"{imageMapping}_{originalFileName}{Path.GetExtension(baseImage)}");
             return Path.Combine(WorkflowEntities.CurrentWorkingDirectory, newFileName);
         }
+
 
         private void UpdateDbImages()
         {

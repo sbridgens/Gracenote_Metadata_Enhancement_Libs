@@ -8,7 +8,11 @@ using SchTech.File.Manager.Concrete.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using SchTech.Business.Manager.Abstract.EntityFramework;
+using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.Business.Manager.Concrete.ImageLogic;
+using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace VirginMediaWorkflowDirector
 {
@@ -18,7 +22,8 @@ namespace VirginMediaWorkflowDirector
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentControl));
-
+        private static readonly IGnMappingDataService GnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
+        public static bool DbImagesNullified { get; private set; }
         private readonly List<string> _adiNodesToRemove = new List<string>
         {
             //look at the set or update method to add if not exists
@@ -251,16 +256,16 @@ namespace VirginMediaWorkflowDirector
 
 
         //Clone / Copy previous enrichment media data to current adi
-        public static bool CopyPreviouslyEnrichedAssetDataToAdi(bool hasPreviewAsset, bool hasPreviousUpdate)
+        public static bool CopyPreviouslyEnrichedAssetDataToAdi(Guid ingestGuid, bool hasPreviewAsset, bool hasPreviousUpdate)
         {
             try
             {
-                var enrichedDataHasImages =
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image");
+                DbImagesNullified = false;
+                var enrichedDataHasImages = hasPreviousUpdate ? EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image")
+                                                              : EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image");
 
-                var enrichedDataHasPreview =
-                    EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p =>
-                        p.Metadata.AMS.Asset_Class == "preview");
+                var enrichedDataHasPreview = hasPreviousUpdate ? EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(p =>  p.Metadata.AMS.Asset_Class == "preview") 
+                                                               : EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "preview");
 
                 //no enriched preview data,
                 //no preview asset supplied preview metadata included via incoming adi
@@ -271,8 +276,11 @@ namespace VirginMediaWorkflowDirector
                     CheckPreviewData();
                 }
 
+                var assetList = hasPreviousUpdate
+                    ? EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.ToList()
+                    : EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.ToList();
 
-                foreach (var assetData in EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.ToList())
+                foreach (var assetData in assetList)
                 {
                     if (assetData.Metadata.AMS.Asset_Class == "movie")
                     {
@@ -348,6 +356,20 @@ namespace VirginMediaWorkflowDirector
                     }
                     if (assetData.Metadata.AMS.Asset_Class == "image")
                     {
+                        //compare db gn_images column
+                        var adiImage = assetData.Metadata.App_Data.FirstOrDefault(v => v.Name == "Image_Qualifier")?.Value;
+                        Match match = Regex.Match(assetData.Content.Value, "(?m)p[0-9]{1,12}.*\\.[A-z]{3}");
+                        var imageMatch = string.Empty;
+
+                        if (match.Success)
+                        {
+                            if(DbImagesNullified == false)
+                                DbImagesNullified = CheckAdiImageMatchesDbImage(ingestGuid, 
+                                    assetData.Metadata.App_Data.FirstOrDefault(i => i.Name == "Image_Qualifier")?.Value, 
+                                    assetData.Content.Value);
+                        }
+
+
                         var imageSection = new ADIAssetAsset
                         {
                             Content = new ADIAssetAssetContent
@@ -360,41 +382,40 @@ namespace VirginMediaWorkflowDirector
                                 App_Data = assetData.Metadata.App_Data
                             }
                         };
-
                         EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
                     }
                 }
 
-                if (!enrichedDataHasImages && EnrichmentWorkflowEntities.UpdateAdi != null)
-                {
-                    if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.All(u => u.Metadata.AMS.Asset_Class != "image"))
-                    {
-                        Log.Warn("No image data found in the Enriched adi data or the Update Adi data? Continuing without this data.");
-                    }
-                    else
-                    {
-                        Log.Info("Cloning image data from db UpdateAdi data.");
+                //if (!enrichedDataHasImages && EnrichmentWorkflowEntities.UpdateAdi != null)
+                //{
+                //    if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.All(u => u.Metadata.AMS.Asset_Class != "image"))
+                //    {
+                //        Log.Warn("No image data found in the Enriched adi data or the Update Adi data? Continuing without this data.");
+                //    }
+                //    else
+                //    {
+                //        Log.Info("Cloning image data from db UpdateAdi data.");
 
-                        foreach (var imageSection in
-                            from assetData in EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.ToList()
-                            where assetData.Metadata.AMS.Asset_Class == "image"
-                            select new ADIAssetAsset
-                            {
-                                Content = new ADIAssetAssetContent
-                                {
-                                    Value = assetData.Content.Value
-                                },
-                                Metadata = new ADIAssetAssetMetadata
-                                {
-                                    AMS = assetData.Metadata.AMS,
-                                    App_Data = assetData.Metadata.App_Data
-                                }
-                            })
-                        {
-                            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
-                        }
-                    }
-                }
+                //        foreach (var imageSection in
+                //            from assetData in EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.ToList()
+                //            where assetData.Metadata.AMS.Asset_Class == "image"
+                //            select new ADIAssetAsset
+                //            {
+                //                Content = new ADIAssetAssetContent
+                //                {
+                //                    Value = assetData.Content.Value
+                //                },
+                //                Metadata = new ADIAssetAssetMetadata
+                //                {
+                //                    AMS = assetData.Metadata.AMS,
+                //                    App_Data = assetData.Metadata.App_Data
+                //                }
+                //            })
+                //        {
+                //            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
+                //        }
+                //    }
+                //}
 
                 return true;
             }
@@ -410,6 +431,42 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
+        //79bc7f8e-36e2-4ffa-93a5-00fd8bde766b, BoxCover, hzn4_adi_boxcover_p17613556_k_v12_ab.jpg
+        private static bool CheckAdiImageMatchesDbImage(Guid ingestGuid, string imageType, string adiImage)
+        {
+            try
+            {
+                var dbImages = GnMappingDataService.Get(i => i.IngestUUID == ingestGuid);
+                //p17613556_k_v12_ab.jpg    
+                var imageName = Regex.Match(adiImage, "(?m)p[0-9]{1,12}.*\\.[A-z]{3}");
+                string imgMatch;
+
+                //if not found return
+                if (!imageName.Success)
+                    return false;
+
+                //BoxCover: assets/p17613556_k_v12_ab.jpg
+                imgMatch = $"{imageType}: assets/{imageName.Value}";
+                //check value in the db images
+                var imgCompare = Regex.Match(dbImages.GN_Images, imgMatch);
+                //value matches db images so return
+                if (imgCompare.Success)
+                {
+                    return false;
+                }
+                //if we are here the adi does not match the db so nullify the db images to force a full update
+                Log.Warn("DB Images mismatch against Stored adi images, resetting db images and forcing image update.");
+                dbImages.GN_Images = string.Empty;
+                GnMappingDataService.Update(dbImages);
+            }
+            catch (Exception caimdiException)
+            {
+                Log.Error("[CheckAdiImageMatchesDbImage] Error during Check of adi and DB Images", caimdiException);
+                return false;
+            }
+
+            return true;
+        }
 
         public static bool UpdateAllVersionMajorValues(int newVersionMajor)
         {
