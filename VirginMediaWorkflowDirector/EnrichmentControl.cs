@@ -1022,18 +1022,18 @@ namespace VirginMediaWorkflowDirector
 
                 _adiDataService.Update(AdiData);
 
-                //Log.Info("Setting Updates Tracking data.");
-                //if (AddOrUpdateMappingTrackingData() &&
-                //    AddOrUpdateLayer1TrackingData() &&
-                //    AddOrUpdateLayer2TrackingData())
-                //{
-                //    Log.Info("Successfully Set Tracking Data.");
-                //}
-                //else
-                //{
-                //    Log.Error("Failed to Set Tracking Data Check previous log entries.");
-                //    return false;
-                //}
+                Log.Info("Setting Updates Tracking data.");
+                if (AddOrUpdateMappingTrackingData() &&
+                    AddOrUpdateLayer1TrackingData() &&
+                    AddOrUpdateLayer2TrackingData())
+                {
+                    Log.Info("Successfully Set Tracking Data.");
+                }
+                else
+                {
+                    Log.Error("Failed to Set Tracking Data Check previous log entries.");
+                    return false;
+                }
             }
             catch (Exception ex)
             {

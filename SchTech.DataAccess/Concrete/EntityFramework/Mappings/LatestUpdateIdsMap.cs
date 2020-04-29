@@ -15,6 +15,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             Property(x => x.LastMappingUpdateIdChecked).HasColumnName("LastMappingUpdateIdChecked");
             Property(x => x.LastLayer1UpdateIdChecked).HasColumnName("LastLayer1UpdateIdChecked");
             Property(x => x.LastLayer2UpdateIdChecked).HasColumnName("LastLayer2UpdateIdChecked");
+            Property(x => x.InOperation).HasColumnName("InOperation");
         }
     }
 }

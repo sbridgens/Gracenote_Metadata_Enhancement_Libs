@@ -5,5 +5,6 @@ namespace SchTech.DataAccess.Abstract
 {
     public interface ILatestUpdateIdsDal : IEntityRepository<LatestUpdateIds>
     {
+        void InUpdateOperation(bool inOperation);
     }
 }

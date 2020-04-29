@@ -62,8 +62,9 @@ namespace ADIWFE_GNTrackerClient
         public void StartOperations()
         {
             try
-            { 
+            {
                 UpdateController = new GracenoteUpdateController();
+                UpdateIdsDal.InUpdateOperation(true);
 
                 if (CheckAndProcessMappingUpdates())
                 {
@@ -72,18 +73,24 @@ namespace ADIWFE_GNTrackerClient
 
                 if (CheckAndProcessProgramUpdates(1))
                 {
-                    Log.Info("Layer1 updates check successful"); 
+                    Log.Info("Layer1 updates check successful");
 
                 }
+
                 if (CheckAndProcessProgramUpdates(2))
                 {
                     Log.Info("Layer2 updates check successful");
 
                 }
+
             }
             catch (Exception spex)
             {
                 LogError("StartOperations", "Error during Processing", spex);
+            }
+            finally
+            {
+                UpdateIdsDal.InUpdateOperation(false);
             }
         }
 

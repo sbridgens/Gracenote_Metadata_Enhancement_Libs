@@ -40,5 +40,10 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
         {
             return _latestUpdateIdsDal.Delete(entity);
         }
+
+        public void InUpdateOperation(bool inOperation)
+        {
+            _latestUpdateIdsDal.InUpdateOperation(inOperation);
+        }
     }
 }

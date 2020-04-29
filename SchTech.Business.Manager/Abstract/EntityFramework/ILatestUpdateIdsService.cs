@@ -4,5 +4,6 @@ namespace SchTech.Business.Manager.Abstract.EntityFramework
 {
     public interface ILatestUpdateIdsService : ILatestUpdateIdsDal
     {
+
     }
 }
