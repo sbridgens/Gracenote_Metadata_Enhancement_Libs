@@ -155,8 +155,7 @@ namespace SchTech.Entities.ConcreteTypes
 
         public static bool CheckIfTvodAsset()
         {
-            ADIAssetAsset first = null;
-            first = AdiFile != null ? AdiFile.Asset.Asset?.FirstOrDefault() : UpdateAdi.Asset.Asset?.FirstOrDefault();
+            ADIAssetAsset first = AdiFile != null ? AdiFile.Asset.Asset?.FirstOrDefault() : UpdateAdi.Asset.Asset?.FirstOrDefault();
             
             if (first == null || !first.Metadata.AMS.Product.ToLower().Contains("tvod"))
                 return false;
