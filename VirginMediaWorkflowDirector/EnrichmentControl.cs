@@ -1054,11 +1054,10 @@ namespace VirginMediaWorkflowDirector
 
                 if (mapTracking == null)
                 {
-
                     mapTracking = new MappingsUpdateTracking
                     {
-                        IngestUUID =  AdiData.IngestUUID,
-                        GN_ProviderId = AdiData.ProviderId,
+                        IngestUUID =  GnMappingData.IngestUUID,
+                        GN_ProviderId = GnMappingData.GN_ProviderId,
                         Mapping_MaxUpdateId = GnMappingData.GN_updateId,
                         Mapping_NextUpdateId = GnMappingData.GN_updateId,
                         Mapping_RootId = GnMappingData.GN_RootID,
@@ -1072,9 +1071,10 @@ namespace VirginMediaWorkflowDirector
                 }
                 else
                 {
+                    mapTracking.GN_ProviderId = GnMappingData.GN_ProviderId;
                     mapTracking.Mapping_UpdateId = GnMappingData.GN_updateId;
-                    mapTracking.UpdatesChecked = DateTime.Now;
                     mapTracking.Mapping_RootId = GnMappingData.GN_RootID;
+                    mapTracking.UpdatesChecked = DateTime.Now;
                     mapTracking.RequiresEnrichment = false;
 
                     _mappingsUpdateTrackingService.Update(mapTracking);
@@ -1099,14 +1099,15 @@ namespace VirginMediaWorkflowDirector
 
                     layer1Tracking = new Layer1UpdateTracking
                     {
-                        IngestUUID = AdiData.IngestUUID,
-                        GN_TMSID = GnMappingData.GN_TMSID,
+                        IngestUUID = GnMappingData.IngestUUID,
                         GN_Paid = GnMappingData.GN_Paid,
-                        Layer1_MaxUpdateId = GnMappingData.GN_updateId,
-                        Layer1_NextUpdateId = GnMappingData.GN_updateId,
-                        Layer1_RootId = GnMappingData.GN_RootID,
-                        Layer1_UpdateDate = DateTime.Now,
+                        GN_TMSID = GnMappingData.GN_TMSID,
                         Layer1_UpdateId = GnMappingData.GN_updateId,
+                        Layer1_UpdateDate = DateTime.Now,
+                        Layer1_NextUpdateId = GnMappingData.GN_updateId,
+                        Layer1_MaxUpdateId = GnMappingData.GN_updateId,
+                        Layer1_RootId = GnMappingData.GN_RootID,
+                        UpdatesChecked = DateTime.Now,
                         RequiresEnrichment = false
                     };
 
@@ -1143,15 +1144,15 @@ namespace VirginMediaWorkflowDirector
 
                     layer2Tracking = new Layer2UpdateTracking
                     {
-                        Id = 0,
-                        IngestUUID = AdiData.IngestUUID,
-                        GN_connectorId = GnMappingData.GN_connectorId,
+                        IngestUUID = GnMappingData.IngestUUID,
                         GN_Paid = GnMappingData.GN_Paid,
-                        Layer2_MaxUpdateId = GnMappingData.GN_updateId,
-                        Layer2_NextUpdateId = GnMappingData.GN_updateId,
-                        Layer2_RootId = GnMappingData.GN_RootID,
-                        Layer2_UpdateDate = DateTime.Now,
+                        GN_connectorId = GnMappingData.GN_connectorId,
                         Layer2_UpdateId = GnMappingData.GN_updateId,
+                        Layer2_UpdateDate = DateTime.Now,
+                        Layer2_NextUpdateId = GnMappingData.GN_updateId,
+                        Layer2_MaxUpdateId = GnMappingData.GN_updateId,
+                        Layer2_RootId = GnMappingData.GN_RootID,
+                        UpdatesChecked = DateTime.Now,
                         RequiresEnrichment = false
                     };
 
