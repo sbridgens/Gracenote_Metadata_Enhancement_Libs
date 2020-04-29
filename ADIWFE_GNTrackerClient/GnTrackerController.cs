@@ -9,12 +9,12 @@ using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace ADIWFE_GNTrackerClient
 {
-        public class GnTrackingManager
+        public class GnTrackerController
         {
             /// <summary>
             ///     Initialize Log4net
             /// </summary>
-            private static readonly ILog Log = LogManager.GetLogger(typeof(GnTrackingManager));
+            private static readonly ILog Log = LogManager.GetLogger(typeof(GnTrackerController));
 
             public static bool IsRunning { get; set; }
 
@@ -51,7 +51,7 @@ namespace ADIWFE_GNTrackerClient
                 }
             }
 
-            public GnTrackingManager()
+            public GnTrackerController()
             {
                 GnTrackingOperations = new GnTrackingOperations();
             }

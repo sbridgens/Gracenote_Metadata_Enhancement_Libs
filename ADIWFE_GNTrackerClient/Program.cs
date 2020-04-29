@@ -40,7 +40,7 @@ namespace ADIWFE_GNTrackerClient
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-            var manager = new GnTrackingManager();
+            var manager = new GnTrackerController();
 
             var thread = new Thread(manager.Workflow_Start);
             thread.Start(manager);
