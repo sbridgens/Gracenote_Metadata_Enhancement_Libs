@@ -25,7 +25,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
             EnrichmentWorkflowEntities.IsDuplicateIngest = false;
             UpdateVersionFailure = false;
 
-            if (dbVersionMajor > 0)
+            if (dbVersionMajor >= 0)
             {
                 Log.Info($"[Version Information] DB Version Major: {dbVersionMajor}, ADI Version Major: {adiVersionMajor}");
 
@@ -68,9 +68,8 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
             }
 
-            Log.Error(
-                $"Package for PAID: {paid} detected as an update does not have a database entry! Failing Enhancement.");
-            return true;
+            Log.Error( $"Package for PAID: {paid} detected as an update does not have a database entry for Version Major! Failing Enhancement.");
+            return false;
         }
 
         private static bool ValidateVersionMinor(int? dbVersionMinor, bool isTvod = false)

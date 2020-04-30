@@ -50,11 +50,14 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     var layer2Data = mapContext.Layer2UpdateTracking.FirstOrDefault(l =>
                         l.IngestUUID == row.IngestUUID);
 
-                    if (mapdata?.RequiresEnrichment == false && layer2Data?.RequiresEnrichment == false)
+                    if (mapdata?.RequiresEnrichment == false)
                     {
-                        SetLayer1RequiresUpdate(row, true);
-                        //only return rowdata for items not requiring enrichment in the previous tables
-                        return rowData;
+                        if(layer2Data?.RequiresEnrichment == false)
+                        {
+                            SetLayer1RequiresUpdate(row, true);
+                            //only return rowdata for items not requiring enrichment in the previous tables
+                            return rowData;
+                        }
                     }
                 }
 

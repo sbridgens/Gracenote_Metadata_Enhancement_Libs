@@ -436,28 +436,41 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
-                var dbImages = GnMappingDataService.Get(i => i.IngestUUID == ingestGuid);
-                //p17613556_k_v12_ab.jpg    
-                var imageName = Regex.Match(adiImage, "(?m)p[0-9]{1,12}.*\\.[A-z]{3}");
-                string imgMatch;
-
-                //if not found return
-                if (!imageName.Success)
-                    return false;
-
-                //BoxCover: assets/p17613556_k_v12_ab.jpg
-                imgMatch = $"{imageType}: assets/{imageName.Value}";
-                //check value in the db images
-                var imgCompare = Regex.Match(dbImages.GN_Images, imgMatch);
-                //value matches db images so return
-                if (imgCompare.Success)
+                if(imageType != null && adiImage != null)
                 {
-                    return false;
+                    var dbImages = GnMappingDataService.Get(i => i.IngestUUID == ingestGuid);
+
+                    if(dbImages != null)
+                    {
+                        //p17613556_k_v12_ab.jpg    
+                        var imageName = Regex.Match(adiImage, "(?m)p[0-9]{1,12}.*\\.[A-z]{3}");
+                        string imgMatch;
+
+                        //if not found return
+                        if (!imageName.Success)
+                            return false;
+
+                        //BoxCover: assets/p17613556_k_v12_ab.jpg
+                        imgMatch = $"{imageType}: assets/{imageName.Value}";
+                        //check value in the db images
+                        var imgCompare = Regex.Match(dbImages.GN_Images, imgMatch);
+                        //value matches db images so return
+                        if (imgCompare.Success)
+                        {
+                            return false;
+                        }
+
+                        //if we are here the adi does not match the db so nullify the db images to force a full update
+                        Log.Warn(
+                            "DB Images mismatch against Stored adi images, resetting db images and forcing image update.");
+                        dbImages.GN_Images = string.Empty;
+                        GnMappingDataService.Update(dbImages);
+                    }
+                    else
+                    {
+                        Log.Warn("Cannot check Adi Image Matches DB as the DB Images returned is Null.");
+                    }
                 }
-                //if we are here the adi does not match the db so nullify the db images to force a full update
-                Log.Warn("DB Images mismatch against Stored adi images, resetting db images and forcing image update.");
-                dbImages.GN_Images = string.Empty;
-                GnMappingDataService.Update(dbImages);
             }
             catch (Exception caimdiException)
             {
