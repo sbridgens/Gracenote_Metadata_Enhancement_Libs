@@ -205,9 +205,10 @@ namespace GracenoteUpdateManager
                     MappingsRequiringUpdate.Add(programMapping);
 
                     Log.Info($"Updating MappingsUpdateTracking Table with new mapping data for IngestUUID: {exists.IngestUUID} and PIDPAID: {exists.GN_ProviderId}");
+                    
                     //set the tracker service to flag the related asset as requiring an update.
                     //this flag will be used to trigger the adi creation service to generate a valid update against the correct ingestuuid.
-                    
+                    //Sets the update ids too
                     _mappingsTrackerService.UpdateMappingData(exists.IngestUUID, programMapping, NextMappingUpdateId.ToString(), MaxMappingUpdateId.ToString());
                 }
                 

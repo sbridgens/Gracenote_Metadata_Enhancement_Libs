@@ -167,17 +167,17 @@ namespace ADIWFE_GNTrackerClient
                     lowestUpdateId = layerId == 1 ? UpdateController.GetLowestLayer1UpdateId() : 
                                                     UpdateController.GetLowestLayer2UpdateId();
                 }
+
                 //Check Max Id for current layer
                 CheckMaxUpdates(lowestUpdateId, $"Layer{layerId}");
 
                 //Log the lowest update id
                 Log.Info($"Layer{layerId} UpdateId being used for Updates Call to Gracenote: {lowestUpdateId}");
 
-                //Call the GN OnApi function to retrieve the Mapping updates.
-                UpdateController.GetGracenoteProgramUpdates(lowestUpdateId.ToString(),  GN_UpdateTracker_Config.ApiLayer1and2Limit, layerId);
+                //Call the GN OnApi function to retrieve the Layer1/2 updates.
+                UpdateController.GetGracenoteProgramUpdates(lowestUpdateId.ToString(), GN_UpdateTracker_Config.ApiLayer1and2Limit, layerId);
 
-                Log.Info(
-                    $"Number of Layer{layerId} Programs requiring updates is: {UpdateController.ProgramDataUpdatesRequiredList.Count}");
+                Log.Info($"Number of Layer{layerId} Programs requiring updates is: {UpdateController.ProgramDataUpdatesRequiredList.Count}");
                 //Update the tracking id table.
                 UpdateLatestUpdateId();
                 return true;

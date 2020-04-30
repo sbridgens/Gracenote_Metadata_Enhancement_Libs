@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using log4net;
 using Remotion.Linq.Clauses.ResultOperators;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Core.DataAccess.EntityFramework;
@@ -12,6 +13,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 {
     public class EfMappingsUpdateTrackingDal : EfEntityRepositoryBase<MappingsUpdateTracking, ADI_EnrichmentContext>, IMappingsUpdateTrackingDal
     {
+        /// <summary>
+        ///     Initialize Log4net
+        /// </summary>
+        private static readonly ILog Log = LogManager.GetLogger(typeof(EfMappingsUpdateTrackingDal));
+
         public MappingsUpdateTracking GetTrackingItemByUid(Guid ingestUuid)
         {
             using (var mapContext = new ADI_EnrichmentContext())
@@ -83,9 +89,13 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             using (var mapContext = new ADI_EnrichmentContext())
             {
                 var rowdata = Get(i => i.IngestUUID == uuid);
+                Log.Debug($"Updating Mapping Update id with GN Value: {mappingData.updateId}");
                 rowdata.Mapping_UpdateId = mappingData.updateId;
-                rowdata.Mapping_UpdateDate = DateTime.Now;
+                Log.Debug($"Updating Mapping Update Date with GN Value: {mappingData.updateDate}");
+                rowdata.Mapping_UpdateDate = mappingData.updateDate;
+                Log.Debug($"Updating Mapping Next Update Id with GN Value: {nextUpdateId}");
                 rowdata.Mapping_NextUpdateId = nextUpdateId;
+                Log.Debug($"Updating Mapping Max Update Id with GN Value: {maxUpdateId}");
                 rowdata.Mapping_MaxUpdateId = maxUpdateId;
                 rowdata.UpdatesChecked = DateTime.Now;
                 rowdata.RequiresEnrichment = true;

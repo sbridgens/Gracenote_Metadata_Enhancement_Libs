@@ -1051,18 +1051,18 @@ namespace VirginMediaWorkflowDirector
             try
             {
                 var mapTracking = _mappingsUpdateTrackingService.Get(m => m.IngestUUID == AdiData.IngestUUID);
-
+                var updateId = WorkflowEntities.GraceNoteUpdateId;
                 if (mapTracking == null)
                 {
                     mapTracking = new MappingsUpdateTracking
                     {
                         IngestUUID =  GnMappingData.IngestUUID,
                         GN_ProviderId = GnMappingData.GN_ProviderId,
-                        Mapping_MaxUpdateId = GnMappingData.GN_updateId,
-                        Mapping_NextUpdateId = GnMappingData.GN_updateId,
-                        Mapping_RootId = GnMappingData.GN_RootID,
+                        Mapping_MaxUpdateId = updateId,
+                        Mapping_NextUpdateId = updateId,
+                        Mapping_RootId = WorkflowEntities.GraceNoteRootId,
                         Mapping_UpdateDate = DateTime.Now,
-                        Mapping_UpdateId = GnMappingData.GN_updateId,
+                        Mapping_UpdateId = updateId,
                         UpdatesChecked = DateTime.Now,
                         RequiresEnrichment = false
                     };
@@ -1072,8 +1072,8 @@ namespace VirginMediaWorkflowDirector
                 else
                 {
                     mapTracking.GN_ProviderId = GnMappingData.GN_ProviderId;
-                    mapTracking.Mapping_UpdateId = GnMappingData.GN_updateId;
-                    mapTracking.Mapping_RootId = GnMappingData.GN_RootID;
+                    mapTracking.Mapping_UpdateId = updateId;
+                    mapTracking.Mapping_RootId = WorkflowEntities.GraceNoteRootId;
                     mapTracking.UpdatesChecked = DateTime.Now;
                     mapTracking.RequiresEnrichment = false;
 
@@ -1092,21 +1092,22 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
+                //layer1 = CoreProgramData
                 var layer1Tracking = _layer1UpdateTrackingService.Get(l => l.IngestUUID == AdiData.IngestUUID);
-
+                var updateId = ApiManager.MovieEpisodeProgramData?.updateId ?? WorkflowEntities.GraceNoteUpdateId;
                 if (layer1Tracking == null)
                 {
 
                     layer1Tracking = new Layer1UpdateTracking
                     {
-                        IngestUUID = GnMappingData.IngestUUID,
+                        IngestUUID =  GnMappingData.IngestUUID,
                         GN_Paid = GnMappingData.GN_Paid,
-                        GN_TMSID = GnMappingData.GN_TMSID,
-                        Layer1_UpdateId = GnMappingData.GN_updateId,
+                        GN_TMSID = ApiManager.MovieEpisodeProgramData?.TMSId,
+                        Layer1_UpdateId = updateId,
                         Layer1_UpdateDate = DateTime.Now,
-                        Layer1_NextUpdateId = GnMappingData.GN_updateId,
-                        Layer1_MaxUpdateId = GnMappingData.GN_updateId,
-                        Layer1_RootId = GnMappingData.GN_RootID,
+                        Layer1_NextUpdateId = updateId,
+                        Layer1_MaxUpdateId = updateId,
+                        Layer1_RootId = ApiManager.MovieEpisodeProgramData?.rootId ?? WorkflowEntities.GraceNoteRootId,
                         UpdatesChecked = DateTime.Now,
                         RequiresEnrichment = false
                     };
@@ -1116,9 +1117,9 @@ namespace VirginMediaWorkflowDirector
                 else
                 {
                     layer1Tracking.GN_Paid = GnMappingData.GN_Paid;
-                    layer1Tracking.GN_TMSID = GnMappingData.GN_TMSID;
-                    layer1Tracking.Layer1_UpdateId = GnMappingData.GN_updateId;
-                    layer1Tracking.Layer1_RootId = GnMappingData.GN_RootID;
+                    layer1Tracking.GN_TMSID = ApiManager.MovieEpisodeProgramData?.TMSId;
+                    layer1Tracking.Layer1_UpdateId = updateId;
+                    layer1Tracking.Layer1_RootId = ApiManager.MovieEpisodeProgramData?.rootId ?? WorkflowEntities.GraceNoteRootId;
                     layer1Tracking.UpdatesChecked = DateTime.Now;
                     layer1Tracking.RequiresEnrichment = false;
 
@@ -1137,8 +1138,9 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
+                //layer2 = CoreSeriesData
                 var layer2Tracking = _layer2UpdateTrackingService.Get(l => l.IngestUUID == AdiData.IngestUUID);
-
+                var updateId = ApiManager.ShowSeriesSeasonProgramData?.updateId ?? WorkflowEntities.GraceNoteUpdateId;
                 if (layer2Tracking == null)
                 {
 
@@ -1146,12 +1148,12 @@ namespace VirginMediaWorkflowDirector
                     {
                         IngestUUID = GnMappingData.IngestUUID,
                         GN_Paid = GnMappingData.GN_Paid,
-                        GN_connectorId = GnMappingData.GN_connectorId,
-                        Layer2_UpdateId = GnMappingData.GN_updateId,
+                        GN_connectorId = ApiManager.ShowSeriesSeasonProgramData?.connectorId ?? WorkflowEntities.GraceNoteConnectorId,
+                        Layer2_UpdateId = updateId,
                         Layer2_UpdateDate = DateTime.Now,
-                        Layer2_NextUpdateId = GnMappingData.GN_updateId,
-                        Layer2_MaxUpdateId = GnMappingData.GN_updateId,
-                        Layer2_RootId = GnMappingData.GN_RootID,
+                        Layer2_NextUpdateId = updateId,
+                        Layer2_MaxUpdateId = updateId,
+                        Layer2_RootId = ApiManager.ShowSeriesSeasonProgramData?.rootId ?? WorkflowEntities.GraceNoteRootId,
                         UpdatesChecked = DateTime.Now,
                         RequiresEnrichment = false
                     };
@@ -1161,9 +1163,9 @@ namespace VirginMediaWorkflowDirector
                 else
                 {
                     layer2Tracking.GN_Paid = GnMappingData.GN_Paid;
-                    layer2Tracking.GN_connectorId = GnMappingData.GN_connectorId;
-                    layer2Tracking.Layer2_UpdateId = GnMappingData.GN_updateId;
-                    layer2Tracking.Layer2_RootId = GnMappingData.GN_RootID;
+                    layer2Tracking.GN_connectorId = ApiManager.ShowSeriesSeasonProgramData?.connectorId ?? WorkflowEntities.GraceNoteConnectorId;
+                    layer2Tracking.Layer2_UpdateId = updateId ?? WorkflowEntities.GraceNoteUpdateId;
+                    layer2Tracking.Layer2_RootId = ApiManager.ShowSeriesSeasonProgramData?.rootId ?? WorkflowEntities.GraceNoteRootId;
                     layer2Tracking.UpdatesChecked = DateTime.Now;
                     layer2Tracking.RequiresEnrichment = false;
 
