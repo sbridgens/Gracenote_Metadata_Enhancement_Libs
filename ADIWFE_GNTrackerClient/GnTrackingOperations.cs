@@ -147,10 +147,27 @@ namespace ADIWFE_GNTrackerClient
         private void UpdateLatestUpdateId()
         {
             var updateTracker = UpdateIdsDal.Get(u => true);
-            updateTracker.LastMappingUpdateIdChecked = GracenoteUpdateController.NextMappingUpdateId;
-            updateTracker.LastLayer1UpdateIdChecked = GracenoteUpdateController.NextLayer1UpdateId;
-            updateTracker.LastLayer2UpdateIdChecked = GracenoteUpdateController.NextLayer2UpdateId;
-            UpdateIdsDal.Update(updateTracker);
+            bool updated = false;
+
+            if (updateTracker.LastMappingUpdateIdChecked < GracenoteUpdateController.NextMappingUpdateId)
+            {
+                updateTracker.LastMappingUpdateIdChecked = GracenoteUpdateController.NextMappingUpdateId;
+                updated = true;
+            }
+
+            if (updateTracker.LastLayer1UpdateIdChecked < GracenoteUpdateController.NextLayer1UpdateId)
+            {
+                updateTracker.LastLayer1UpdateIdChecked = GracenoteUpdateController.NextLayer1UpdateId;
+                updated = true;
+            }
+
+            if (updateTracker.LastLayer2UpdateIdChecked < GracenoteUpdateController.NextLayer2UpdateId)
+            {
+                updateTracker.LastLayer2UpdateIdChecked = GracenoteUpdateController.NextLayer2UpdateId;
+                updated = true;
+            }
+            if(updated)
+                UpdateIdsDal.Update(updateTracker);
         }
 
         private bool CheckAndProcessProgramUpdates(int layerId)

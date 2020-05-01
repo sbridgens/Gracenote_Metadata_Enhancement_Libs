@@ -23,7 +23,8 @@ namespace GracenoteUpdateManager
         
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         private GraceNoteApiManager ApiManager { get; }
-
+        
+        private static readonly  IAdiEnrichmentService AdiEnrichmentService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
         private readonly IMappingsUpdateTrackingService _mappingsTrackerService;
         private readonly ILayer1UpdateTrackingService _layer1TrackingService;
         private readonly ILayer2UpdateTrackingService _layer2TrackingService;
@@ -340,9 +341,13 @@ namespace GracenoteUpdateManager
             }
         }
 
-        public static int GetAdiVersionMinor()
+        public static int GetAdiVersionMinor(Guid ingestGuid)
         {
-            return EnrichmentWorkflowEntities.UpdateAdi.Metadata.AMS.Version_Minor;
+            var versionMinor = AdiEnrichmentService.Get(i => i.IngestUUID == ingestGuid).VersionMinor;
+            if (versionMinor != null)
+                return (int) versionMinor;
+
+            return 0;
         }
 
         public static bool UpdateAllVersionMinorValues(int newVersionMinor)

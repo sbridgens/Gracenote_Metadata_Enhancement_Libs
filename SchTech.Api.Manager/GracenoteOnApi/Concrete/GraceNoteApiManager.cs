@@ -34,12 +34,9 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
             return externalLinks;
         }
 
-        public string GetUpdateId()
+        public string GetMappingUpdateId()
         {
-            //"10954028558"
-            if(string.IsNullOrEmpty(MovieEpisodeProgramData.updateId))
-                throw new Exception("No Gracenote UpdateId for package at this time, failing ingest.");
-            return MovieEpisodeProgramData.updateId;
+            return CoreGnMappingData.programMappings.programMapping.FirstOrDefault()?.updateId;
         }
 
         public string GetConnectorId()

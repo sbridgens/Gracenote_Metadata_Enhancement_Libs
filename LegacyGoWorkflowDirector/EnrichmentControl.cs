@@ -489,7 +489,8 @@ namespace LegacyGoWorkflowDirector
                 Log.Info("Successfully serialized Gracenote Episode/Movie data");
 
                 WorkflowEntities.GraceNoteConnectorId = ApiManager.GetConnectorId();
-                WorkflowEntities.GraceNoteUpdateId = ApiManager.GetUpdateId();
+                //Wrong place and call for this!
+                //WorkflowEntities.GraceNoteUpdateId = ApiManager.GetUpdateId();
                 GnMappingData.GN_connectorId = WorkflowEntities.GraceNoteConnectorId;
                 _gnMappingDataService.Update(GnMappingData);
 

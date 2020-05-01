@@ -82,7 +82,6 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             using (var mapContext = new ADI_EnrichmentContext())
             {
                 var val = mapContext.LatestUpdateIds.FirstOrDefault();
-
                 Log.Debug($"[GetLastUpdateIdFromLatestUpdateIds] Returning value {val?.LastLayer1UpdateIdChecked ?? 0} from LatestUpdateIds LastLayer1UpdateIdChecked");
                 return val?.LastLayer1UpdateIdChecked ?? 0;
             }

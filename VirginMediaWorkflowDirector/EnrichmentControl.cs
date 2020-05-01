@@ -327,6 +327,7 @@ namespace VirginMediaWorkflowDirector
                 {
                     Log.Info($"Asset Mapping status: {mapData.status}, Catalog Name: {mapData.catalogName}");
                     
+                    WorkflowEntities.GraceNoteUpdateId = mapData.updateId;
 
                     var data = new GN_Mapping_Data
                     {
@@ -585,7 +586,6 @@ namespace VirginMediaWorkflowDirector
                 Log.Info("Successfully serialized Gracenote Episode/Movie data");
 
                 WorkflowEntities.GraceNoteConnectorId = ApiManager.GetConnectorId();
-                WorkflowEntities.GraceNoteUpdateId = ApiManager.GetUpdateId();
                 GnMappingData.GN_connectorId = WorkflowEntities.GraceNoteConnectorId;
                 _gnMappingDataService.Update(GnMappingData);
 
@@ -1051,7 +1051,8 @@ namespace VirginMediaWorkflowDirector
             try
             {
                 var mapTracking = _mappingsUpdateTrackingService.Get(m => m.IngestUUID == AdiData.IngestUUID);
-                var updateId = WorkflowEntities.GraceNoteUpdateId;
+                var updateId = ApiManager.GetMappingUpdateId();
+                
                 if (mapTracking == null)
                 {
                     mapTracking = new MappingsUpdateTracking
@@ -1095,6 +1096,7 @@ namespace VirginMediaWorkflowDirector
                 //layer1 = CoreProgramData
                 var layer1Tracking = _layer1UpdateTrackingService.Get(l => l.IngestUUID == AdiData.IngestUUID);
                 var updateId = ApiManager.MovieEpisodeProgramData?.updateId ?? WorkflowEntities.GraceNoteUpdateId;
+
                 if (layer1Tracking == null)
                 {
 
