@@ -21,7 +21,7 @@ using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.File.Manager.Concrete.ZipArchive;
 using SchTech.Queue.Manager.Concrete;
-
+using SchTech.Web.Manager.Concrete;
 
 
 namespace VirginMediaWorkflowDirector
@@ -234,7 +234,7 @@ namespace VirginMediaWorkflowDirector
         {
             var adiData = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue);
 
-            if (IsPackageAnUpdate && adiData == null)
+            if (IsPackageAnUpdate & adiData == null)
             {
                 Log.Error(
                     $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
@@ -244,7 +244,7 @@ namespace VirginMediaWorkflowDirector
             if (adiData?.VersionMajor != null)
                 IsPackageAnUpdate = EnhancementDataValidator.ValidateVersionMajor(adiData.VersionMajor, adiData.VersionMinor, IsTvodPackage);
 
-            if (IsPackageAnUpdate && adiData != null)
+            if (IsPackageAnUpdate & adiData != null)
             {
                 Log.Info("Package is confirmed as a valid Update Package");
 
@@ -255,12 +255,12 @@ namespace VirginMediaWorkflowDirector
             }
 
 
-            if (!IsPackageAnUpdate && adiData != null && !EnhancementDataValidator.UpdateVersionFailure)
+            if (!IsPackageAnUpdate & adiData != null & !EnhancementDataValidator.UpdateVersionFailure)
             {
                 Log.Error($"Package with Paid: {WorkflowEntities.TitlPaidValue} Exists in the database, failing Ingest.");
                 return false;
             }
-            if (!IsPackageAnUpdate && adiData != null && EnhancementDataValidator.UpdateVersionFailure)
+            if (!IsPackageAnUpdate & adiData != null & EnhancementDataValidator.UpdateVersionFailure)
             {
                 return false;
             }
@@ -293,13 +293,13 @@ namespace VirginMediaWorkflowDirector
             {
                 case "start":
                     {
-                        if (mapdata.availability?.start != null && mapdata.availability?.start.Year != 1)
+                        if (mapdata.availability?.start != null & mapdata.availability?.start.Year != 1)
                             availableDateTime = Convert.ToDateTime(mapdata.availability?.start);
                         break;
                     }
                 case "end":
                     {
-                        if (mapdata.availability?.end != null && mapdata.availability?.end.Year != 1)
+                        if (mapdata.availability?.end != null & mapdata.availability?.end.Year != 1)
                             availableDateTime = Convert.ToDateTime(mapdata.availability?.end);
                         break;
                     }
@@ -432,7 +432,7 @@ namespace VirginMediaWorkflowDirector
             try
             {
                 //if (!IsPackageAnUpdate || IsTvodPackage)
-                if (IsPackageAnUpdate && !IsTvodPackage)
+                if (IsPackageAnUpdate & !IsTvodPackage)
                     return SetInitialUpdateData();
 
                 Log.Info("Extracting Media from Package");
@@ -469,7 +469,7 @@ namespace VirginMediaWorkflowDirector
                     PrimaryAsset = ZipHandler.ExtractedMovieAsset;
                 }
 
-                if (!IsPackageAnUpdate && !ZipHandler.HasPreviewAsset)
+                if (!IsPackageAnUpdate & !ZipHandler.HasPreviewAsset)
                     return SeedAdiData();
 
 
@@ -502,7 +502,7 @@ namespace VirginMediaWorkflowDirector
                 var isMapped = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue) != null;
 
 
-                if (!isMapped && !IsPackageAnUpdate)
+                if (!isMapped & !IsPackageAnUpdate)
                 {
                     Log.Info("Seeding Adi Data to the database");
 
@@ -885,8 +885,8 @@ namespace VirginMediaWorkflowDirector
                     mappingData.ProgramType.SingleOrDefault(p => p == ApiManager.MovieEpisodeProgramData.progType);
 
                 // Ensure we don't use series or show assets for movies
-                if (EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_series_") ||
-                    EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_show_"))
+                if (EnrichmentWorkflowEntities.IsMoviePackage & configLookup.Image_Mapping.ToLower().Contains("_series_") ||
+                    EnrichmentWorkflowEntities.IsMoviePackage & configLookup.Image_Mapping.ToLower().Contains("_show_"))
                     continue;
 
                 //prevent duplicate processing
@@ -1006,7 +1006,7 @@ namespace VirginMediaWorkflowDirector
                     shoDataRootId: ApiManager.ShowSeriesSeasonProgramData?.rootId);
 
                 AdiContentController.CheckAndAddBlockPlatformData();
-                if (WorkflowEntities.IsQamAsset && IsPackageAnUpdate)
+                if (WorkflowEntities.IsQamAsset & IsPackageAnUpdate)
                     AdiContentManager.SetQamUpdateContent();
 
                 //Ensure db checksum is correct
@@ -1023,8 +1023,8 @@ namespace VirginMediaWorkflowDirector
                 _adiDataService.Update(AdiData);
 
                 Log.Info("Setting Updates Tracking data.");
-                if (AddOrUpdateMappingTrackingData() &&
-                    AddOrUpdateLayer1TrackingData() &&
+                if (AddOrUpdateMappingTrackingData() &
+                    AddOrUpdateLayer1TrackingData() &
                     AddOrUpdateLayer2TrackingData())
                 {
                     Log.Info("Successfully Set Tracking Data.");
@@ -1272,7 +1272,7 @@ namespace VirginMediaWorkflowDirector
                     : throw new Exception("Licensing_Window_End Is not a valid DateTime Format, Rejecting Ingest");
 
 
-                if (IsTvodPackage && AdiData.UpdateAdi != null)
+                if (IsTvodPackage & AdiData.UpdateAdi != null)
                 {
                     WorkflowEntities.SerializeAdiFile(true, AdiData.UpdateAdi, true);
                 }
@@ -1284,7 +1284,7 @@ namespace VirginMediaWorkflowDirector
                     AdiData.UpdateAdi != null))
                     return false;
 
-                if (EnrichmentWorkflowEntities.PackageHasPreviewMetadata && AdiData.PreviewFileChecksum != null)
+                if (EnrichmentWorkflowEntities.PackageHasPreviewMetadata & AdiData.PreviewFileChecksum != null)
                 {
                     var previewAsset =
                         EnrichmentWorkflowEntities.AdiFile.Asset.Asset.FirstOrDefault(p =>
@@ -1425,53 +1425,31 @@ namespace VirginMediaWorkflowDirector
                 var source = packageFile.FullName;
                 var destination = GetFailureDirectory(packageFile.Name);
 
-                if (FailedToMap)
+                if (WebClientManager.Is403Error)
                 {
-                    Log.Info($"Setting Package: {packageFile} Move Destination to Failed to map directory: " +
-                             $"{ADIWF_Config.MoveNonMappedDirectory}");
-
-                    Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
-                             $" days before it is failed completely.");
-
-                    var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
-
-                    if (dt >= packageFile.LastWriteTime.Date)
-                    {
-                        Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
-                        File.Delete(packageFile.FullName);
-                        RemoveWorkingDirectory();
-                        return;
-                    }
-                    if (File.Exists(destination))
-                    {
-                        Log.Info("No package move required for Mapping failure retry.");
-                        RemoveWorkingDirectory();
-                        return;
-                    }
-                }
-
-                if (IsPackageAnUpdate)
-                {
-                    Log.Info($"Setting Package: {packageFile} Move Destination to Updates Failed directory: " +
-                             $"{ADIWF_Config.UpdatesFailedDirectory}");
-                    File.Move(source, destination);
+                    Log.Info($"Failed package received a 403 error, cleaning temp directory and leaving package inside the input directory.");
                 }
                 else
                 {
-                    Log.Info(FailedToMap
-                        ? $"Moving Package: {packageFile} to Failed directory: {destination}"
-                        : $"Moving Package: {packageFile} to Failed to Map directory: {destination}");
+                    if (FailedToMap)
+                    {
+                        ProcessMappingFailure(packageFile, destination);
+                    }
 
-                    if (File.Exists(destination) && source != destination)
-                        File.Delete(destination);
-
-                    File.Move(source, destination);
+                    if (IsPackageAnUpdate)
+                    {
+                        ProcessUpdateFailure(packageFile, destination);
+                    }
+                    else
+                    {
+                        ProcessRegularFailure(packageFile, destination);
+                    }
+                    if (File.Exists(destination))
+                    {
+                        Log.Info("Move to failed directory successful.");
+                    }
                 }
-
-
-                if (File.Exists(destination))
-                    Log.Info("Move to failed directory successful.");
-
+                
                 FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
 
                 if (IsPackageAnUpdate || EnrichmentWorkflowEntities.IsDuplicateIngest)
@@ -1487,6 +1465,78 @@ namespace VirginMediaWorkflowDirector
                 LogError(
                     "ProcessFailedPackage",
                     "Error Processing Failed Package", pfpex);
+            }
+        }
+
+        private void ProcessMappingFailure(FileInfo packageFile, string destination)
+        {
+            try
+            {
+                Log.Info($"Setting Package: {packageFile} Move Destination to Failed to map directory: " +
+                         $"{ADIWF_Config.MoveNonMappedDirectory}");
+
+                Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
+                         $" days before it is failed completely.");
+
+                var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
+
+                if (dt >= packageFile.LastWriteTime.Date)
+                {
+                    Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
+                    File.Delete(packageFile.FullName);
+                    RemoveWorkingDirectory();
+                    return;
+                }
+                if (File.Exists(destination))
+                {
+                    Log.Info("No package move required for Mapping failure retry.");
+                    RemoveWorkingDirectory();
+                    return;
+                }
+            }
+            catch (Exception pmfException)
+            {
+                LogError(
+                    "ProcessMappingFailure",
+                    "Error Processing Failed Mapping Package", pmfException);
+            }
+        }
+
+
+        private void ProcessUpdateFailure(FileInfo packageFile, string destination)
+        {
+            try
+            {
+                Log.Info($"Setting Package: {packageFile.Name} Move Destination to Updates Failed directory: " +
+                         $"{ADIWF_Config.UpdatesFailedDirectory}");
+                File.Move(packageFile.FullName, destination);
+            }
+            catch (Exception pufException)
+            {
+                LogError(
+                    "ProcessUpdateFailure",
+                    "Error Processing Failed Update Package", pufException);
+            }
+        }
+
+        private void ProcessRegularFailure(FileInfo packageFile, string destination)
+        {
+            try
+            {
+                Log.Info(FailedToMap
+                    ? $"Moving Package: {packageFile} to Failed directory: {destination}"
+                    : $"Moving Package: {packageFile} to Failed to Map directory: {destination}");
+
+                if (File.Exists(destination) & packageFile.FullName != destination)
+                    File.Delete(destination);
+
+                File.Move(packageFile.FullName, destination);
+            }
+            catch (Exception prfException)
+            {
+                LogError(
+                    "ProcessRegularFailure",
+                    "Error Processing Failed Package", prfException);
             }
         }
 

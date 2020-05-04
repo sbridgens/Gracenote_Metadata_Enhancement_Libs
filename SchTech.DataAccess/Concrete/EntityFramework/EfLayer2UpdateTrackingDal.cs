@@ -43,8 +43,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = GetList(t => t.GN_connectorId == connectorId && 
-                                            t.Layer2_RootId == rootId && 
+                var rowData = GetList(t => t.GN_connectorId == connectorId & 
+                                            t.Layer2_RootId == rootId & 
                                             t.RequiresEnrichment == false);
 
                 if (rowData.Count == 0)

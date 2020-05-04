@@ -53,22 +53,22 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                     ValidatePackageEntries(archive);
                     ProcessArchive(archive, extractAdiOnly, IsUpdatePackage);
 
-                    if (extractAdiOnly || IsLegacyGoPackage && AdiExtracted)
+                    if (extractAdiOnly || IsLegacyGoPackage & AdiExtracted)
                     {
                         return true;
                     }
-                    if (IsUpdatePackage && AdiExtracted && !HasPreviewAsset)
+                    if (IsUpdatePackage & AdiExtracted & !HasPreviewAsset)
                     {
                         return true;
                     }
 
-                    if (IsUpdatePackage && AdiExtracted && HasPreviewAsset && PreviewExtracted)
+                    if (IsUpdatePackage & AdiExtracted & HasPreviewAsset & PreviewExtracted)
                     {
                         return true;
                     }
-                    if (!extractAdiOnly && MovieAssetExtracted)
+                    if (!extractAdiOnly & MovieAssetExtracted)
                     {
-                        if (HasPreviewAsset && PreviewExtracted)
+                        if (HasPreviewAsset & PreviewExtracted)
                             OperationsSuccessful = true;
                         else if (!HasPreviewAsset)
                             OperationsSuccessful = true;
@@ -106,7 +106,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
             Log.Info("Package contains a Preview file.");
 
-            if (IsTvod && IsUpdatePackage)
+            if (IsTvod & IsUpdatePackage)
             {
                 Log.Info("TVOD Update package contains a Preview asset for inclusion");
                 PreviewOnly = true;
@@ -125,19 +125,19 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         {
             foreach (var entry in archive.Entries.OrderByDescending(e => e.Length))
             {
-                if (AdiExtracted && IsLegacyGoPackage)
+                if (AdiExtracted & IsLegacyGoPackage)
                 {
                     break;
                 }
 
-                if (!AdiExtracted && IsLegacyGoPackage && entry.Name.ToLower().Equals("adi.xml"))
+                if (!AdiExtracted & IsLegacyGoPackage & entry.Name.ToLower().Equals("adi.xml"))
                 {
                     Log.Info("Legacy go Package - Extracting ADI.xml Only");
                     ExtractEntry(entry, "adi");
                 }
                 else
                 {
-                    if (!AdiExtracted && entry.Name.ToLower().Equals("adi.xml"))
+                    if (!AdiExtracted & entry.Name.ToLower().Equals("adi.xml"))
                     {
                         Log.Info("Extracting ADI File from archive.");
                         ExtractEntry(entry, "adi");
@@ -146,7 +146,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                         continue;
                     if (!bIsUpdate)
                     {
-                        if (!MovieAssetExtracted && entry.FullName.Contains("media/"))
+                        if (!MovieAssetExtracted & entry.FullName.Contains("media/"))
                         {
                             Log.Info($"Extracting Largest .ts file: {entry.Name} from Package");
                             ExtractEntry(entry, "movie");
@@ -159,7 +159,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                         ExtractEntry(entry, "preview");
 
                     }
-                    else if (PreviewOnly && entry.FullName.Contains("preview/") && !PreviewExtracted)
+                    else if (PreviewOnly & entry.FullName.Contains("preview/") & !PreviewExtracted)
                     {
                         Log.Info($"Extracting Largest Preview Asset {entry.Name} from Package.");
                         ExtractEntry(entry, "preview");
@@ -177,7 +177,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                            ? Path.Combine(OutputDirectory, archiveEntry.FullName)
                            : Path.Combine(OutputDirectory, archiveEntry.Name);
             
-            if (IsLegacyGoPackage && !Directory.Exists(Path.GetDirectoryName(outputFile)))
+            if (IsLegacyGoPackage & !Directory.Exists(Path.GetDirectoryName(outputFile)))
             {
                 var dir = Path.GetDirectoryName(outputFile);
 

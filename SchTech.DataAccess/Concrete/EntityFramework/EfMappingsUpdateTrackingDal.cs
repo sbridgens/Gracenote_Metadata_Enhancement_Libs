@@ -30,7 +30,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = Get(t => t.RequiresEnrichment == false && t.GN_ProviderId == gnProviderId);
+                var rowData = Get(t => t.RequiresEnrichment == false & t.GN_ProviderId == gnProviderId);
 
                 if (rowData == null || rowData.RequiresEnrichment)
                     return null;

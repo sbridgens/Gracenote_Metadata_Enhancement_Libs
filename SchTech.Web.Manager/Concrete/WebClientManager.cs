@@ -3,6 +3,7 @@ using SchTech.Web.Manager.Abstract;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 
@@ -23,6 +24,7 @@ namespace SchTech.Web.Manager.Concrete
         public StreamReader StreamReader { get; set; }
         public string WebUserAgentString { get; set; }
         public bool SuccessfulWebRequest { get; set; }
+        public static bool Is403Error { get; private set; }
         public string WebErrorMessage { get; set; }
         public int RequestStatusCode { get; set; }
         private const int MaxWebRetries = 5;
@@ -73,6 +75,7 @@ namespace SchTech.Web.Manager.Concrete
         
         public string HttpGetRequest(string url, bool followRedirect = true)
         {
+            Is403Error = false;
             RequestStatusCode = 0;
             CurrentRetryCount = 0;
             WebClientRequest = (HttpWebRequest)WebRequest.Create(url);
@@ -197,11 +200,21 @@ namespace SchTech.Web.Manager.Concrete
 
                 SuccessfulWebRequest = true;
             }
-            catch (Exception cwrException)
+            catch (WebException cwrException)
             {
+                RequestStatusCode = (int)((HttpWebResponse)cwrException.Response).StatusCode;
+                Is403Error = RequestStatusCode == (int)HttpStatusCode.Forbidden;
+
                 Log.Error($"Http Get Exception: {cwrException.Message}");
                 if (cwrException.InnerException != null)
                     Log.Error($"Inner Exception: {cwrException.InnerException.Message}");
+                SuccessfulWebRequest = false;
+            }
+            catch (Exception unhandledException)
+            {
+                Log.Error($"Http Get Unhandled Exception: {unhandledException.Message}");
+                if (unhandledException.InnerException != null)
+                    Log.Error($"Inner Exception: {unhandledException.InnerException.Message}");
                 SuccessfulWebRequest = false;
             }
 

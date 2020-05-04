@@ -108,6 +108,10 @@
       <Project>{B486D741-AE9E-4745-B6A1-09365FEB22AB}</Project>
       <Name>SchTech.Queue.Manager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SchTech.Web.Manager\SchTech.Web.Manager.csproj">
+      <Project>{53CB7D04-F7BE-4280-B431-C41298B89299}</Project>
+      <Name>SchTech.Web.Manager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

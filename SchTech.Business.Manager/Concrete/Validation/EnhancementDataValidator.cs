@@ -122,9 +122,9 @@ namespace SchTech.Business.Manager.Concrete.Validation
             if (!isSeason)
                 return programDescriptions.desc
                     .Where(
-                        d => d.type == "plot" && d.size == "250" ||
-                             d.type == "plot" && d.size == "100" ||
-                             d.type == "generic" && d.size == "100" ||
+                        d => d.type == "plot" & d.size == "250" ||
+                             d.type == "plot" & d.size == "100" ||
+                             d.type == "generic" & d.size == "100" ||
                              d.size == "250" ||
                              d.size == "100")
                     .Select(t => t.Value)

@@ -135,7 +135,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
         public string GetShowName()
         {
             return ShowSeriesSeasonProgramData.titles.title
-                .Where(t => t.type == "full" && t.size == "120")
+                .Where(t => t.type == "full" & t.size == "120")
                 .Select(t => t.Value)
                 .FirstOrDefault()
                 ?.ToString();

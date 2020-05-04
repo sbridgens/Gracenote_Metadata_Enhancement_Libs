@@ -223,7 +223,7 @@ namespace LegacyGoWorkflowDirector
         {
             var adiMajor = _adiDataService.Get(i => i.TitlPaid == WorkflowEntities.TitlPaidValue);
 
-            if (IsPackageAnUpdate && adiMajor != null)
+            if (IsPackageAnUpdate & adiMajor != null)
             {
                 if (!EnhancementDataValidator.ValidateVersionMajor(adiMajor.VersionMajor, adiMajor.VersionMinor))
                     return false;
@@ -233,14 +233,14 @@ namespace LegacyGoWorkflowDirector
                 return true;
             }
 
-            if (IsPackageAnUpdate && adiMajor == null)
+            if (IsPackageAnUpdate & adiMajor == null)
             {
                 Log.Error(
                     $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
                 return false;
             }
             //if (!IsPackageAnUpdate && adiMajor == null)
-            if (IsPackageAnUpdate && adiMajor != null)
+            if (IsPackageAnUpdate & adiMajor != null)
                 return false;
             Log.Info($"Package with Paid: {WorkflowEntities.TitlPaidValue} " +
                      "confirmed as a unique package, continuing ingest operations.");
@@ -267,13 +267,13 @@ namespace LegacyGoWorkflowDirector
             {
                 case "start":
                     {
-                        if (mapdata.availability?.start != null && mapdata.availability?.start.Year != 1)
+                        if (mapdata.availability?.start != null & mapdata.availability?.start.Year != 1)
                             availableDateTime = Convert.ToDateTime(mapdata.availability?.start);
                         break;
                     }
                 case "end":
                     {
-                        if (mapdata.availability?.end != null && mapdata.availability?.end.Year != 1)
+                        if (mapdata.availability?.end != null & mapdata.availability?.end.Year != 1)
                             availableDateTime = Convert.ToDateTime(mapdata.availability?.end);
                         break;
                     }
@@ -428,7 +428,7 @@ namespace LegacyGoWorkflowDirector
                 var isMapped = _adiDataService.Get(p => p.TitlPaid == WorkflowEntities.TitlPaidValue) != null;
 
 
-                if (!isMapped && !IsPackageAnUpdate)
+                if (!isMapped & !IsPackageAnUpdate)
                 {
                     Log.Info("Seeding Adi Data to the database");
 
@@ -730,8 +730,8 @@ namespace LegacyGoWorkflowDirector
                     mappingData.ProgramType.SingleOrDefault(p => p == ApiManager.MovieEpisodeProgramData.progType);
 
                 // Ensure we don't use series or show assets for movies
-                if (EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_series_") ||
-                    EnrichmentWorkflowEntities.IsMoviePackage && configLookup.Image_Mapping.ToLower().Contains("_show_"))
+                if (EnrichmentWorkflowEntities.IsMoviePackage & configLookup.Image_Mapping.ToLower().Contains("_series_") ||
+                    EnrichmentWorkflowEntities.IsMoviePackage & configLookup.Image_Mapping.ToLower().Contains("_show_"))
                     continue;
 
                 //prevent duplicate processing
@@ -765,7 +765,7 @@ namespace LegacyGoWorkflowDirector
                 var localImage = GetImageName(imageUri, configLookup.Image_Mapping);
                 isl.DownloadImage(imageUri, localImage);
 
-                if (IsPackageAnUpdate && !string.IsNullOrEmpty(SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages))
+                if (IsPackageAnUpdate & !string.IsNullOrEmpty(SchTech.Business.Manager.Concrete.ImageLogic.ImageSelectionLogic.DbImages))
                 {
 
                     InsertSuccess = AdiContentController.UpdateImageData(
@@ -1067,7 +1067,7 @@ namespace LegacyGoWorkflowDirector
                 }
 
 
-                if (File.Exists(destination) && !NonLegacyGoPackage)
+                if (File.Exists(destination) & !NonLegacyGoPackage)
                     Log.Info("Move to failed directory successful.");
 
                 FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);

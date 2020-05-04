@@ -366,7 +366,7 @@ namespace LegacyGoWorkflowDirector
 
                 var isValid = providers.FirstOrDefault(p => p.Trim(' ').Contains(currentProvider));
 
-                if (!ValidateBlockOtt() && !string.IsNullOrEmpty(isValid))
+                if (!ValidateBlockOtt() & !string.IsNullOrEmpty(isValid))
                     return true;
 
                 Log.Error($"Package for Provider: {currentProvider} is not a Legacy Go Package");
@@ -453,7 +453,7 @@ namespace LegacyGoWorkflowDirector
         {
             try
             {
-                return AddTitleMetadataApp_DataNode("GN_Layer2_TMSId", seriesTmsId) &&
+                return AddTitleMetadataApp_DataNode("GN_Layer2_TMSId", seriesTmsId) &
                        AddTitleMetadataApp_DataNode("GN_Layer2_SeriesId", seriesId);
             }
             catch (Exception isldEx)
@@ -857,7 +857,7 @@ namespace LegacyGoWorkflowDirector
                     ? seriesPremiere?.Year.ToString()
                     : seasonPremiere?.Year.ToString();
 
-                if (sPremiere != null && sPremiere.Length != 4)
+                if (sPremiere != null & sPremiere?.Length != 4)
                     return false;
 
                 Log.Info($"Premiere year: {sPremiere}");
@@ -866,7 +866,7 @@ namespace LegacyGoWorkflowDirector
                     ? seriesFinale?.Year.ToString()
                     : seasonFinale?.Year.ToString();
 
-                if (sFinale != null && sFinale.Length == 4)
+                if (sFinale != null & sFinale?.Length == 4)
                 {
                     Log.Info($"Finale year: {sFinale}");
                     productionYears = $"{sPremiere}-{sFinale}";
@@ -898,7 +898,7 @@ namespace LegacyGoWorkflowDirector
         {
             try
             {
-                if (externalLinks.Count <= 0 && IdmbDataInserted)
+                if (externalLinks.Count <= 0 & IdmbDataInserted)
                     return true;
 
                 var links = externalLinks;

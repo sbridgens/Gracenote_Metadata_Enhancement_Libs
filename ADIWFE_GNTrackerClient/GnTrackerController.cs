@@ -87,7 +87,7 @@ namespace ADIWFE_GNTrackerClient
                 {
                     try
                     {
-                        if(!EfAdiEnrichmentDal.IsWorkflowProcessing && canExecute <= dtNow)
+                        if(!EfAdiEnrichmentDal.IsWorkflowProcessing & canExecute <= dtNow)
                         {
                             EfAdiEnrichmentDal.IsWorkflowProcessing = false;
                             GnTrackingOperations.StartOperations();

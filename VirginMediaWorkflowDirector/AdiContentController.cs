@@ -269,8 +269,8 @@ namespace VirginMediaWorkflowDirector
 
                 //no enriched preview data,
                 //no preview asset supplied preview metadata included via incoming adi
-                if (!hasPreviewAsset &&
-                    EnrichmentWorkflowEntities.PackageHasPreviewMetadata &&
+                if (!hasPreviewAsset &
+                    EnrichmentWorkflowEntities.PackageHasPreviewMetadata &
                     !enrichedDataHasPreview)
                 {
                     CheckPreviewData();
@@ -1004,7 +1004,7 @@ namespace VirginMediaWorkflowDirector
                     ? seriesPremiere?.Year.ToString()
                     : seasonPremiere?.Year.ToString();
 
-                if (sPremiere != null && sPremiere.Length != 4)
+                if (sPremiere != null & sPremiere?.Length != 4)
                     return false;
 
                 Log.Info($"Premiere year: {sPremiere}");
@@ -1013,7 +1013,7 @@ namespace VirginMediaWorkflowDirector
                     ? seriesFinale?.Year.ToString()
                     : seasonFinale?.Year.ToString();
 
-                if (sFinale != null && sFinale.Length == 4)
+                if (sFinale != null & sFinale?.Length == 4)
                 {
                     Log.Info($"Finale year: {sFinale}");
                     productionYears = $"{sPremiere}-{sFinale}";
@@ -1045,7 +1045,7 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
-                if (externalLinks.Count <= 0 && IdmbDataInserted)
+                if (externalLinks.Count <= 0 & IdmbDataInserted)
                     return true;
 
                 if (!externalLinks.Any())

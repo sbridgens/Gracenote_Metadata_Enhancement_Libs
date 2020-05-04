@@ -72,7 +72,7 @@ namespace SchTech.Queue.Manager.Concrete
             try
             {
                 BuildPackageList();
-                if (IncludeFailedMappingPackages && ProcessMappingFailures)
+                if (IncludeFailedMappingPackages & ProcessMappingFailures)
                     AddMappingFailuresToList();
 
                 if (PackageCount >= 1)

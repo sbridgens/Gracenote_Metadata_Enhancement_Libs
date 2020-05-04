@@ -69,7 +69,7 @@ namespace SchTech.File.Manager.Concrete.FileSystem
                              $"  Total size:\t{drive.TotalSize / BytesInMb} MB\t{totalsize} GB\n\n");
 
 
-                    if (drive.Name.ToLower() == "d:\\" && freespace < 50)
+                    if (drive.Name.ToLower() == "d:\\" & freespace < 50)
                         throw new Exception(
                             $"Drive Space on {drive.VolumeLabel} is less that 50GB, this service will stop running!");
                 }

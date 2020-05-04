@@ -102,7 +102,7 @@ namespace SchTech.Entities.ConcreteTypes
                     AdiFile = XmlSerializer.Read(
                         System.IO.File.ReadAllText(Path.Combine(CurrentWorkingDirectory, "ADI.xml")));
                 }
-                if(isUpdate && !loadUpdateAdi)
+                if(isUpdate & !loadUpdateAdi)
                 {
                     EnrichedAdi = new ADI();
                     EnrichedAdi = XmlSerializer.Read(adiData);
@@ -114,17 +114,17 @@ namespace SchTech.Entities.ConcreteTypes
                     UpdateAdi = new ADI();
                     UpdateAdi = XmlSerializer.Read(adiData);
                 }
-                if (!isUpdate && AdiFile == null)
+                if (!isUpdate & AdiFile == null)
                     throw new Exception("Adi file is null check namespaces and adi document structure?");
 
                 Log.Info("ADI Loaded correctly and will continue processing.");
 
-                if(AdiFile != null && !isUpdate)
+                if(AdiFile != null & !isUpdate)
                 {
                     AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
                     AdiVersionMinor = AdiFile.Metadata.AMS.Version_Minor;
                 }
-                else if(isUpdate && UpdateAdi != null)
+                else if(isUpdate & UpdateAdi != null)
                 {
                     AdiVersionMajor = UpdateAdi.Metadata.AMS.Version_Major;
                     AdiVersionMinor = UpdateAdi.Metadata.AMS.Version_Minor;
@@ -176,7 +176,7 @@ namespace SchTech.Entities.ConcreteTypes
                               .FirstOrDefault(c => c.Name.ToLower() == "hdcontent")
                               ?.Value.ToLower() != "y";
 
-            if (IsSdContent && !Convert.ToBoolean(ADIWF_Config.AllowSDContentIngest))
+            if (IsSdContent & !Convert.ToBoolean(ADIWF_Config.AllowSDContentIngest))
                 throw new InvalidOperationException(
                     $"SD Content Detected, Configuration disallows SD Content from Ingest; Failing ingest for {TitlPaidValue}");
 
@@ -200,10 +200,11 @@ namespace SchTech.Entities.ConcreteTypes
                 var webClient = new WebClientManager();
                 GracenoteMappingData = webClient.HttpGetRequest(mapUrl);
                 Log.Debug($"RECEIVED MAPPING DATA FROM GRACENOTE: \r\n{GracenoteMappingData}");
-                if (GracenoteMappingData != null && webClient.SuccessfulWebRequest) return true;
+                if (GracenoteMappingData != null & webClient.SuccessfulWebRequest)
+                    return true;
 
                 throw new Exception($"Gracenote Mapping Data: {GracenoteMappingData}, " +
-                                    $"Successful Web request: {webClient.SuccessfulWebRequest}," +
+                                    $"Failed Web request: {webClient.SuccessfulWebRequest}," +
                                     $"Web request response code: {webClient.RequestStatusCode}");
             }
             catch (Exception ggmdEx)
@@ -232,7 +233,7 @@ namespace SchTech.Entities.ConcreteTypes
                 var webClient = new WebClientManager();
                 GraceNoteUpdateData = webClient.HttpGetRequest(updateUrl);
                 Log.Info("Successfully Called Gracenote OnApi");
-                if (GraceNoteUpdateData != null && webClient.SuccessfulWebRequest)
+                if (GraceNoteUpdateData != null & webClient.SuccessfulWebRequest)
                     return true;
 
                 throw new Exception($"Gracenote Update Data: {GraceNoteUpdateData}, " +
@@ -264,7 +265,7 @@ namespace SchTech.Entities.ConcreteTypes
                 var webClient = new WebClientManager();
                 GracenoteProgramData = webClient.HttpGetRequest(programUrl);
 
-                if (GracenoteProgramData != null && webClient.SuccessfulWebRequest) return true;
+                if (GracenoteProgramData != null & webClient.SuccessfulWebRequest) return true;
 
                 throw new Exception("Error during receive of GN Api Program data, " +
                                     $"Web request data: {webClient.SuccessfulWebRequest}," +
@@ -298,7 +299,7 @@ namespace SchTech.Entities.ConcreteTypes
                 var webClient = new WebClientManager();
                 GraceNoteSeriesSeasonSpecialsData = webClient.HttpGetRequest(requestUrl);
 
-                if (GraceNoteSeriesSeasonSpecialsData != null && webClient.SuccessfulWebRequest) return true;
+                if (GraceNoteSeriesSeasonSpecialsData != null & webClient.SuccessfulWebRequest) return true;
 
                 throw new Exception("[GetGraceNoteSeriesSeasonSpecialsData] Error during receive of GN Api data, " +
                                     $"Web request data: {webClient.SuccessfulWebRequest}," +
