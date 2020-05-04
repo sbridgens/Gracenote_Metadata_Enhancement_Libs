@@ -386,37 +386,6 @@ namespace VirginMediaWorkflowDirector
                     }
                 }
 
-                //if (!enrichedDataHasImages && EnrichmentWorkflowEntities.UpdateAdi != null)
-                //{
-                //    if (EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.All(u => u.Metadata.AMS.Asset_Class != "image"))
-                //    {
-                //        Log.Warn("No image data found in the Enriched adi data or the Update Adi data? Continuing without this data.");
-                //    }
-                //    else
-                //    {
-                //        Log.Info("Cloning image data from db UpdateAdi data.");
-
-                //        foreach (var imageSection in
-                //            from assetData in EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.ToList()
-                //            where assetData.Metadata.AMS.Asset_Class == "image"
-                //            select new ADIAssetAsset
-                //            {
-                //                Content = new ADIAssetAssetContent
-                //                {
-                //                    Value = assetData.Content.Value
-                //                },
-                //                Metadata = new ADIAssetAssetMetadata
-                //                {
-                //                    AMS = assetData.Metadata.AMS,
-                //                    App_Data = assetData.Metadata.App_Data
-                //                }
-                //            })
-                //        {
-                //            EnrichmentWorkflowEntities.AdiFile.Asset.Asset.Add(imageSection);
-                //        }
-                //    }
-                //}
-
                 return true;
             }
             catch (Exception cpeadtaEx)
