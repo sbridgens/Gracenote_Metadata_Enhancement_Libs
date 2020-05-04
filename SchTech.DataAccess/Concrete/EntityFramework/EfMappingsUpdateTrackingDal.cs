@@ -32,16 +32,18 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 var rowData = Get(t => t.RequiresEnrichment == false && t.GN_ProviderId == gnProviderId);
 
-                if (rowData == null)
+                if (rowData == null || rowData.RequiresEnrichment)
                     return null;
 
-                var layer1Data = mapContext.Layer1UpdateTracking.FirstOrDefault(l1 => l1.IngestUUID == rowData.IngestUUID);
+                var layer1Data =
+                    mapContext.Layer1UpdateTracking.FirstOrDefault(l1 => l1.IngestUUID == rowData.IngestUUID);
 
-                var layer2Data = mapContext.Layer2UpdateTracking.FirstOrDefault(l2 => l2.IngestUUID == rowData.IngestUUID);
+                var layer2Data =
+                    mapContext.Layer2UpdateTracking.FirstOrDefault(l2 => l2.IngestUUID == rowData.IngestUUID);
 
                 if (layer1Data?.RequiresEnrichment == false)
                 {
-                    if(layer2Data?.RequiresEnrichment == false)
+                    if (layer2Data?.RequiresEnrichment == false)
                     {
                         return rowData;
                     }

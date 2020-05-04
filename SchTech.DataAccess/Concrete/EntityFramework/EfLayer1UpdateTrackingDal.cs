@@ -50,6 +50,9 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                 foreach (var row in rowData)
                 {
+                    if(row.RequiresEnrichment)
+                        continue;
+                    
                     var mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
                         m.IngestUUID == row.IngestUUID);
 

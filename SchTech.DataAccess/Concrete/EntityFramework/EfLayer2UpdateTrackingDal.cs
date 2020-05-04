@@ -52,15 +52,18 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
 
                 foreach (var row in rowData)
                 {
+                    if (row.RequiresEnrichment)
+                        continue;
+
                     var mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
                         m.IngestUUID == row.IngestUUID);
 
                     var layer1Data = mapContext.Layer1UpdateTracking.FirstOrDefault(l =>
                         l.IngestUUID == row.IngestUUID);
 
-                    if(mapdata?.RequiresEnrichment == false)
+                    if (mapdata?.RequiresEnrichment == false)
                     {
-                        if(layer1Data?.RequiresEnrichment == false)
+                        if (layer1Data?.RequiresEnrichment == false)
                         {
                             SetLayer2RequiresUpdate(row, true);
                             //only return rowdata for items not requiring enrichment in the previous tables
