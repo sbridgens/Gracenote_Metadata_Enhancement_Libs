@@ -43,35 +43,41 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = GetList(t => t.RequiresEnrichment == false & t.GN_TMSID == tmsId & t.Layer1_RootId == rootId);
+                var rowData = GetList(t => t.GN_TMSID == tmsId &
+                                           t.Layer1_RootId == rootId &
+                                           t.RequiresEnrichment == false);
 
                 if (rowData.Count == 0)
+                    return null;
+                //check if any l2 data with the same uid requires enrichment
+                var hasL2Update = rowData.Select(row => mapContext.Layer2UpdateTracking.
+                                          FirstOrDefault(l => l.IngestUUID == row.IngestUUID)).
+                                          Any(layer2Data => layer2Data != null && layer2Data.RequiresEnrichment);
+
+
+                if (hasL2Update)
                     return null;
 
                 foreach (var row in rowData)
                 {
-                    if(row.RequiresEnrichment)
+                    if (row.RequiresEnrichment)
                         continue;
-                    
+
                     var mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
                         m.IngestUUID == row.IngestUUID);
 
-                    var layer2Data = mapContext.Layer2UpdateTracking.FirstOrDefault(l =>
-                        l.IngestUUID == row.IngestUUID);
 
-                    if (mapdata?.RequiresEnrichment == false)
-                    {
-                        if(layer2Data?.RequiresEnrichment == false)
-                        {
-                            SetLayer1RequiresUpdate(row, true);
-                            //only return rowdata for items not requiring enrichment in the previous tables
-                            return rowData;
-                        }
-                    }
+                    if (mapdata?.RequiresEnrichment != false)
+                        continue;
+
+                    SetLayer1RequiresUpdate(row, true);
+                    //only return rowdata for items not requiring enrichment in the previous tables
+                    return rowData;
                 }
 
-                return null;
             }
+
+            return null;
         }
 
         public List<Layer1UpdateTracking> GetPackagesRequiringEnrichment()

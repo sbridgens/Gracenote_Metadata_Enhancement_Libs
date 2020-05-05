@@ -336,6 +336,8 @@ namespace GracenoteUpdateManager
 
             foreach (var row in programExistsInDb)
             {
+                if(row.IngestUUID.ToString().Equals("6de9d51a-e64f-4807-8067-b8ced8714bed"))
+                    Log.Info("");
                 Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { row.IngestUUID} and ConnectorId: {row.GN_connectorId}");
                 _layer2TrackingService.UpdateLayer2Data(row.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
             }

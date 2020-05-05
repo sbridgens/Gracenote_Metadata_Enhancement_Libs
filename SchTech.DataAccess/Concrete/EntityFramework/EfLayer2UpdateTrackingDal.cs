@@ -50,6 +50,16 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 if (rowData.Count == 0)
                     return null;
 
+                //check if any l1 data with the same uid requires enrichment
+                var hasL1Update = rowData.Select(row => mapContext.Layer1UpdateTracking.
+                                          FirstOrDefault(l => l.IngestUUID == row.IngestUUID)).
+                                          Any(layer1Data => layer1Data != null && 
+                                                            layer1Data.RequiresEnrichment);
+
+
+                if (hasL1Update)
+                    return null;
+
                 foreach (var row in rowData)
                 {
                     if (row.RequiresEnrichment)
@@ -58,22 +68,18 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                     var mapdata = mapContext.MappingsUpdateTracking.FirstOrDefault(m =>
                         m.IngestUUID == row.IngestUUID);
 
-                    var layer1Data = mapContext.Layer1UpdateTracking.FirstOrDefault(l =>
-                        l.IngestUUID == row.IngestUUID);
 
-                    if (mapdata?.RequiresEnrichment == false)
-                    {
-                        if (layer1Data?.RequiresEnrichment == false)
-                        {
-                            SetLayer2RequiresUpdate(row, true);
-                            //only return rowdata for items not requiring enrichment in the previous tables
-                            return rowData;
-                        }
-                    }
+                    if (mapdata?.RequiresEnrichment != false)
+                        continue;
+
+                    SetLayer2RequiresUpdate(row, true);
+                    //only return rowdata for items not requiring enrichment in the previous tables
+                    return rowData;
                 }
 
-                return null;
             }
+
+            return null;
         }
 
         public List<Layer2UpdateTracking> GetPackagesRequiringEnrichment()

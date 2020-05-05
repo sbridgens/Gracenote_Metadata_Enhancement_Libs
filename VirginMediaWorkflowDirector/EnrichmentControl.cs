@@ -1491,7 +1491,6 @@ namespace VirginMediaWorkflowDirector
                 {
                     Log.Info("No package move required for Mapping failure retry.");
                     RemoveWorkingDirectory();
-                    return;
                 }
             }
             catch (Exception pmfException)
