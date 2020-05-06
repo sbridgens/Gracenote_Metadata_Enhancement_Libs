@@ -1422,8 +1422,9 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
-                var source = packageFile.FullName;
                 var destination = GetFailureDirectory(packageFile.Name);
+                var packageMoveRequired = true;
+
                 if (WebClientManager.Is403Error)
                 {
                     Log.Info($"Failed package received a 403 error, cleaning temp directory and leaving package inside the input directory.");
@@ -1432,48 +1433,19 @@ namespace VirginMediaWorkflowDirector
                 {
                     if (FailedToMap)
                     {
-                        Log.Info($"Setting Package: {packageFile} Move Destination to Failed to map directory: " +
-                                 $"{ADIWF_Config.MoveNonMappedDirectory}");
-
-                        Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
-                                 $" days before it is failed completely.");
-
-                        var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
-
-                        if (dt >= packageFile.LastWriteTime.Date)
-                        {
-                            Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
-                            File.Delete(packageFile.FullName);
-                            RemoveWorkingDirectory();
-                            return;
-                        }
-                        if (File.Exists(destination))
-                        {
-                            Log.Info("No package move required for Mapping failure retry.");
-                            RemoveWorkingDirectory();
-                            return;
-                        }
+                        packageMoveRequired = ProcessFailedToMap(packageFile, destination);
                     }
                     if (IsPackageAnUpdate)
                     {
-                        Log.Info($"Setting Package: {packageFile} Move Destination to Updates Failed directory: " +
-                                 $"{ADIWF_Config.UpdatesFailedDirectory}");
-                        File.Move(source, destination);
+                        ProcessUpdateFailure(packageFile, destination);
                     }
-                    else
+                    else if(packageMoveRequired)
                     {
-                        Log.Info(FailedToMap
-                            ? $"Moving Package: {packageFile} to Failed directory: {destination}"
-                            : $"Moving Package: {packageFile} to Failed to Map directory: {destination}");
-
-                        if (File.Exists(destination) && source != destination)
-                            File.Delete(destination);
-
-                        File.Move(source, destination);
+                        ProcessPackageFailure(packageFile, destination);
                     }
 
 
-                    if (File.Exists(destination))
+                    if (File.Exists(destination) & packageMoveRequired)
                         Log.Info("Move to failed directory successful.");
                 }
                 
@@ -1493,6 +1465,78 @@ namespace VirginMediaWorkflowDirector
                 LogError(
                     "ProcessFailedPackage",
                     "Error Processing Failed Package", pfpex);
+            }
+        }
+
+
+        private bool ProcessFailedToMap(FileInfo packageFile, string destination)
+        {
+            try
+            {
+                Log.Info($"Setting Package: {packageFile} Move Destination to Failed to map directory: " +
+                         $"{ADIWF_Config.MoveNonMappedDirectory}");
+
+                Log.Info($"This package will be retried for: {ADIWF_Config.FailedToMap_Max_Retry_Days}" +
+                         $" days before it is failed completely.");
+
+                var dt = DateTime.Now.AddDays(-Convert.ToInt32(ADIWF_Config.FailedToMap_Max_Retry_Days));
+
+                if (dt >= packageFile.LastWriteTime.Date)
+                {
+                    Log.Warn($"Ingest file has passed the time for allowed mapping and will deleted!");
+                    File.Delete(packageFile.FullName);
+                    return false;
+                }
+                if (File.Exists(destination))
+                {
+                    Log.Info("No package move required for Mapping failure retry.");
+                    return false;
+                }
+            }
+            catch (Exception pftmException)
+            {
+                LogError(
+                    "ProcessFailedToMap",
+                    "Error Processing Failed To Map Package", pftmException);
+            }
+
+            return true;
+        }
+
+        private void ProcessUpdateFailure(FileInfo packageFile, string destination)
+        {
+            try
+            {
+                Log.Info($"Setting Package: {packageFile} Move Destination to Updates Failed directory: " +
+                         $"{ADIWF_Config.UpdatesFailedDirectory}");
+                File.Move(packageFile.FullName, destination);
+            }
+            catch (Exception pufException)
+            {
+                LogError(
+                    "ProcessUpdateFailure",
+                    "Error Processing Failed To Update Package", pufException);
+            }
+        }
+
+        private void ProcessPackageFailure(FileInfo packageFile, string destination)
+        {
+            try
+            {
+                Log.Info(FailedToMap
+                    ? $"Moving Package: {packageFile} to Failed directory: {destination}"
+                    : $"Moving Package: {packageFile} to Failed to Map directory: {destination}");
+
+                if (File.Exists(destination) & packageFile.FullName != destination)
+                    File.Delete(destination);
+
+                File.Move(packageFile.FullName, destination);
+            }
+            catch (Exception ppfException)
+            {
+                LogError(
+                    "ProcessPackageFailure",
+                    "Error Processing Failed Package", ppfException);
             }
         }
 
