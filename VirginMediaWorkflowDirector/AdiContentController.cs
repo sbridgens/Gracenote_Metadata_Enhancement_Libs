@@ -405,11 +405,11 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
-                if(imageType != null && adiImage != null)
+                if(imageType != null & adiImage != null)
                 {
                     var dbImages = GnMappingDataService.Get(i => i.IngestUUID == ingestGuid);
 
-                    if(dbImages != null)
+                    if(dbImages.GN_Images != null)
                     {
                         //p17613556_k_v12_ab.jpg    
                         var imageName = Regex.Match(adiImage, "(?m)p[0-9]{1,12}.*\\.[A-z]{3}");
@@ -1144,10 +1144,12 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
-        public void SetQamUpdateContent()
+        public void SetQamUpdateContent(bool isUpdate)
         {
             try
             {
+                if (isUpdate)
+                    return;
                 var enrichedMovieAsset =
                     EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.FirstOrDefault(c =>
                         c.Metadata.AMS.Asset_Class == "movie");

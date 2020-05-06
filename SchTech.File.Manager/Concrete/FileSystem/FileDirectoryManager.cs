@@ -61,9 +61,16 @@ namespace SchTech.File.Manager.Concrete.FileSystem
         /// </summary>
         public static void RemoveExistingTempDirectory(string outputDirectory)
         {
-            Log.Info($"Temp Directory {outputDirectory} Exists, removing");
             try
             {
+                if (!Directory.Exists(outputDirectory))
+                {
+                    return;
+                }
+                
+                
+                Log.Info($"Temp Directory {outputDirectory} Exists, removing");
+
                 foreach (var file in Directory.EnumerateFiles(outputDirectory, 
                     "*.*", SearchOption.AllDirectories))
                     System.IO.File.Delete(file);
