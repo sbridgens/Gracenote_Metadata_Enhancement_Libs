@@ -236,8 +236,8 @@ namespace VirginMediaWorkflowDirector
 
             if (IsPackageAnUpdate & adiData == null)
             {
-                Log.Error(
-                    $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+                Log.Error( $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+                FailedToMap = true;
                 return false;
             }
 
@@ -1435,7 +1435,7 @@ namespace VirginMediaWorkflowDirector
                     {
                         packageMoveRequired = ProcessFailedToMap(packageFile, destination);
                     }
-                    if (IsPackageAnUpdate)
+                    if (IsPackageAnUpdate & !FailedToMap)
                     {
                         ProcessUpdateFailure(packageFile, destination);
                     }
