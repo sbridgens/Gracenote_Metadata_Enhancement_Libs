@@ -449,7 +449,7 @@ namespace VirginMediaWorkflowDirector
 
             return true;
         }
-
+         
         public static bool UpdateAllVersionMajorValues(int newVersionMajor)
         {
             try
@@ -467,6 +467,34 @@ namespace VirginMediaWorkflowDirector
 
                 if (uavmvEx.InnerException != null)
                     Log.Error($"[UpdateAllVersionMajorValues] Inner Exception: {uavmvEx.InnerException.Message}");
+                return false;
+            }
+        }
+
+        //Duplicated here from GracenoteUpdateController as the 2 programs do not share this library.
+        public static bool UpdateAllVersionMinorValues(int newVersionMinor)
+        {
+            try
+            {
+                //set main ams version minor
+                EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor = newVersionMinor;
+                //set titl data ams version minor
+                EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.AMS.Version_Minor = newVersionMinor;
+
+                //iterate any asset sections and update the version minor
+                foreach (var item in EnrichmentWorkflowEntities.AdiFile.Asset.Asset.ToList()
+                    .Where(item => item.Metadata.AMS.Version_Minor != newVersionMinor))
+                    item.Metadata.AMS.Version_Minor = newVersionMinor;
+
+                return true;
+            }
+            catch (Exception uavmvEx)
+            {
+                Log.Error("[UpdateAllVersionMinorValues] Error during update of version Minor" +
+                          $": {uavmvEx.Message}");
+
+                if (uavmvEx.InnerException != null)
+                    Log.Error($"[UpdateAllVersionMinorValues] Inner Exception: {uavmvEx.InnerException.Message}");
                 return false;
             }
         }

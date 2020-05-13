@@ -1312,7 +1312,13 @@ namespace VirginMediaWorkflowDirector
                 if (!AdiContentController.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
                     return false;
 
+                if(EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor != 0)
 
+                {
+                    if (!AdiContentController.UpdateAllVersionMinorValues(EnrichmentWorkflowEntities.AdiFile.Metadata
+                        .AMS.Version_Minor))
+                        return false;
+                }
 
                 _adiDataService.Update(AdiData);
                 Log.Info("Adi data updated in the database.");
