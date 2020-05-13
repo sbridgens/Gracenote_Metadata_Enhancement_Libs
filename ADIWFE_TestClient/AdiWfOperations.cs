@@ -221,6 +221,7 @@ namespace ADIWFE_TestClient
                 return WorkflowManager.ImageSelectionLogic() &&
                           WorkflowManager.RemoveDerivedFromAsset() &&
                           WorkflowManager.FinalisePackageData() &&
+                          WorkflowManager.UpdateAdiVersions() &&
                           WorkflowManager.SaveAdiFile() &&
                           WorkflowManager.PackageEnrichedAsset() &&
                           WorkflowManager.DeliverEnrichedAsset();

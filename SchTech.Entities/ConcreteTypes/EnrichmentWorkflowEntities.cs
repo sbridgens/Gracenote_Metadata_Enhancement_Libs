@@ -119,16 +119,12 @@ namespace SchTech.Entities.ConcreteTypes
 
                 Log.Info("ADI Loaded correctly and will continue processing.");
 
-                if(AdiFile != null & !isUpdate)
+                if(AdiFile != null)
                 {
                     AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
                     AdiVersionMinor = AdiFile.Metadata.AMS.Version_Minor;
                 }
-                else if(isUpdate & UpdateAdi != null)
-                {
-                    AdiVersionMajor = UpdateAdi.Metadata.AMS.Version_Major;
-                    AdiVersionMinor = UpdateAdi.Metadata.AMS.Version_Minor;
-                }
+
 
                 Log.Info($"Asset Version Major: {AdiVersionMajor}");
                 return true;

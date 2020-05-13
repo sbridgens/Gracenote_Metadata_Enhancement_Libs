@@ -1308,20 +1308,10 @@ namespace VirginMediaWorkflowDirector
 
                 }
 
-                //Update all version major values to correct value.
-                if (!AdiContentController.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
-                    return false;
-
-                if(EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor != 0)
-
-                {
-                    if (!AdiContentController.UpdateAllVersionMinorValues(EnrichmentWorkflowEntities.AdiFile.Metadata
-                        .AMS.Version_Minor))
-                        return false;
-                }
 
                 _adiDataService.Update(AdiData);
                 Log.Info("Adi data updated in the database.");
+
 
                 //nullify updateadi data
                 if (EnrichmentWorkflowEntities.UpdateAdi != null)
@@ -1395,6 +1385,37 @@ namespace VirginMediaWorkflowDirector
                 LogError(
                     "SaveAdiFile",
                     "Error Saving Enriched ADI", safex);
+                return false;
+            }
+        }
+
+        public bool UpdateAdiVersions()
+        {
+            try
+            { 
+                //Update all version major values to correct value.
+                if (!AdiContentController.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
+                    return false;
+
+                if (EnrichmentWorkflowEntities.AdiFile.Metadata.AMS.Version_Minor != 0)
+
+                {
+                    if (!AdiContentController.UpdateAllVersionMinorValues(EnrichmentWorkflowEntities.AdiFile.Metadata
+                        .AMS.Version_Minor))
+                        return false;
+                }
+
+                _adiDataService.Update(AdiData);
+                Log.Info("Adi data table updated with correct version data.");
+
+                return true;
+
+            }
+            catch (Exception uavException)
+            {
+                LogError(
+                    "SaveUpdateAdiVersionsAdiFile",
+                    "Error Saving Enriched ADI", uavException);
                 return false;
             }
         }
