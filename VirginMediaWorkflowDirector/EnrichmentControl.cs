@@ -688,9 +688,7 @@ namespace VirginMediaWorkflowDirector
                     AdiContentManager.InsertTitleData(EnrichmentWorkflowEntities.IsMoviePackage) &&
 
                     //Add Correct description summaries
-                    AdiContentManager.InsertDescriptionData(
-                        descriptions: ApiManager.MovieEpisodeProgramData.descriptions
-                        ) &&
+                    AdiContentManager.InsertDescriptionData() &&
 
                     //Insert the Year data based on air date
                     AdiContentManager.InsertYearData(
@@ -824,8 +822,7 @@ namespace VirginMediaWorkflowDirector
                        AdiContentManager.InsertShowData(
                            showId: ApiManager.GetShowId(),
                            showName: ApiManager.GetShowName(),
-                           totalSeasons: ApiManager.GetNumberOfSeasons(),
-                           descriptions: ApiManager.ShowSeriesSeasonProgramData.descriptions) &&
+                           totalSeasons: ApiManager.GetNumberOfSeasons()) &&
 
                        AdiContentManager.InsertSeriesGenreData() &&
 

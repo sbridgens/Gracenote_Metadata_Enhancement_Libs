@@ -17,6 +17,8 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         private bool AdiExtracted { get; set; }
         private bool MovieAssetExtracted { get; set; }
         private bool PreviewExtracted { get; set; }
+
+        private bool StlExtracted { get; set; }
         private bool PreviewOnly { get; set; }
         public bool OperationsSuccessful { get; set; }
         public static bool HasPreviewAsset { get; set; }
@@ -26,6 +28,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
         public FileInfo ExtractedAdiFile { get; set; }
         public FileInfo ExtractedMovieAsset { get; set; }
         public FileInfo ExtractedPreview { get; set; }
+        public FileInfo ExtractedSubtitle { get; set; }
 
         #endregion Properties
 
@@ -130,6 +133,14 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                     break;
                 }
 
+                if (Path.GetExtension(entry.FullName) == ".stl")
+                {
+                    if(!StlExtracted)
+                    {
+                        Log.Info($"Extracting Subtitle file: {entry.Name}");
+                        ExtractEntry(entry, "stl");
+                    }
+                }
                 if (!AdiExtracted & IsLegacyGoPackage & entry.Name.ToLower().Equals("adi.xml"))
                 {
                     Log.Info("Legacy go Package - Extracting ADI.xml Only");
@@ -212,6 +223,11 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
                     ExtractedPreview = EntryFileInfo;
                     Log.Info($"Successfully extracted {archiveEntry.Name} to {outputFile}");
                     PreviewExtracted = true;
+                    break;
+                case "stl":
+                    ExtractedSubtitle = EntryFileInfo;
+                    Log.Info($"Successfully extracted {archiveEntry.Name} to {outputFile}");
+                    StlExtracted = true;
                     break;
             }
         }

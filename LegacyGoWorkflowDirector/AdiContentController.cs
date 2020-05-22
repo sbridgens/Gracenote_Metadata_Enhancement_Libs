@@ -599,11 +599,11 @@ namespace LegacyGoWorkflowDirector
             }
         }
 
-        public bool InsertDescriptionData(GnApiProgramsSchema.programsProgramDescriptions descriptions)
+        public bool InsertDescriptionData()
         {
             try
             {
-                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions);
+                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions);
 
                 if (!string.IsNullOrEmpty(desc))
                 {
@@ -777,8 +777,7 @@ namespace LegacyGoWorkflowDirector
             }
         }
 
-        public bool InsertShowData(string showId, string showName, int totalSeasons,
-            GnApiProgramsSchema.programsProgramDescriptions descriptions)
+        public bool InsertShowData(string showId, string showName, int totalSeasons)
         {
             try
             {
@@ -789,9 +788,7 @@ namespace LegacyGoWorkflowDirector
                        AddTitleMetadataApp_DataNode("Show_Name", showName) &&
                        AddTitleMetadataApp_DataNode(
                            "Show_Summary_Short",
-                           EnhancementDataValidator.CheckAndReturnDescriptionData(
-                               descriptions,
-                               true));
+                           EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions,true));
             }
             catch (Exception shDEx)
             {

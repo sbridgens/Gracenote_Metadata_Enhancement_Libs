@@ -12,35 +12,57 @@ namespace SchTech.Entities.ConcreteTypes
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentDataLists));
 
-        public List<GnApiProgramsSchema.assetType> ProgramAssets { get; private set; }
+        public List<GnApiProgramsSchema.titleDescType> ProgramTitles { get; private set; }
+
+        public List<GnApiProgramsSchema.titleDescType> ProgramDescriptions { get; private set; }
 
         public List<GnApiProgramsSchema.castTypeMember> CastMembers { get; private set; }
 
         public List<GnApiProgramsSchema.crewTypeMember> CrewMembers { get; private set; }
 
-        public List<GnApiProgramsSchema.titleDescType> ProgramTitles { get; private set; }
-
         public List<GnApiProgramsSchema.programsProgramGenre> GenresList { get; private set; }
+
+        public List<GnApiProgramsSchema.assetType> ProgramAssets { get; private set; }
 
         private List<GnApiProgramsSchema.externalLinksTypeExternalLink> ExternalLinks { get; set; }
 
-        public void AddProgramAssetsToList(IEnumerable<GnApiProgramsSchema.assetType> programsList, string apiLevel)
+
+
+        public void AddProgramTitlesToList(GnApiProgramsSchema.programsProgramTitles programTitles, string apiLevel)
         {
-            var assetTypes = programsList.ToList();
-
-            if (assetTypes.Any())
+            if (programTitles.title != null && programTitles.title.Any())
             {
-                if (ProgramAssets == null)
-                    ProgramAssets = new List<GnApiProgramsSchema.assetType>();
+                if (ProgramTitles == null)
+                    ProgramTitles = new List<GnApiProgramsSchema.titleDescType>();
 
-                Log.Debug($"Number of Assets at {apiLevel} Level: {assetTypes.Count()}");
-                foreach (var item in assetTypes) ProgramAssets.Add(item);
+                Log.Debug($"Number of Program Titles at {apiLevel} Level: {programTitles.title.Count()}");
+
+                foreach (var title in programTitles.title.ToList()) ProgramTitles.Add(title);
             }
             else
             {
-                Log.Warn($"Asset is currently null at the current api level: {apiLevel}, " +
-                         "will continue and check next api results for Cast data");
+                Log.Warn($"Title info is currently null at the current api level: {apiLevel}, " +
+                         "will continue and check next api results for Title data");
             }
+        }
+
+        public void AddProgramDescriptionsToList(GnApiProgramsSchema.programsProgramDescriptions programDescriptions, string apiLevel)
+        {
+            if (programDescriptions.desc != null && programDescriptions.desc.Any())
+            {
+                if (ProgramDescriptions == null)
+                    ProgramDescriptions = new List<GnApiProgramsSchema.titleDescType>();
+
+                Log.Debug($"Number of Program Descriptions at {apiLevel} Level: {programDescriptions.desc.Count()}");
+
+                foreach (var description in programDescriptions.desc) ProgramDescriptions.Add(description);
+            }
+            else
+            {
+                Log.Warn($"Program Descriptions are currently null at the current api level: {apiLevel}, " +
+                         "will continue and check next api results for Description data");
+            }
+
         }
 
         public void AddCastMembersToList(IEnumerable<GnApiProgramsSchema.castTypeMember> castList, string apiLevel)
@@ -80,24 +102,6 @@ namespace SchTech.Entities.ConcreteTypes
             }
         }
 
-        public void AddProgramTitlesToList(GnApiProgramsSchema.programsProgramTitles programTitles, string apiLevel)
-        {
-            if (programTitles.title != null && programTitles.title.Any())
-            {
-                if (ProgramTitles == null)
-                    ProgramTitles = new List<GnApiProgramsSchema.titleDescType>();
-
-                Log.Debug($"Number of Program Titles at {apiLevel} Level: {programTitles.title.Count()}");
-
-                foreach (var title in programTitles.title.ToList()) ProgramTitles.Add(title);
-            }
-            else
-            {
-                Log.Warn($"Title info is currently null at the current api level: {apiLevel}, " +
-                         "will continue and check next api results for Title data");
-            }
-        }
-
         public void AddGenresToList(IEnumerable<GnApiProgramsSchema.programsProgramGenre> genres, string apiLevel)
         {
             var programsProgramGenres = genres.ToList();
@@ -116,6 +120,27 @@ namespace SchTech.Entities.ConcreteTypes
                          "will continue and check next api results for genre data");
             }
         }
+
+
+        public void AddProgramAssetsToList(IEnumerable<GnApiProgramsSchema.assetType> programsList, string apiLevel)
+        {
+            var assetTypes = programsList.ToList();
+
+            if (assetTypes.Any())
+            {
+                if (ProgramAssets == null)
+                    ProgramAssets = new List<GnApiProgramsSchema.assetType>();
+
+                Log.Debug($"Number of Assets at {apiLevel} Level: {assetTypes.Count()}");
+                foreach (var item in assetTypes) ProgramAssets.Add(item);
+            }
+            else
+            {
+                Log.Warn($"Asset is currently null at the current api level: {apiLevel}, " +
+                         "will continue and check next api results for Cast data");
+            }
+        }
+
 
         public void AddExternalLinksToList(IEnumerable<GnApiProgramsSchema.externalLinksTypeExternalLink> externalLinks)
         {

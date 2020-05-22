@@ -86,30 +86,35 @@ namespace VirginMediaWorkflowDirector
         public void UpdateListData(GnApiProgramsSchema.programsProgram apiData, string seasonId)
         {
             //Build Data Lists
-            //Asset List
 
-            EnrichmentDataLists.AddProgramAssetsToList(apiData?.assets, "program(series/movie)");
-            //Cast List
-            EnrichmentDataLists.AddCastMembersToList(apiData?.cast, "program(series/movie)");
-            //Crew List
-            EnrichmentDataLists.AddCrewMembersToList(apiData?.crew, "program(series/movie)");
             //titles
-            EnrichmentDataLists.AddProgramTitlesToList(apiData?.titles, "program(series/movie)");
+            EnrichmentDataLists.AddProgramTitlesToList(apiData?.titles, "Layer1");
+            //descriptions
+            EnrichmentDataLists.AddProgramDescriptionsToList(apiData?.descriptions, "Layer1");
+            //Cast List
+            EnrichmentDataLists.AddCastMembersToList(apiData?.cast, "Layer1");
+            //Crew List
+            EnrichmentDataLists.AddCrewMembersToList(apiData?.crew, "Layer1");
             //genres
-            EnrichmentDataLists.AddGenresToList(apiData?.genres, "program(series/movie)");
+            EnrichmentDataLists.AddGenresToList(apiData?.genres, "Layer1");
+            //Asset List
+            EnrichmentDataLists.AddProgramAssetsToList(apiData?.assets, "Layer1");
             //external Links
             EnrichmentDataLists.AddExternalLinksToList(apiData?.externalLinks);
-            //
+            //Check for layer2 Availability
             var seasonData = apiData?.seasons?.FirstOrDefault(s => s.seasonId == seasonId);
 
             if (seasonData == null)
+            {
+                Log.Info("No Layer2 Data available for current Deliverable.");
                 return;
+            }
             //Season Asset List
-            EnrichmentDataLists.AddProgramAssetsToList(seasonData.assets, "Season");
+            EnrichmentDataLists.AddProgramAssetsToList(seasonData.assets, "Layer2");
             //Season Cast List
-            EnrichmentDataLists.AddCastMembersToList(seasonData.cast, "Season");
+            EnrichmentDataLists.AddCastMembersToList(seasonData.cast, "Layer2");
             //Season Crew List
-            EnrichmentDataLists.AddCrewMembersToList(seasonData.crew, "Season");
+            EnrichmentDataLists.AddCrewMembersToList(seasonData.crew, "Layer2");
         }
 
         public List<GnApiProgramsSchema.assetType> ReturnAssetList()
@@ -732,11 +737,11 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
-        public bool InsertDescriptionData(GnApiProgramsSchema.programsProgramDescriptions descriptions)
+        public bool InsertDescriptionData()
         {
             try
             {
-                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions);
+                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions);
 
                 if (!string.IsNullOrEmpty(desc))
                 {
@@ -911,8 +916,7 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
-        public bool InsertShowData(string showId, string showName, int totalSeasons,
-            GnApiProgramsSchema.programsProgramDescriptions descriptions)
+        public bool InsertShowData(string showId, string showName, int totalSeasons)
         {
             try
             {
@@ -923,13 +927,11 @@ namespace VirginMediaWorkflowDirector
                 if(AddTitleMetadataApp_DataNode("Show_ID", showId) &&
                        AddTitleMetadataApp_DataNode("Show_Name", showName))
                 {
-                    if(!string.IsNullOrEmpty(EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions,true)))
+                    if(!string.IsNullOrEmpty(EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions,true)))
                     {
                         AddTitleMetadataApp_DataNode(
                             "Show_Summary_Short",
-                            EnhancementDataValidator.CheckAndReturnDescriptionData(
-                                descriptions,
-                                true));
+                            EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions, true));
                     }
                     else
                     {

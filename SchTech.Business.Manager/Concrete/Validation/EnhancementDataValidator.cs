@@ -2,6 +2,7 @@
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Entities.ConcreteTypes;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using SchTech.File.Manager.Concrete.ZipArchive;
 
@@ -113,15 +114,14 @@ namespace SchTech.Business.Manager.Concrete.Validation
             return programData.progType.ToLower().Contains("special") || programData.holiday != null;
         }
 
-        public static string CheckAndReturnDescriptionData(
-            GnApiProgramsSchema.programsProgramDescriptions programDescriptions, bool isSeason = false)
+        public static string CheckAndReturnDescriptionData(List<GnApiProgramsSchema.titleDescType> programDescriptions, bool isSeason = false)
         {
-            if (!programDescriptions.desc.Any())
+            if (!programDescriptions.Any())
                 return string.Empty;
 
             if (!isSeason)
             {
-                foreach (var desc in programDescriptions.desc.OrderByDescending(d => d.size).ThenBy(d => d.type))
+                foreach (var desc in programDescriptions.OrderByDescending(d => d.size).ThenBy(d => d.type))
                 {
                     if (desc.type == "plot")
                     {
@@ -142,7 +142,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
                 }
             }
             // season or default fallback if above are not found
-            return programDescriptions.desc.OrderByDescending(d => d.size)
+            return programDescriptions.OrderByDescending(d => d.size)
                 .Where(d => d.size == "250" || d.size == "100")
                 .Select(t => t.Value)
                 .FirstOrDefault()
