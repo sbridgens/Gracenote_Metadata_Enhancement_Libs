@@ -564,6 +564,7 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
+        //Layer1Data
         public bool GetGracenoteMovieEpisodeData()
         {
             try
@@ -608,6 +609,7 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
+        //Layer2Data
         public bool GetSeriesSeasonSpecialsData()
         {
             try

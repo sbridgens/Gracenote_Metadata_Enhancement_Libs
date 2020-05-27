@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace SchTech.File.Manager.Concrete.Serialization
 {
@@ -39,6 +40,17 @@ namespace SchTech.File.Manager.Concrete.Serialization
             }
 
             return result;
+        }
+
+        public static string SerializedObjectToString<T>(T serializedObject)
+        {
+            var xmlSerializer = new XmlSerializer(serializedObject.GetType());
+
+            using (var writer = new StringWriter())
+            {
+                xmlSerializer.Serialize(writer, serializedObject);
+                return writer.ToString();
+            }
         }
     }
 }

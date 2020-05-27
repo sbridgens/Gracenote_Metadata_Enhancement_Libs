@@ -31,6 +31,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
         public virtual Microsoft.EntityFrameworkCore.DbSet<Layer1UpdateTracking> Layer1UpdateTracking { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<Layer2UpdateTracking> Layer2UpdateTracking { get; set; }
         public virtual Microsoft.EntityFrameworkCore.DbSet<LatestUpdateIds> LatestUpdateIds { get; set; }
+        public virtual Microsoft.EntityFrameworkCore.DbSet<GN_Api_Lookup> GN_Api_Lookup { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -56,6 +57,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Contexts
             _modelBuilder.Configurations.Add(new Layer1UpdateTrackingMap());
             _modelBuilder.Configurations.Add(new Layer2UpdateTrackingMap());
             _modelBuilder.Configurations.Add(new LatestUpdateIdsMap());
+            _modelBuilder.Configurations.Add(new GnApiLookupMap());
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
+using SchTech.File.Manager.Concrete.Serialization;
 
 
 namespace GracenoteUpdateManager
@@ -20,25 +21,26 @@ namespace GracenoteUpdateManager
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(GracenoteUpdateController));
-        
-        private EnrichmentWorkflowEntities WorkflowEntities { get; }
-        private GraceNoteApiManager ApiManager { get; }
-        
-        private static readonly  IAdiEnrichmentService AdiEnrichmentService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
-        private readonly IMappingsUpdateTrackingService _mappingsTrackerService;
-        private readonly ILayer1UpdateTrackingService _layer1TrackingService;
-        private readonly ILayer2UpdateTrackingService _layer2TrackingService;
 
+        private static readonly  IAdiEnrichmentService AdiEnrichmentService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
         public List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping> MappingsRequiringUpdate { get; private set; }
         public List<GnApiProgramsSchema.programsProgram> ProgramDataUpdatesRequiredList { get; private set; }
 
+        private readonly IMappingsUpdateTrackingService _mappingsTrackerService;
+
+        private readonly ILayer1UpdateTrackingService _layer1TrackingService;
+
+        private readonly ILayer2UpdateTrackingService _layer2TrackingService;
+        private EnrichmentDataLists EnrichmentDataLists { get; set; }
+        private EnrichmentWorkflowEntities WorkflowEntities { get; }
         public static long NextMappingUpdateId { get; private set; }
         public static long MaxMappingUpdateId { get; private set; }
         public static long NextLayer1UpdateId { get; private set; }
         public static long MaxLayer1UpdateId { get; private set; }
         public static long NextLayer2UpdateId { get; private set; }
         public static long MaxLayer2UpdateId { get; private set; }
-        
+        private GraceNoteApiManager ApiManager { get; }
+
         public GracenoteUpdateController()
         {
             _mappingsTrackerService = new MappingsUpdateTrackingManager(new EfMappingsUpdateTrackingDal());
@@ -120,8 +122,6 @@ namespace GracenoteUpdateManager
                 return 0;
             }
         }
-
-
 
         private void BuildLayer1UpdatesList()
         {
@@ -315,6 +315,8 @@ namespace GracenoteUpdateManager
             Log.Info($"Layer1 TMSID: {programData.TMSId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
             ProgramDataUpdatesRequiredList.Add(programData);
 
+            var test = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
+
             foreach (var row in programExistsInDb)
             {
                 Log.Info($"Updating Layer1UpdateTracking Table with new Layer1 data for IngestUUID: { row.IngestUUID} and TmsID: {row.GN_TMSID}");
@@ -336,8 +338,6 @@ namespace GracenoteUpdateManager
 
             foreach (var row in programExistsInDb)
             {
-                if(row.IngestUUID.ToString().Equals("6de9d51a-e64f-4807-8067-b8ced8714bed"))
-                    Log.Info("");
                 Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { row.IngestUUID} and ConnectorId: {row.GN_connectorId}");
                 _layer2TrackingService.UpdateLayer2Data(row.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
             }

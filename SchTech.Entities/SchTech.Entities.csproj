@@ -57,6 +57,7 @@
     <Compile Include="ConcreteTypes\EnrichmentDataLists.cs" />
     <Compile Include="ConcreteTypes\EnrichmentWorkflowEntities.cs" />
     <Compile Include="ConcreteTypes\GnProgramTypeLookup.cs" />
+    <Compile Include="ConcreteTypes\GN_Api_Lookup.cs" />
     <Compile Include="ConcreteTypes\GN_Mapping_Data.cs" />
     <Compile Include="ConcreteTypes\LatestUpdateIds.cs" />
     <Compile Include="ConcreteTypes\Layer1UpdateTracking.cs" />
