@@ -26,12 +26,15 @@ namespace GracenoteUpdateManager
         public List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping> MappingsRequiringUpdate { get; private set; }
         public List<GnApiProgramsSchema.programsProgram> ProgramDataUpdatesRequiredList { get; private set; }
 
+        private readonly IGnMappingDataService _gnMappingDataService;
+
         private readonly IMappingsUpdateTrackingService _mappingsTrackerService;
 
         private readonly ILayer1UpdateTrackingService _layer1TrackingService;
 
         private readonly ILayer2UpdateTrackingService _layer2TrackingService;
-        private EnrichmentDataLists EnrichmentDataLists { get; set; }
+
+        private readonly IGnApiLookupService _apiLookupService;
         private EnrichmentWorkflowEntities WorkflowEntities { get; }
         public static long NextMappingUpdateId { get; private set; }
         public static long MaxMappingUpdateId { get; private set; }
@@ -46,6 +49,8 @@ namespace GracenoteUpdateManager
             _mappingsTrackerService = new MappingsUpdateTrackingManager(new EfMappingsUpdateTrackingDal());
             _layer1TrackingService = new Layer1UpdateTrackingManager(new EfLayer1UpdateTrackingDal());
             _layer2TrackingService = new Layer2UpdateTrackingManager(new EfLayer2UpdateTrackingDal());
+            _apiLookupService = new GnApiLookupManager(new EfGnApiLookupDal());
+            _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
 
             ApiManager = new GraceNoteApiManager();
             if(WorkflowEntities==null)
@@ -141,6 +146,37 @@ namespace GracenoteUpdateManager
                     select programs).ToList();
         }
 
+        private void ValidateMappingExistsInDb(
+            GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping programMapping, string providerId)
+        {
+            var existsInMappingTable = _gnMappingDataService.Get(m => m.GN_ProviderId == providerId);
+
+            if (existsInMappingTable == null) 
+                return;
+
+            var apiXmlData =
+                XmlSerializationManager<GnOnApiProgramMappingSchema.@on>.SerializedObjectToString(
+                    programMapping);
+            var apiData = _apiLookupService.Get(a => a.IngestUUID == existsInMappingTable.IngestUUID);
+
+            if (apiData == null)
+            {
+                apiData = new GN_Api_Lookup
+                {
+                    IngestUUID = existsInMappingTable.IngestUUID,
+                    GN_TMSID = programMapping.id.FirstOrDefault(t => t.type.ToLower() == "tmsid")?.Value,
+                    GnMapData = apiXmlData
+                };
+
+                _apiLookupService.Add(apiData);
+            }
+            else
+            {
+                apiData.GnMapData = apiXmlData;
+                _apiLookupService.Update(apiData);
+            }
+        }
+
         public bool GetGracenoteMappingData(string dbUpdateId, string apiLimit)
         {
             try
@@ -195,22 +231,26 @@ namespace GracenoteUpdateManager
                     //continue if null
                     if (string.IsNullOrEmpty(providerId))
                         continue;
+
+
+                    ValidateMappingExistsInDb(programMapping, providerId);
+
                     //pid paid exists in the db based on providerid value
-                    var exists = _mappingsTrackerService?.GetTrackingItemByPidPaid(providerId);
+                    var existsInTracker = _mappingsTrackerService?.GetTrackingItemByPidPaid(providerId);
                     //continue if null
-                    if (exists == null)
+                    if (existsInTracker == null)
                         continue;
 
                     Log.Info($"Mapping PIDPAID: {providerId} EXISTS IN THE DB Requires Update, Update id: {programMapping.updateId}");
                     //update the the list for programs requiring adi updates
                     MappingsRequiringUpdate.Add(programMapping);
 
-                    Log.Info($"Updating MappingsUpdateTracking Table with new mapping data for IngestUUID: {exists.IngestUUID} and PIDPAID: {exists.GN_ProviderId}");
+                    Log.Info($"Updating MappingsUpdateTracking Table with new mapping data for IngestUUID: {existsInTracker.IngestUUID} and PIDPAID: {existsInTracker.GN_ProviderId}");
                     
                     //set the tracker service to flag the related asset as requiring an update.
                     //this flag will be used to trigger the adi creation service to generate a valid update against the correct ingestuuid.
                     //Sets the update ids too
-                    _mappingsTrackerService.UpdateMappingData(exists.IngestUUID, programMapping, NextMappingUpdateId.ToString(), MaxMappingUpdateId.ToString());
+                    _mappingsTrackerService.UpdateMappingData(existsInTracker.IngestUUID, programMapping, NextMappingUpdateId.ToString(), MaxMappingUpdateId.ToString());
                 }
                 
                 //mappings requiring updates finished being calculated and can now be used to generate adi updates
@@ -304,8 +344,45 @@ namespace GracenoteUpdateManager
             }
         }
 
+
+        private void ValidateLayer1ExistsInDb(GnApiProgramsSchema.programsProgram programData)
+        {
+            var mappings = _gnMappingDataService.GetList(m => m.GN_TMSID == programData.TMSId & m.GN_RootID == programData.rootId);
+
+            if (!mappings.Any()) 
+                return;
+
+            foreach (var mapping in mappings)
+            {
+                var apiXmlData = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
+                var apiData = _apiLookupService.Get(a => a.IngestUUID == mapping.IngestUUID);
+
+                if (apiData == null)
+                {
+                    apiData = new GN_Api_Lookup
+                    {
+                        IngestUUID = mapping.IngestUUID,
+                        GN_TMSID = mapping.GN_TMSID,
+                        GnLayer1Data = apiXmlData
+                    };
+
+                    _apiLookupService.Add(apiData);
+                }
+                else
+                {
+                    apiData.GnLayer1Data = apiXmlData;
+                    apiData.GN_TMSID = mapping.GN_TMSID;
+                    _apiLookupService.Update(apiData);
+                }
+
+            }
+
+        }
+
+
         private void ParseLayer1Updates(GnApiProgramsSchema.programsProgram programData)
         {
+            ValidateLayer1ExistsInDb(programData);
             var programExistsInDb =
                 _layer1TrackingService.GetTrackingItemByTmsIdAndRootId(programData.TMSId, programData.rootId);
             
@@ -315,7 +392,6 @@ namespace GracenoteUpdateManager
             Log.Info($"Layer1 TMSID: {programData.TMSId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
             ProgramDataUpdatesRequiredList.Add(programData);
 
-            var test = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
 
             foreach (var row in programExistsInDb)
             {
@@ -324,8 +400,43 @@ namespace GracenoteUpdateManager
             }
         }
 
+        private void ValidateLayer2ExistsInDb(GnApiProgramsSchema.programsProgram programData)
+        {
+            var mappings = _gnMappingDataService.GetList(m => m.GN_connectorId == programData.connectorId & m.GN_RootID == programData.rootId);
+
+            if (!mappings.Any()) 
+                return;
+
+            foreach (var mapping in mappings)
+            {
+                var apiXmlData = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
+                var apiData = _apiLookupService.Get(a => a.IngestUUID == mapping.IngestUUID);
+
+                if (apiData == null)
+                {
+                    apiData = new GN_Api_Lookup
+                    {
+                        IngestUUID = mapping.IngestUUID,
+                        GN_connectorId = programData.connectorId,
+                        GnLayer2Data = apiXmlData
+                    };
+
+                    _apiLookupService.Add(apiData);
+                }
+                else
+                {
+                    apiData.GnLayer2Data = apiXmlData;
+                    apiData.GN_connectorId = programData.connectorId;
+                    _apiLookupService.Update(apiData);
+                }
+
+            }
+
+        }
+
         private void ParseLayer2Updates(GnApiProgramsSchema.programsProgram programData)
         {
+            ValidateLayer2ExistsInDb(programData);
             var programExistsInDb =
                 _layer2TrackingService.GetTrackingItemByConnectorIdAndRootId(programData.connectorId,
                     programData.rootId);
@@ -340,6 +451,29 @@ namespace GracenoteUpdateManager
             {
                 Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { row.IngestUUID} and ConnectorId: {row.GN_connectorId}");
                 _layer2TrackingService.UpdateLayer2Data(row.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
+
+                var apiXmlData = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
+                var apiData = _apiLookupService.Get(a => a.IngestUUID == row.IngestUUID);
+
+                if (apiData == null)
+                {
+                    apiData = new GN_Api_Lookup
+                    {
+                        IngestUUID = row.IngestUUID,
+                        GN_TMSID = programData.TMSId,
+                        GN_connectorId = row.GN_connectorId,
+                        GnLayer2Data = apiXmlData
+                    };
+
+                    _apiLookupService.Add(apiData);
+                }
+                else
+                {
+                    apiData.GnLayer2Data = apiXmlData;
+                    apiData.GN_TMSID = programData.TMSId;
+                    apiData.GN_connectorId = row.GN_connectorId;
+                    _apiLookupService.Update(apiData);
+                }
             }
         }
 

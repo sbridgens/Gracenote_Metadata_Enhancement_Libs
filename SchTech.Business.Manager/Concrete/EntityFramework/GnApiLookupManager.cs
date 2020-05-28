@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.DataAccess.Abstract;
+using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
@@ -11,6 +12,11 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
     public class GnApiLookupManager : IGnApiLookupService
     {
         private readonly IGnApiLookupDal _gnApiLookupDal;
+
+        public GnApiLookupManager(IGnApiLookupDal gnApiLookupDal)
+        {
+            _gnApiLookupDal = gnApiLookupDal;
+        }
 
         public List<GN_Api_Lookup> GetList(Expression<Func<GN_Api_Lookup, bool>> filter = null)
         {

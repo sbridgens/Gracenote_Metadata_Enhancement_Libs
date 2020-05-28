@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {
-    class EfGnApiLookupDal : EfEntityRepositoryBase<GN_Api_Lookup, ADI_EnrichmentContext>, IGnApiLookupDal
+    public class EfGnApiLookupDal : EfEntityRepositoryBase<GN_Api_Lookup, ADI_EnrichmentContext>, IGnApiLookupDal
     {
     }
 }

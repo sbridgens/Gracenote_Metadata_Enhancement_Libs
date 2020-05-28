@@ -33,8 +33,7 @@ namespace VirginMediaWorkflowDirector
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentControl));
 
-        private IAdiEnrichmentService _adiDataService;
-
+        private readonly IAdiEnrichmentService _adiDataService;
         private readonly IGnImageLookupService _gnImageLookupService;
         private readonly IGnMappingDataService _gnMappingDataService;
         private readonly IMappingsUpdateTrackingService _mappingsUpdateTrackingService;
@@ -365,7 +364,7 @@ namespace VirginMediaWorkflowDirector
 
                 }
 
-                Log.Error($"Package {WorkflowEntities.TitlPaidValue} is not mapped, Status returned: {mapData.status.ToString()}, Catalog Name: {mapData.catalogName}");
+                Log.Error(message: $"Package {WorkflowEntities.TitlPaidValue} is not mapped, Status returned: {mapData.status}, Catalog Name: {mapData.catalogName}");
                 FailedToMap = true;
                 return false;
 
