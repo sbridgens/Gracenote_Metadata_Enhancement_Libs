@@ -285,6 +285,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema
         [DebuggerStepThrough]
         [DesignerCategory("code")]
         [XmlType(AnonymousType = true)]
+        [XmlRoot("programMapping")]
         public class onProgramMappingsProgramMapping
         {
             private onProgramMappingsProgramMappingAvailability availabilityField;

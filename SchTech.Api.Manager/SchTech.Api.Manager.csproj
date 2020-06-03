@@ -63,6 +63,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Serialization\UpdateTrackerSerializationHelper.cs" />
     <Compile Include="Serialization\XmlApiSerializationHelper.cs" />
   </ItemGroup>
   <ItemGroup>

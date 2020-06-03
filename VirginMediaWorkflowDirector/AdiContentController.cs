@@ -86,7 +86,6 @@ namespace VirginMediaWorkflowDirector
         public void UpdateListData(GnApiProgramsSchema.programsProgram apiData, string seasonId)
         {
             //Build Data Lists
-
             //titles
             EnrichmentDataLists.AddProgramTitlesToList(apiData?.titles, "Layer1");
             //descriptions

@@ -155,10 +155,11 @@ namespace GracenoteUpdateManager
                 return;
 
             var apiXmlData =
-                XmlSerializationManager<GnOnApiProgramMappingSchema.@on>.SerializedObjectToString(
+                UpdateTrackerSerializationHelper<GnOnApiProgramMappingSchema.@on>.SerializedObjectToString(
                     programMapping);
-            var apiData = _apiLookupService.Get(a => a.IngestUUID == existsInMappingTable.IngestUUID);
 
+            var apiData = _apiLookupService.Get(a => a.IngestUUID == existsInMappingTable.IngestUUID);
+            
             if (apiData == null)
             {
                 apiData = new GN_Api_Lookup
@@ -354,7 +355,7 @@ namespace GracenoteUpdateManager
 
             foreach (var mapping in mappings)
             {
-                var apiXmlData = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
+                var apiXmlData = UpdateTrackerSerializationHelper<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
                 var apiData = _apiLookupService.Get(a => a.IngestUUID == mapping.IngestUUID);
 
                 if (apiData == null)
@@ -409,7 +410,7 @@ namespace GracenoteUpdateManager
 
             foreach (var mapping in mappings)
             {
-                var apiXmlData = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
+                var apiXmlData = UpdateTrackerSerializationHelper<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
                 var apiData = _apiLookupService.Get(a => a.IngestUUID == mapping.IngestUUID);
 
                 if (apiData == null)
@@ -452,7 +453,7 @@ namespace GracenoteUpdateManager
                 Log.Info($"Updating Layer2UpdateTracking Table with new Layer2 data for IngestUUID: { row.IngestUUID} and ConnectorId: {row.GN_connectorId}");
                 _layer2TrackingService.UpdateLayer2Data(row.IngestUUID, programData, NextLayer2UpdateId.ToString(), MaxLayer2UpdateId.ToString());
 
-                var apiXmlData = XmlSerializationManager<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
+                var apiXmlData = UpdateTrackerSerializationHelper<GnApiProgramsSchema.@on>.SerializedObjectToString(programData);
                 var apiData = _apiLookupService.Get(a => a.IngestUUID == row.IngestUUID);
 
                 if (apiData == null)

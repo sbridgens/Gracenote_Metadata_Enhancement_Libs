@@ -31,26 +31,11 @@ namespace SchTech.File.Manager.Concrete.Serialization
             T result;
             using (TextReader textReader = new StringReader(fileContent))
             {
-                using (var reader = new XmlTextReader(textReader))
-                {
-                    reader.Namespaces = false;
-                    var serializer = new XmlSerializer(_type);
-                    result = (T)serializer.Deserialize(reader);
-                }
+                var serializer = new XmlSerializer(_type);
+                result = (T)serializer.Deserialize(textReader);
             }
 
             return result;
-        }
-
-        public static string SerializedObjectToString<T>(T serializedObject)
-        {
-            var xmlSerializer = new XmlSerializer(serializedObject.GetType());
-
-            using (var writer = new StringWriter())
-            {
-                xmlSerializer.Serialize(writer, serializedObject);
-                return writer.ToString();
-            }
         }
     }
 }
