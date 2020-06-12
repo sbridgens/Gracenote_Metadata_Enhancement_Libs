@@ -30,7 +30,7 @@ namespace SchTech.Api.Manager.Serialization
             return result;
         }
 
-        public static string SerializedObjectToString<T>(T serializedObject)
+        public static string SerializedObjectToString<T>(T serializedObject, bool isMapping)
         {
             
             var xmlSerializer = new XmlSerializer(serializedObject.GetType());
@@ -44,19 +44,19 @@ namespace SchTech.Api.Manager.Serialization
 
                 var doc = new XmlDocument();
                 doc.LoadXml(writer.ToString());
-                var newDoc = PrepareDbMappingDocument(doc);
+                var newDoc = PrepareDbDocument(doc, isMapping);
                 return newDoc.InnerXml;
             }
         }
 
-        private static XmlDocument PrepareDbMappingDocument(XmlDocument apiDocument)
+        private static XmlDocument PrepareDbDocument(XmlDocument apiDocument, bool isMapping)
         {
             var returnDoc = new XmlDocument();
             XmlNode rootElement = returnDoc.CreateElement("on");
-            XmlElement mappingsElement = returnDoc.CreateElement("programMappings");
+            XmlElement childElement = isMapping ? returnDoc.CreateElement("programMappings") : returnDoc.CreateElement("programs");
 
             returnDoc.AppendChild(rootElement);
-            returnDoc.DocumentElement?.AppendChild(mappingsElement);
+            returnDoc.DocumentElement?.AppendChild(childElement);
 
 
             var xsn = new XmlSerializerNamespaces();
@@ -64,7 +64,7 @@ namespace SchTech.Api.Manager.Serialization
             if (apiDocument.DocumentElement != null)
             {
                 var importedNode = returnDoc.ImportNode(apiDocument.DocumentElement, true);
-                mappingsElement.AppendChild(importedNode);
+                childElement.AppendChild(importedNode);
             }
 
             return returnDoc;

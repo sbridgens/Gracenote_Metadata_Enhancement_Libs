@@ -582,7 +582,7 @@ namespace LegacyGoWorkflowDirector
                     return titleAdded;
 
                 Log.Info("Title contains sort data, adding Show_Title_Sort_Name to ADI.");
-                titleAdded = AddTitleMetadataApp_DataNode("Show_Title_Sort_Name", sortTitle);
+                titleAdded = AddTitleMetadataApp_DataNode("Show_x", sortTitle);
 
 
                 return titleAdded;

@@ -614,11 +614,11 @@ namespace VirginMediaWorkflowDirector
                     var counter = 0;
                     var actorsDisplay = "";
 
-                    foreach (var member in EnrichmentDataLists.CastMembers.Distinct(new CastComparer())
-                        .ToList()
-                        .Where(member => member.role.Equals("Actor") ||
-                                         member.role.Equals("Voice")))
-                    {
+                        foreach (var member in EnrichmentDataLists.CastMembers.Distinct(new CastComparer())
+                            .ToList()
+                            .Where(member => member.role.Equals("Actor") ||
+                                             member.role.Equals("Voice")))
+                        {
                         if (counter == 5)
                         {
                             AddTitleMetadataApp_DataNode("Actors_Display",

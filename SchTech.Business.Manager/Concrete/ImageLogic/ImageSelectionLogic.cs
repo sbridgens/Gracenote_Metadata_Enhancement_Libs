@@ -244,6 +244,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                 if (ApiAssetList != null)
                 {
+                    if(imageTypeRequired=="HighResLandscape")
+                        _log.Debug("");
                     DownloadImageRequired = true;
                     SortAssets();
                     int logged;
@@ -251,6 +253,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                     foreach (var category in ConfigImageCategories)
                     {
                         logged = 0;
+                        if(category.CategoryName.ToLower().Equals("key art")  & string.IsNullOrEmpty(category.ImageTier.FirstOrDefault()))
+                            _log.Debug("");
                         //Iterate each image category based on asset tier
                         foreach (var imageTier in category.ImageTier)
                         {
@@ -259,14 +263,15 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                             UpdateCategoryList(ConfigImageCategories);
 
                             //iterate each image inside the sorted api asset list
-                            foreach (var image in ApiAssetSortedList)
+                            foreach (var image in ApiAssetSortedList.Where(i => !i.expiredDateSpecified))
                             {
                                 ImageAspect(image.width, image.height);
+                                if (category.CategoryName.ToLower().Equals("key art") & image.assetId.Equals("p14097646_k_h8_aa"))
+                                    _log.Debug("");
 
                                 //validate the image category is a match with the config
                                 //and that the image is not flagged as expired on the api
-                                if (image.category != category.CategoryName &&
-                                    !String.IsNullOrEmpty(image.expiredDate.ToLongDateString()))
+                                if (image.category != category.CategoryName)
                                     continue;
 
                                 //Check if the images contain identifiers

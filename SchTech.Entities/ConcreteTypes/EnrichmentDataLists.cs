@@ -28,44 +28,47 @@ namespace SchTech.Entities.ConcreteTypes
 
 
 
-        public void AddProgramTitlesToList(GnApiProgramsSchema.programsProgramTitles programTitles, string apiLevel)
+        public void AddProgramTitlesToList(GnApiProgramsSchema.programsProgramTitles programTitles, string apiLevel, bool updateTracker = false)
         {
             if (programTitles.title != null && programTitles.title.Any())
             {
                 if (ProgramTitles == null)
                     ProgramTitles = new List<GnApiProgramsSchema.titleDescType>();
 
-                Log.Debug($"Number of Program Titles at {apiLevel} Level: {programTitles.title.Count()}");
+                if(!updateTracker)
+                    Log.Debug($"Number of Program Titles at {apiLevel} Level: {programTitles.title.Count()}");
 
                 foreach (var title in programTitles.title.ToList()) ProgramTitles.Add(title);
             }
             else
             {
-                Log.Warn($"Title info is currently null at the current api level: {apiLevel}, " +
+                if (!updateTracker)
+                    Log.Warn($"Title info is currently null at the current api level: {apiLevel}, " +
                          "will continue and check next api results for Title data");
             }
         }
 
-        public void AddProgramDescriptionsToList(GnApiProgramsSchema.programsProgramDescriptions programDescriptions, string apiLevel)
+        public void AddProgramDescriptionsToList(GnApiProgramsSchema.programsProgramDescriptions programDescriptions, string apiLevel, bool updateTracker = false)
         {
             if (programDescriptions.desc != null && programDescriptions.desc.Any())
             {
                 if (ProgramDescriptions == null)
                     ProgramDescriptions = new List<GnApiProgramsSchema.titleDescType>();
-
-                Log.Debug($"Number of Program Descriptions at {apiLevel} Level: {programDescriptions.desc.Count()}");
+                if (!updateTracker)
+                    Log.Debug($"Number of Program Descriptions at {apiLevel} Level: {programDescriptions.desc.Count()}");
 
                 foreach (var description in programDescriptions.desc) ProgramDescriptions.Add(description);
             }
             else
             {
-                Log.Warn($"Program Descriptions are currently null at the current api level: {apiLevel}, " +
+                if (!updateTracker)
+                    Log.Warn($"Program Descriptions are currently null at the current api level: {apiLevel}, " +
                          "will continue and check next api results for Description data");
             }
 
         }
 
-        public void AddCastMembersToList(IEnumerable<GnApiProgramsSchema.castTypeMember> castList, string apiLevel)
+        public void AddCastMembersToList(IEnumerable<GnApiProgramsSchema.castTypeMember> castList, string apiLevel, bool updateTracker = false)
         {
             var castTypeMembers = castList.ToList();
             if (castTypeMembers.Any())
@@ -73,56 +76,61 @@ namespace SchTech.Entities.ConcreteTypes
                 if (CastMembers == null)
                     CastMembers = new List<GnApiProgramsSchema.castTypeMember>();
 
-                Log.Debug($"Number of Cast Members at {apiLevel} Level: {castTypeMembers.Count()}");
+                if (!updateTracker) 
+                    Log.Debug($"Number of Cast Members at {apiLevel} Level: {castTypeMembers.Count()}");
+
                 foreach (var cast in castTypeMembers) CastMembers.Add(cast);
             }
             else
             {
-                Log.Warn($"Cast info is currently null at the current api level: {apiLevel}, " +
+                if (!updateTracker)
+                    Log.Warn($"Cast info is currently null at the current api level: {apiLevel}, " +
                          "will continue and check next api results for Cast data");
             }
         }
 
-        public void AddCrewMembersToList(IEnumerable<GnApiProgramsSchema.crewTypeMember> crewList, string apiLevel)
+        public void AddCrewMembersToList(IEnumerable<GnApiProgramsSchema.crewTypeMember> crewList, string apiLevel, bool updateTracker = false)
         {
             var crewTypeMembers = crewList.ToList();
             if (crewTypeMembers.Any())
             {
                 if (CrewMembers == null)
                     CrewMembers = new List<GnApiProgramsSchema.crewTypeMember>();
-
-                Log.Debug($"Number of Crew Members at {apiLevel} Level: {crewTypeMembers.Count()}");
+                if (!updateTracker)
+                    Log.Debug($"Number of Crew Members at {apiLevel} Level: {crewTypeMembers.Count()}");
 
                 foreach (var crew in crewTypeMembers) CrewMembers.Add(crew);
             }
             else
             {
-                Log.Warn($"Crew info is currently null at the current api level: {apiLevel}, " +
+                if (!updateTracker)
+                    Log.Warn($"Crew info is currently null at the current api level: {apiLevel}, " +
                          "will continue and check next api results for Crew data");
             }
         }
 
-        public void AddGenresToList(IEnumerable<GnApiProgramsSchema.programsProgramGenre> genres, string apiLevel)
+        public void AddGenresToList(IEnumerable<GnApiProgramsSchema.programsProgramGenre> genres, string apiLevel, bool updateTracker = false)
         {
             var programsProgramGenres = genres.ToList();
             if (programsProgramGenres.Any())
             {
                 if (GenresList == null)
                     GenresList = new List<GnApiProgramsSchema.programsProgramGenre>();
-
-                Log.Debug($"Number of Genres at {apiLevel} Level: {programsProgramGenres.Count()}");
+                if (!updateTracker)
+                    Log.Debug($"Number of Genres at {apiLevel} Level: {programsProgramGenres.Count()}");
 
                 foreach (var genre in programsProgramGenres) GenresList.Add(genre);
             }
             else
             {
-                Log.Warn($"Genre info is currently null at the current api level: {apiLevel}, " +
+                if (!updateTracker)
+                    Log.Warn($"Genre info is currently null at the current api level: {apiLevel}, " +
                          "will continue and check next api results for genre data");
             }
         }
 
 
-        public void AddProgramAssetsToList(IEnumerable<GnApiProgramsSchema.assetType> programsList, string apiLevel)
+        public void AddProgramAssetsToList(IEnumerable<GnApiProgramsSchema.assetType> programsList, string apiLevel, bool updateTracker = false)
         {
             var assetTypes = programsList.ToList();
 
@@ -130,25 +138,27 @@ namespace SchTech.Entities.ConcreteTypes
             {
                 if (ProgramAssets == null)
                     ProgramAssets = new List<GnApiProgramsSchema.assetType>();
-
-                Log.Debug($"Number of Assets at {apiLevel} Level: {assetTypes.Count()}");
+                if (!updateTracker)
+                    Log.Debug($"Number of Assets at {apiLevel} Level: {assetTypes.Count()}");
                 foreach (var item in assetTypes) ProgramAssets.Add(item);
             }
             else
             {
-                Log.Warn($"Asset is currently null at the current api level: {apiLevel}, " +
+                if (!updateTracker)
+                    Log.Warn($"Asset is currently null at the current api level: {apiLevel}, " +
                          "will continue and check next api results for Cast data");
             }
         }
 
 
-        public void AddExternalLinksToList(IEnumerable<GnApiProgramsSchema.externalLinksTypeExternalLink> externalLinks)
+        public void AddExternalLinksToList(IEnumerable<GnApiProgramsSchema.externalLinksTypeExternalLink> externalLinks, bool updateTracker = false)
         {
             var externalLinksTypeExternalLinks = externalLinks.ToList();
 
             if (externalLinksTypeExternalLinks.Any())
             {
-                Log.Info("Asset has External Links, Storing IMDB Data.");
+                if (!updateTracker)
+                    Log.Info("Asset has External Links, Storing IMDB Data.");
 
                 if (ExternalLinks == null)
                     ExternalLinks = new List<GnApiProgramsSchema.externalLinksTypeExternalLink>();
@@ -158,7 +168,8 @@ namespace SchTech.Entities.ConcreteTypes
             }
             else
             {
-                Log.Warn("No Imdb Data available for the current package.");
+                if (!updateTracker)
+                    Log.Warn("No Imdb Data available for the current package.");
             }
         }
     }

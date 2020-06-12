@@ -942,6 +942,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema
         [DebuggerStepThrough]
         [DesignerCategory("code")]
         [XmlType(AnonymousType = true)]
+        [XmlRoot("program")]
         public class programsProgram
         {
             private string animationField;
