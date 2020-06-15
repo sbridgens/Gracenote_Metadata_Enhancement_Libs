@@ -118,7 +118,11 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public int GetNumberOfSeasons()
         {
-            return ShowSeriesSeasonProgramData.seasons?.Count ?? 0;
+            return ShowSeriesSeasonProgramData != null
+                ? Convert.ToInt32(ShowSeriesSeasonProgramData.seasons?.Count)
+                : Convert.ToInt32(MovieEpisodeProgramData != null
+                    ? MovieEpisodeProgramData.seasons?.Count
+                    : 0);
         }
 
         public void SetSeasonData()
@@ -134,18 +138,22 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public string GetShowName()
         {
-            return ShowSeriesSeasonProgramData.titles.title
+            return ShowSeriesSeasonProgramData?.titles.title
                 .Where(t => t.type == "full" & t.size == "120")
                 .Select(t => t.Value)
                 .FirstOrDefault()
-                ?.ToString();
+                ?.ToString() ?? 
+                MovieEpisodeProgramData.titles.title
+                    .Where(t => t.type == "full" & t.size == "120")
+                       .Select(t => t.Value)
+                       .FirstOrDefault();
         }
 
         public string GetShowId()
         {
             return !string.IsNullOrWhiteSpace(ADIWF_Config.Prefix_Show_ID_Value)
-                ? $"{ADIWF_Config.Prefix_Show_ID_Value}{ShowSeriesSeasonProgramData.seriesId}"
-                : ShowSeriesSeasonProgramData.seriesId;
+                ? $"{ADIWF_Config.Prefix_Show_ID_Value}{ShowSeriesSeasonProgramData?.seriesId}"
+                : (ShowSeriesSeasonProgramData?.seriesId ?? MovieEpisodeProgramData.seriesId);
         }
 
         public string GetEpisodeSeason()
@@ -155,23 +163,23 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
         public List<GnApiProgramsSchema.programsProgramSeason> GetSeasonInfo()
         {
-            return ShowSeriesSeasonProgramData.seasons ?? MovieEpisodeProgramData.seasons;
+            return ShowSeriesSeasonProgramData?.seasons ?? MovieEpisodeProgramData.seasons;
         }
 
         public DateTime GetSeriesPremiere()
         {
-            return ShowSeriesSeasonProgramData.seriesPremiere;
+            return ShowSeriesSeasonProgramData?.seriesPremiere ?? MovieEpisodeProgramData.seriesPremiere;
         }
 
         public DateTime GetSeriesFinale()
         {
-            return ShowSeriesSeasonProgramData.seriesFinale;
+            return ShowSeriesSeasonProgramData?.seriesFinale ?? MovieEpisodeProgramData.seriesFinale;
         }
 
         public DateTime? GetSeasonPremiere()
         {
             var first =
-                ShowSeriesSeasonProgramData.seasons?.FirstOrDefault();
+                ShowSeriesSeasonProgramData?.seasons?.FirstOrDefault() ?? MovieEpisodeProgramData.seasons?.FirstOrDefault();
 
             return first?.seasonPremiere;
         }
@@ -179,7 +187,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
         public DateTime? GetSeasonFinale()
         {
             var last =
-                ShowSeriesSeasonProgramData.seasons?.LastOrDefault();
+                ShowSeriesSeasonProgramData?.seasons?.LastOrDefault() ?? MovieEpisodeProgramData.seasons.LastOrDefault();
             return last?.seasonFinale;
         }
     }

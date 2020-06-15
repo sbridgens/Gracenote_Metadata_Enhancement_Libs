@@ -90,7 +90,7 @@ namespace SchTech.Entities.ConcreteTypes
                 Path.GetFileNameWithoutExtension(CurrentPackage.Name));
         }
 
-        public bool SerializeAdiFile(bool isUpdate, string adiData = "", bool loadUpdateAdi = false)
+        public bool SerializeAdiFile(bool isUpdate, string adiData = "", bool loadUpdateAdi = false, bool isUpdateService = false)
         {
             try
             {
@@ -110,14 +110,16 @@ namespace SchTech.Entities.ConcreteTypes
 
                 if (loadUpdateAdi)
                 {
-                    Log.Info("Loading DB Update ADI.");
+                    if(!isUpdateService) 
+                        Log.Info("Loading DB Update ADI.");
                     UpdateAdi = new ADI();
                     UpdateAdi = XmlSerializer.Read(adiData);
                 }
                 if (!isUpdate & AdiFile == null)
                     throw new Exception("Adi file is null check namespaces and adi document structure?");
 
-                Log.Info("ADI Loaded correctly and will continue processing.");
+                if (!isUpdateService) 
+                    Log.Info("ADI Loaded correctly and will continue processing.");
 
                 if(AdiFile != null)
                 {
@@ -126,7 +128,8 @@ namespace SchTech.Entities.ConcreteTypes
                 }
 
 
-                Log.Info($"Asset Version Major: {AdiVersionMajor}");
+                if (!isUpdateService) 
+                    Log.Info($"Asset Version Major: {AdiVersionMajor}");
                 return true;
 
             }
