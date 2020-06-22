@@ -173,7 +173,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
         private bool MatchIdentifier(
             IEnumerable<GnApiProgramsSchema.identifierType> identifiers,
-            string imageName
+            string imageName, bool isTrackerService = false
         )
         {
             foreach (var idArr in identifiers)
@@ -185,15 +185,16 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 {
                     IdentifierId = idArr.id.FirstOrDefault();
                     IdentifierType = idArr.type;
-                    _log.Debug($"Image: {imageName} - Identifier Type: {IdentifierType} " +
+                    if(!isTrackerService)
+                        _log.Debug($"Image: {imageName} - Identifier Type: {IdentifierType} " +
                                $"Identifier ID: {IdentifierId}" +
                                $" matches Config value: {confIdentifier.Id}");
                     return true;
                 }
             }
 
-
-            _log.Debug($"Image: {imageName} - No matching identifier present for image, " +
+            if(!isTrackerService)
+                _log.Debug($"Image: {imageName} - No matching identifier present for image, " +
                       "no identifier rules applied.");
 
             return false;
@@ -236,16 +237,16 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
         }
 
 
-        public string GetGracenoteImage(string imageTypeRequired)
+        public string GetGracenoteImage(string imageTypeRequired, bool isTrackerService = false)
         {
             try
             {
-                _log.Info($"Processing Image: {imageTypeRequired}");
+                if(!isTrackerService)
+                    _log.Info($"Processing Image: {imageTypeRequired}");
 
                 if (ApiAssetList != null)
                 {
-                    if (imageTypeRequired == "HighResLandscape")
-                        _log.Debug("");
+
                     DownloadImageRequired = true;
                     SortAssets();
                     int logged;
@@ -253,8 +254,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                     foreach (var category in ConfigImageCategories)
                     {
                         logged = 0;
-                        if (category.CategoryName.ToLower().Equals("key art") & string.IsNullOrEmpty(category.ImageTier.FirstOrDefault()))
-                            _log.Debug("");
+
                         //Iterate each image category based on asset tier
                         foreach (var imageTier in category.ImageTier)
                         {
@@ -266,8 +266,6 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                             foreach (var image in ApiAssetSortedList.Where(i => !i.expiredDateSpecified))
                             {
                                 ImageAspect(image.width, image.height);
-                                if (category.CategoryName.ToLower().Equals("key art") & image.assetId.Equals("p14097646_k_h8_aa"))
-                                    _log.Debug("");
 
                                 //validate the image category is a match with the config
                                 //and that the image is not flagged as expired on the api
@@ -286,7 +284,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 }
                                 else if (logged == 0)
                                 {
-                                    _log.Debug($"No Identifier config found for current image Type -" +
+                                    if(!isTrackerService)
+                                        _log.Debug($"No Identifier config found for current image Type -" +
                                                $" {imageTypeRequired}");
                                     logged++;
                                 }
@@ -297,11 +296,9 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
 
                                 //LogIdentifierLogic(image.identifiers.Count(), image.assetId);
+                                if (!isTrackerService)
+                                    _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
-                                _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
-
-                                if (imageTypeRequired == "TitleTreatment")
-                                    _log.Info("");
                                 //check if the image is flagged as a requires trimming in config
                                 var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
                                     .Select(r => r.TrimImage).FirstOrDefault());
@@ -320,15 +317,18 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 //Is new ingest or update?
                                 if (!IsUpdate || gnimages == null)
                                 {
-                                    _log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
+                                    if (!isTrackerService)
+                                        _log.Info($"Updating Database with Image {imageTypeRequired}: {image.URI}");
                                     SetDbImages(imageTypeRequired, image.URI);
-                                    _log.Info(
+                                    if (!isTrackerService)
+                                        _log.Info(
                                         $"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
 
                                     return imageUri;
                                 }
 
-                                _log.Debug("Retrieved images for update package from db");
+                                if (!isTrackerService)
+                                    _log.Debug("Retrieved images for update package from db");
 
                                 //if this is an update get the db images and validate if the image matches 
                                 //or has been updated, if there is no match download else return false as the image matches
@@ -359,7 +359,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 }
                                 else
                                 {
-                                    _log.Info("Update Package - image is up to date not required for download.");
+                                    if (!isTrackerService)
+                                        _log.Info("Update Package - image is up to date not required for download.");
                                     DownloadImageRequired = false;
                                 }
 
@@ -378,8 +379,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                 return null;
             }
 
-
-            _log.Warn($"No Matching images found for: {imageTypeRequired}");
+            if (!isTrackerService)
+                _log.Warn($"No Matching images found for: {imageTypeRequired}");
 
             return null;
         }

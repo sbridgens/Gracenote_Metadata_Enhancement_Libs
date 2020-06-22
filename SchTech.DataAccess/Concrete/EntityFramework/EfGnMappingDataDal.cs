@@ -80,11 +80,11 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             return true;
         }
 
-        public Dictionary<string, string> ReturnDbImagesForAsset(string paidValue, int rowId)
+        public Dictionary<string, string> ReturnDbImagesForAsset(string paidValue, int rowId, bool isTrackerService)
         {
             var dbImages = new Dictionary<string, string>();
-
-            EfStaticMethods.Log.Debug($"Retrieving image data from the db where GNPAID = {paidValue}");
+            if(!isTrackerService)
+                EfStaticMethods.Log.Debug($"Retrieving image data from the db where GNPAID = {paidValue}");
             try
             {
                 using (var db = new ADI_EnrichmentContext())

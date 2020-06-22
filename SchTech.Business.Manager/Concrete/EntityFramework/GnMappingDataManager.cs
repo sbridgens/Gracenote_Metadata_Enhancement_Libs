@@ -53,9 +53,9 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
             return _gnMappingDataDal.AddGraceNoteProgramData(ingestGuid, seriesTitle, episodeTitle, programDatas);
         }
 
-        public Dictionary<string, string> ReturnDbImagesForAsset(string paidValue, int rowId)
+        public Dictionary<string, string> ReturnDbImagesForAsset(string paidValue, int rowId, bool isTrackerService)
         {
-            return _gnMappingDataDal.ReturnDbImagesForAsset(paidValue, rowId);
+            return _gnMappingDataDal.ReturnDbImagesForAsset(paidValue, rowId, isTrackerService);
         }
 
         public GN_Mapping_Data ReturnMapData(Guid ingestGuid)

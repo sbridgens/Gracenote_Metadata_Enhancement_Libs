@@ -904,7 +904,8 @@ namespace VirginMediaWorkflowDirector
 
                 isl.DbImagesForAsset = _gnMappingDataService.ReturnDbImagesForAsset(
                     WorkflowEntities.GnMappingPaid,
-                    isl.CurrentMappingData.Id
+                    isl.CurrentMappingData.Id,
+                    false
                 );
 
                 var imageUri = isl.GetGracenoteImage(configLookup.Image_Lookup);
