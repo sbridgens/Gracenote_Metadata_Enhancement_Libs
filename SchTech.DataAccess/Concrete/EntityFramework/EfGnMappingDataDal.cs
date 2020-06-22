@@ -115,7 +115,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 return dbImages;
             }
         }
-        
+
         public GN_Mapping_Data ReturnMapData(Guid ingestGuid)
         {
             using (var db = new ADI_EnrichmentContext())

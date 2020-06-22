@@ -11,7 +11,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
             ToTable(@"MappingsUpdateTracking", @"dbo");
             //Primary key is set here
             HasKey(x => x.Id);
-            
+
             Property(x => x.IngestUUID).HasColumnName("IngestUUID");
             Property(x => x.GN_ProviderId).HasColumnName("GN_ProviderId");
             Property(x => x.Mapping_UpdateId).HasColumnName("Mapping_UpdateId");

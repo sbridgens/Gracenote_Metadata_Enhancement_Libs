@@ -1,9 +1,4 @@
 ﻿using log4net;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
@@ -22,6 +17,11 @@ using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.File.Manager.Concrete.ZipArchive;
 using SchTech.Queue.Manager.Concrete;
 using SchTech.Web.Manager.Concrete;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 
 namespace VirginMediaWorkflowDirector
@@ -76,7 +76,7 @@ namespace VirginMediaWorkflowDirector
                 Log.Error($"[{functionName}] Inner Exception:" +
                           $" {ex.InnerException.Message}");
         }
-        
+
         public bool AvailableDriveSpace()
         {
             using (var hardwareInformation = new HardwareInformationManager())
@@ -235,7 +235,7 @@ namespace VirginMediaWorkflowDirector
 
             if (IsPackageAnUpdate & adiData == null)
             {
-                Log.Error( $"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
+                Log.Error($"No Parent Package exists in the database for update package with paid: {WorkflowEntities.TitlPaidValue}, Failing ingest");
                 FailedToMap = true;
                 return false;
             }
@@ -319,13 +319,13 @@ namespace VirginMediaWorkflowDirector
                 if (IsPackageAnUpdate)
                     return UpdateGnMappingData();
 
-                
+
 
                 //secondary check
                 if (mapData.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped)
                 {
                     Log.Info($"Asset Mapping status: {mapData.status}, Catalog Name: {mapData.catalogName}");
-                    
+
                     WorkflowEntities.GraceNoteUpdateId = mapData.updateId;
 
                     var data = new GN_Mapping_Data
@@ -1002,7 +1002,7 @@ namespace VirginMediaWorkflowDirector
                     WorkflowEntities.GraceNoteTmsId,
                     programRootId: ApiManager.MovieEpisodeProgramData?.rootId,
                     shoDataRootId: ApiManager.ShowSeriesSeasonProgramData?.rootId);
-                
+
                 AdiContentController.CheckAndAddBlockPlatformData();
                 if (WorkflowEntities.IsQamAsset & IsPackageAnUpdate)
                     AdiContentManager.SetQamUpdateContent(IsPackageAnUpdate);
@@ -1050,12 +1050,12 @@ namespace VirginMediaWorkflowDirector
             {
                 var mapTracking = _mappingsUpdateTrackingService.Get(m => m.IngestUUID == AdiData.IngestUUID);
                 var updateId = ApiManager.GetMappingUpdateId();
-                
+
                 if (mapTracking == null)
                 {
                     mapTracking = new MappingsUpdateTracking
                     {
-                        IngestUUID =  GnMappingData.IngestUUID,
+                        IngestUUID = GnMappingData.IngestUUID,
                         GN_ProviderId = GnMappingData.GN_ProviderId,
                         Mapping_MaxUpdateId = updateId,
                         Mapping_NextUpdateId = updateId,
@@ -1100,7 +1100,7 @@ namespace VirginMediaWorkflowDirector
 
                     layer1Tracking = new Layer1UpdateTracking
                     {
-                        IngestUUID =  GnMappingData.IngestUUID,
+                        IngestUUID = GnMappingData.IngestUUID,
                         GN_Paid = GnMappingData.GN_Paid,
                         GN_TMSID = ApiManager.MovieEpisodeProgramData?.TMSId,
                         Layer1_UpdateId = updateId,
@@ -1255,7 +1255,7 @@ namespace VirginMediaWorkflowDirector
 
                 //Serialize previously enriched Adi File to obtain Asset data
 
-                if(AdiData.UpdateAdi != null)
+                if (AdiData.UpdateAdi != null)
                     WorkflowEntities.SerializeAdiFile(true, AdiData.UpdateAdi, true);
                 else
                     WorkflowEntities.SerializeAdiFile(true, AdiData.EnrichedAdi);
@@ -1390,7 +1390,7 @@ namespace VirginMediaWorkflowDirector
         public bool UpdateAdiVersions()
         {
             try
-            { 
+            {
                 //Update all version major values to correct value.
                 if (!AdiContentController.UpdateAllVersionMajorValues(WorkflowEntities.AdiVersionMajor))
                     return false;
@@ -1464,7 +1464,7 @@ namespace VirginMediaWorkflowDirector
                     {
                         ProcessUpdateFailure(packageFile, destination);
                     }
-                    else if(packageMoveRequired)
+                    else if (packageMoveRequired)
                     {
                         ProcessPackageFailure(packageFile, destination);
                     }
@@ -1473,7 +1473,7 @@ namespace VirginMediaWorkflowDirector
                     if (File.Exists(destination) & packageMoveRequired)
                         Log.Info("Move to failed directory successful.");
                 }
-                
+
 
                 FileDirectoryManager.RemoveExistingTempDirectory(WorkflowEntities.CurrentWorkingDirectory);
 
@@ -1590,7 +1590,7 @@ namespace VirginMediaWorkflowDirector
             try
             {
                 Log.Info($"Removing working directory: {WorkflowEntities.CurrentWorkingDirectory}");
-                
+
                 if (Directory.Exists(WorkflowEntities.CurrentWorkingDirectory))
                     Directory.Delete(WorkflowEntities.CurrentWorkingDirectory, true);
 

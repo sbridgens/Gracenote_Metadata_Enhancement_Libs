@@ -1,5 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using SchTech.Entities.ConcreteTypes;
+﻿using SchTech.Entities.ConcreteTypes;
+using System.Data.Entity.ModelConfiguration;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework.Mappings
 {

@@ -1,13 +1,13 @@
 ﻿using ADIWFE_TestClient.Properties;
 using log4net;
 using SchTech.Configuration.Manager.Concrete;
+using SchTech.Configuration.Manager.Parameters;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
+using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
 using System;
-using SchTech.Configuration.Manager.Parameters;
-using SchTech.Entities.ConcreteTypes;
 using VirginMediaWorkflowDirector;
 
 namespace ADIWFE_TestClient
@@ -18,14 +18,14 @@ namespace ADIWFE_TestClient
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(AdiWfOperations));
-        
+
         private EnrichmentControl WorkflowManager { get; set; }
         private EfAdiEnrichmentDal AdiEnrichmentDal { get; set; }
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
         private WorkQueueItem IngestFile { get; set; }
         private bool HasGnMapping { get; set; }
-        
+
         private bool Success { get; set; }
 
         public static void LogError(string functionName, string message, Exception ex)
@@ -58,7 +58,7 @@ namespace ADIWFE_TestClient
                 return false;
             }
         }
-       
+
         public void InitialiseWorkflowOperations()
         {
             AdiEnrichmentDal = new EfAdiEnrichmentDal();
@@ -122,10 +122,10 @@ namespace ADIWFE_TestClient
                             "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
                     if (!EnrichmentWorkflowEntities.IsMoviePackage)
                     {
-                        if(!ProcessSeriesEpisodePackage())
+                        if (!ProcessSeriesEpisodePackage())
                             throw new Exception("Error Processing Series/Episode data.");
                     }
-                    if(AllPackageTasks())
+                    if (AllPackageTasks())
                     {
                         WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
                         AdiEnrichmentQueueController.QueuedPackages.Remove(package);
@@ -139,13 +139,13 @@ namespace ADIWFE_TestClient
                 }
                 catch (Exception pqiEx)
                 {
-                    if(HasGnMapping)
+                    if (HasGnMapping)
                         LogError("ProcessQueuedItems",
                             $"Error encountered processing package: {IngestFile.AdiPackage.Name}",
                             pqiEx);
 
                     WorkflowManager.ProcessFailedPackage(IngestFile.AdiPackage);
-                    if(HasGnMapping || WorkflowManager.IsPackageAnUpdate)
+                    if (HasGnMapping || WorkflowManager.IsPackageAnUpdate)
                         Log.Info($"############### Processing FAILED! for item: {IngestFile.AdiPackage.Name} ###############\r\n");
                     else
                     {
@@ -169,11 +169,11 @@ namespace ADIWFE_TestClient
         {
             try
             {
-                if(WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
+                if (WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
                        WorkflowManager.ValidatePackageIsUnique())
                 {
                     HasGnMapping = WorkflowManager.CallAndParseGnMappingData();
-                    if(HasGnMapping)
+                    if (HasGnMapping)
                         return WorkflowManager.SeedGnMappingData() &&
                                WorkflowManager.ExtractPackageMedia() &&
                                WorkflowManager.SetAdiMovieMetadata() &&

@@ -1,11 +1,11 @@
 ﻿using log4net;
+using SchTech.Configuration.Manager.Schema.ADIWFE;
+using SchTech.DataAccess.Concrete.EntityFramework;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using SchTech.Configuration.Manager.Schema.ADIWFE;
-using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace ADIWFE_TestLegacyGo
 {

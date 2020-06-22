@@ -1,10 +1,10 @@
 ﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Entities.ConcreteTypes;
+using SchTech.File.Manager.Concrete.ZipArchive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SchTech.File.Manager.Concrete.ZipArchive;
 
 namespace SchTech.Business.Manager.Concrete.Validation
 {
@@ -69,7 +69,7 @@ namespace SchTech.Business.Manager.Concrete.Validation
 
             }
 
-            Log.Error( $"Package for PAID: {paid} detected as an update does not have a database entry for Version Major! Failing Enhancement.");
+            Log.Error($"Package for PAID: {paid} detected as an update does not have a database entry for Version Major! Failing Enhancement.");
             return false;
         }
 

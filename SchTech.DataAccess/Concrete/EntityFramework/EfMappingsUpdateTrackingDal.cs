@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using log4net;
-using Remotion.Linq.Clauses.ResultOperators;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 using SchTech.Entities.ConcreteTypes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {

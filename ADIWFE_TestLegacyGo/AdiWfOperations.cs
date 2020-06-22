@@ -1,13 +1,13 @@
 ﻿using ADIWFE_TestLegacyGo.Properties;
-using log4net;
-using System;
 using LegacyGoWorkflowDirector;
+using log4net;
 using SchTech.Configuration.Manager.Concrete;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
+using System;
 
 namespace ADIWFE_TestLegacyGo
 {
@@ -17,9 +17,9 @@ namespace ADIWFE_TestLegacyGo
         ///     Initialize Log4net
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(AdiWfOperations));
-        
+
         private EnrichmentControl WorkflowManager { get; set; }
-        
+
         private EfAdiEnrichmentDal AdiEnrichmentDal { get; set; }
         private AdiEnrichmentPollController PollController { get; set; }
         private HardwareInformationManager HwInformationManager { get; set; }
@@ -50,7 +50,7 @@ namespace ADIWFE_TestLegacyGo
                 return false;
             }
         }
-        
+
 
         public void InitialiseWorkflowOperations()
         {

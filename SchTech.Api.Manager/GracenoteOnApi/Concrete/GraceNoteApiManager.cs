@@ -19,7 +19,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
         public GnApiProgramsSchema.programsProgram MovieEpisodeProgramData { get; set; }
         public GnApiProgramsSchema.programsProgram ShowSeriesSeasonProgramData { get; set; }
         public GnApiProgramsSchema.programsProgramSeason SeasonData { get; set; }
-        
+
         public List<GnApiProgramsSchema.externalLinksTypeExternalLink> ExternalLinks()
         {
             var externalLinks = new List<GnApiProgramsSchema.externalLinksTypeExternalLink>();
@@ -27,7 +27,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
 
             if (MovieEpisodeProgramData.externalLinks.Any())
                 externalLinks.AddRange(MovieEpisodeProgramData.externalLinks);
-            
+
             if (ShowSeriesSeasonProgramData != null && ShowSeriesSeasonProgramData.externalLinks.Any())
                 externalLinks.AddRange(ShowSeriesSeasonProgramData.externalLinks);
 
@@ -42,7 +42,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
         public string GetConnectorId()
         {
             //"SH025371110000"
-            if(string.IsNullOrEmpty(MovieEpisodeProgramData.connectorId))
+            if (string.IsNullOrEmpty(MovieEpisodeProgramData.connectorId))
                 throw new Exception("No Gracenote ConnectorId for package at this time, failing ingest.");
             return MovieEpisodeProgramData.connectorId;
         }
@@ -142,7 +142,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
                 .Where(t => t.type == "full" & t.size == "120")
                 .Select(t => t.Value)
                 .FirstOrDefault()
-                ?.ToString() ?? 
+                ?.ToString() ??
                 MovieEpisodeProgramData.titles.title
                     .Where(t => t.type == "full" & t.size == "120")
                        .Select(t => t.Value)

@@ -67,17 +67,17 @@ namespace SchTech.File.Manager.Concrete.FileSystem
                 {
                     return;
                 }
-                
-                
+
+
                 Log.Info($"Temp Directory {outputDirectory} Exists, removing");
 
-                foreach (var file in Directory.EnumerateFiles(outputDirectory, 
+                foreach (var file in Directory.EnumerateFiles(outputDirectory,
                     "*.*", SearchOption.AllDirectories))
                     System.IO.File.Delete(file);
 
-                foreach (var dir in Directory.GetDirectories(outputDirectory,"*", SearchOption.AllDirectories))
+                foreach (var dir in Directory.GetDirectories(outputDirectory, "*", SearchOption.AllDirectories))
                     Directory.Delete(dir);
-                
+
                 for (var d = 0; d <= 5; d++)
                 {
                     if (!RemoveDirectory(outputDirectory))
@@ -99,7 +99,7 @@ namespace SchTech.File.Manager.Concrete.FileSystem
 
         private static bool RemoveDirectory(string outputdir)
         {
-            if(Directory.Exists(outputdir))
+            if (Directory.Exists(outputdir))
                 Directory.Delete(outputdir);
 
             return Directory.Exists(outputdir);

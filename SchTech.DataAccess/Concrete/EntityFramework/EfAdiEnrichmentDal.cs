@@ -12,14 +12,14 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         public static bool ExpiryProcessing { get; private set; }
 
         public static bool IsWorkflowProcessing { get; set; }
-        
+
         private ADI_EnrichmentContext CurrentContext { get; set; }
-        
+
         public Adi_Data GetAdiData(Guid adiGuid)
         {
             using (var db = new ADI_EnrichmentContext())
             {
-               return db.Adi_Data.FirstOrDefault(i => i.IngestUUID.Equals(adiGuid));
+                return db.Adi_Data.FirstOrDefault(i => i.IngestUUID.Equals(adiGuid));
             }
         }
     }

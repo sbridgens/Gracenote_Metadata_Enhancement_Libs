@@ -1,11 +1,11 @@
 ﻿using log4net;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
+using SchTech.Configuration.Manager.Schema.GNUpdateTracker;
 using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.Web.Manager.Concrete;
 using System;
 using System.IO;
 using System.Linq;
-using SchTech.Configuration.Manager.Schema.GNUpdateTracker;
 
 namespace SchTech.Entities.ConcreteTypes
 {
@@ -17,7 +17,7 @@ namespace SchTech.Entities.ConcreteTypes
         private static readonly ILog Log = LogManager.GetLogger(typeof(EnrichmentWorkflowEntities));
 
         private XmlSerializationManager<ADI> XmlSerializer { get; set; }
-        
+
         public static ADI AdiFile { get; set; }
 
         public static ADI EnrichedAdi { get; set; }
@@ -55,7 +55,7 @@ namespace SchTech.Entities.ConcreteTypes
         public string TitlPaidValue { get; set; }
 
         public string GnMappingPaid { get; set; }
-        
+
         public bool IsQamAsset { get; set; }
 
         public string OnapiProviderid { get; set; }
@@ -102,7 +102,7 @@ namespace SchTech.Entities.ConcreteTypes
                     AdiFile = XmlSerializer.Read(
                         System.IO.File.ReadAllText(Path.Combine(CurrentWorkingDirectory, "ADI.xml")));
                 }
-                if(isUpdate & !loadUpdateAdi)
+                if (isUpdate & !loadUpdateAdi)
                 {
                     EnrichedAdi = new ADI();
                     EnrichedAdi = XmlSerializer.Read(adiData);
@@ -110,7 +110,7 @@ namespace SchTech.Entities.ConcreteTypes
 
                 if (loadUpdateAdi)
                 {
-                    if(!isUpdateService) 
+                    if (!isUpdateService)
                         Log.Info("Loading DB Update ADI.");
                     UpdateAdi = new ADI();
                     UpdateAdi = XmlSerializer.Read(adiData);
@@ -118,17 +118,17 @@ namespace SchTech.Entities.ConcreteTypes
                 if (!isUpdate & AdiFile == null)
                     throw new Exception("Adi file is null check namespaces and adi document structure?");
 
-                if (!isUpdateService) 
+                if (!isUpdateService)
                     Log.Info("ADI Loaded correctly and will continue processing.");
 
-                if(AdiFile != null)
+                if (AdiFile != null)
                 {
                     AdiVersionMajor = AdiFile.Metadata.AMS.Version_Major;
                     AdiVersionMinor = AdiFile.Metadata.AMS.Version_Minor;
                 }
 
 
-                if (!isUpdateService) 
+                if (!isUpdateService)
                     Log.Info($"Asset Version Major: {AdiVersionMajor}");
                 return true;
 
@@ -155,7 +155,7 @@ namespace SchTech.Entities.ConcreteTypes
         public static bool CheckIfTvodAsset()
         {
             ADIAssetAsset first = AdiFile != null ? AdiFile.Asset.Asset?.FirstOrDefault() : UpdateAdi.Asset.Asset?.FirstOrDefault();
-            
+
             if (first == null || !first.Metadata.AMS.Product.ToLower().Contains("tvod"))
                 return false;
 
@@ -179,7 +179,7 @@ namespace SchTech.Entities.ConcreteTypes
                 throw new InvalidOperationException(
                     $"SD Content Detected, Configuration disallows SD Content from Ingest; Failing ingest for {TitlPaidValue}");
 
-            if(IsSdContent)
+            if (IsSdContent)
                 Log.Info("Content is marked as SD Content, Configuration allows SD content for ingest.");
 
             return IsSdContent;

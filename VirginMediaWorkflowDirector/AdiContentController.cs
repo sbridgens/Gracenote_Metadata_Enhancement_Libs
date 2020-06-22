@@ -1,18 +1,18 @@
 ﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
+using SchTech.Business.Manager.Abstract.EntityFramework;
+using SchTech.Business.Manager.Concrete.EntityFramework;
+using SchTech.Business.Manager.Concrete.ImageLogic;
 using SchTech.Business.Manager.Concrete.Validation;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
+using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SchTech.Business.Manager.Abstract.EntityFramework;
-using SchTech.Business.Manager.Concrete.EntityFramework;
-using SchTech.Business.Manager.Concrete.ImageLogic;
-using SchTech.DataAccess.Concrete.EntityFramework;
 
 namespace VirginMediaWorkflowDirector
 {
@@ -268,7 +268,7 @@ namespace VirginMediaWorkflowDirector
                 var enrichedDataHasImages = hasPreviousUpdate ? EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image")
                                                               : EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "image");
 
-                var enrichedDataHasPreview = hasPreviousUpdate ? EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(p =>  p.Metadata.AMS.Asset_Class == "preview") 
+                var enrichedDataHasPreview = hasPreviousUpdate ? EnrichmentWorkflowEntities.UpdateAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "preview")
                                                                : EnrichmentWorkflowEntities.EnrichedAdi.Asset.Asset.Any(p => p.Metadata.AMS.Asset_Class == "preview");
 
                 //no enriched preview data,
@@ -367,9 +367,9 @@ namespace VirginMediaWorkflowDirector
 
                         if (match.Success)
                         {
-                            if(DbImagesNullified == false)
-                                DbImagesNullified = CheckAdiImageMatchesDbImage(ingestGuid, 
-                                    assetData.Metadata.App_Data.FirstOrDefault(i => i.Name == "Image_Qualifier")?.Value, 
+                            if (DbImagesNullified == false)
+                                DbImagesNullified = CheckAdiImageMatchesDbImage(ingestGuid,
+                                    assetData.Metadata.App_Data.FirstOrDefault(i => i.Name == "Image_Qualifier")?.Value,
                                     assetData.Content.Value);
                         }
 
@@ -409,11 +409,11 @@ namespace VirginMediaWorkflowDirector
         {
             try
             {
-                if(imageType != null & adiImage != null)
+                if (imageType != null & adiImage != null)
                 {
                     var dbImages = GnMappingDataService.Get(i => i.IngestUUID == ingestGuid);
 
-                    if(dbImages.GN_Images != null)
+                    if (dbImages.GN_Images != null)
                     {
                         //p17613556_k_v12_ab.jpg    
                         var imageName = Regex.Match(adiImage, "(?m)p[0-9]{1,12}.*\\.[A-z]{3}");
@@ -453,7 +453,7 @@ namespace VirginMediaWorkflowDirector
 
             return true;
         }
-         
+
         public static bool UpdateAllVersionMajorValues(int newVersionMajor)
         {
             try
@@ -614,11 +614,11 @@ namespace VirginMediaWorkflowDirector
                     var counter = 0;
                     var actorsDisplay = "";
 
-                        foreach (var member in EnrichmentDataLists.CastMembers.Distinct(new CastComparer())
-                            .ToList()
-                            .Where(member => member.role.Equals("Actor") ||
-                                             member.role.Equals("Voice")))
-                        {
+                    foreach (var member in EnrichmentDataLists.CastMembers.Distinct(new CastComparer())
+                        .ToList()
+                        .Where(member => member.role.Equals("Actor") ||
+                                         member.role.Equals("Voice")))
+                    {
                         if (counter == 5)
                         {
                             AddTitleMetadataApp_DataNode("Actors_Display",
@@ -923,10 +923,10 @@ namespace VirginMediaWorkflowDirector
                     AddTitleMetadataApp_DataNode("Show_NumberOfItems", totalSeasons.ToString());
 
 
-                if(AddTitleMetadataApp_DataNode("Show_ID", showId) &&
+                if (AddTitleMetadataApp_DataNode("Show_ID", showId) &&
                        AddTitleMetadataApp_DataNode("Show_Name", showName))
                 {
-                    if(!string.IsNullOrEmpty(EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions,true)))
+                    if (!string.IsNullOrEmpty(EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions, true)))
                     {
                         AddTitleMetadataApp_DataNode(
                             "Show_Summary_Short",

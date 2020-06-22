@@ -35,7 +35,7 @@ namespace SchTech.Entities.ConcreteTypes
                 if (ProgramTitles == null)
                     ProgramTitles = new List<GnApiProgramsSchema.titleDescType>();
 
-                if(!updateTracker)
+                if (!updateTracker)
                     Log.Debug($"Number of Program Titles at {apiLevel} Level: {programTitles.title.Count()}");
 
                 foreach (var title in programTitles.title.ToList()) ProgramTitles.Add(title);
@@ -76,7 +76,7 @@ namespace SchTech.Entities.ConcreteTypes
                 if (CastMembers == null)
                     CastMembers = new List<GnApiProgramsSchema.castTypeMember>();
 
-                if (!updateTracker) 
+                if (!updateTracker)
                     Log.Debug($"Number of Cast Members at {apiLevel} Level: {castTypeMembers.Count()}");
 
                 foreach (var cast in castTypeMembers) CastMembers.Add(cast);

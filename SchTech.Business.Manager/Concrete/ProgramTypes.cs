@@ -1,9 +1,9 @@
-﻿using System;
-using log4net;
+﻿using log4net;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
+using System;
 
 
 namespace SchTech.Business.Manager.Concrete
@@ -20,7 +20,7 @@ namespace SchTech.Business.Manager.Concrete
             try
             {
                 Log.Info("Setting Program Types for Package.");
-                IGnProgramTypeLookupService programTypeLookupService = 
+                IGnProgramTypeLookupService programTypeLookupService =
                     new GnProgramTypeLookupManager(new EfGnProgramTypeLookupDal());
 
                 var lookupValue = programTypeLookupService.Get(
@@ -29,7 +29,7 @@ namespace SchTech.Business.Manager.Concrete
                          string.Equals(t.GnProgramSubType.ToLower(), progSubType.ToLower(),
                              StringComparison.OrdinalIgnoreCase
                          )).LgiProgramTypeId;
-                
+
                 //set all 3 flags to ensure static flags are set correctly per package.
                 EnrichmentWorkflowEntities.IsMoviePackage = false;
                 EnrichmentWorkflowEntities.IsEpisodeSeries = false;

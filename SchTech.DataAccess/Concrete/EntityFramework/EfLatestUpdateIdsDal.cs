@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SchTech.Core.DataAccess.EntityFramework;
+﻿using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 using SchTech.Entities.ConcreteTypes;
+using System.Linq;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {

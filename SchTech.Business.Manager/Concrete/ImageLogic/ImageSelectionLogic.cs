@@ -244,7 +244,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                 if (ApiAssetList != null)
                 {
-                    if(imageTypeRequired=="HighResLandscape")
+                    if (imageTypeRequired == "HighResLandscape")
                         _log.Debug("");
                     DownloadImageRequired = true;
                     SortAssets();
@@ -253,7 +253,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                     foreach (var category in ConfigImageCategories)
                     {
                         logged = 0;
-                        if(category.CategoryName.ToLower().Equals("key art")  & string.IsNullOrEmpty(category.ImageTier.FirstOrDefault()))
+                        if (category.CategoryName.ToLower().Equals("key art") & string.IsNullOrEmpty(category.ImageTier.FirstOrDefault()))
                             _log.Debug("");
                         //Iterate each image category based on asset tier
                         foreach (var imageTier in category.ImageTier)
@@ -300,7 +300,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                                 _log.Info($"Image {image.assetId} for {imageTypeRequired} passed Image logic");
 
-                                if(imageTypeRequired == "TitleTreatment")
+                                if (imageTypeRequired == "TitleTreatment")
                                     _log.Info("");
                                 //check if the image is flagged as a requires trimming in config
                                 var requiresTrim = Convert.ToBoolean(category.AllowedAspects.Aspect
@@ -345,12 +345,12 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                         _log.Debug($"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
                                         //Added this check in to ensure images are updated if missing or changed.
                                         CurrentMappingData.GN_Images = match.Value == ""
-                                            ? (CurrentMappingData.GN_Images != string.Empty 
+                                            ? (CurrentMappingData.GN_Images != string.Empty
                                                 ? CurrentMappingData.GN_Images = $"{CurrentMappingData.GN_Images}, {imageTypeRequired}: {image.URI}"
                                                 : CurrentMappingData.GN_Images = $"{imageTypeRequired}: {image.URI}")
                                             : CurrentMappingData.GN_Images = CurrentMappingData.GN_Images.Replace(match.Value, newUri);
 
-                                        
+
                                         //update DbImages list, this will be saved by calling class.
                                         DbImages = CurrentMappingData.GN_Images;
 

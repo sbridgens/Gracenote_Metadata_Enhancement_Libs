@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace SchTech.Configuration.Manager.Schema.AdiGenerator
 {
@@ -24,7 +19,7 @@ namespace SchTech.Configuration.Manager.Schema.AdiGenerator
 
         [XmlElement(ElementName = "TempWorkingDirectory")]
         public static string TempWorkingDirectory { get; set; }
-        
+
         [XmlElement(ElementName = "DeliveryDirectory")]
         public static string DeliveryDirectory { get; set; }
     }

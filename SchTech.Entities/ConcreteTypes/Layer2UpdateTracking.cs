@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SchTech.Core.Entities;
+﻿using SchTech.Core.Entities;
+using System;
 
 namespace SchTech.Entities.ConcreteTypes
 {

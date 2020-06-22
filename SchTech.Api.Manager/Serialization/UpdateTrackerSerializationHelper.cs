@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
-using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 
 
 namespace SchTech.Api.Manager.Serialization
@@ -32,7 +29,7 @@ namespace SchTech.Api.Manager.Serialization
 
         public static string SerializedObjectToString<T>(T serializedObject, bool isMapping)
         {
-            
+
             var xmlSerializer = new XmlSerializer(serializedObject.GetType());
 
             using (var writer = new StringWriter())
@@ -60,7 +57,7 @@ namespace SchTech.Api.Manager.Serialization
 
 
             var xsn = new XmlSerializerNamespaces();
-            xsn.Add("xmlns"," http://www.w3.org/2001/XMLSchema-instance");
+            xsn.Add("xmlns", " http://www.w3.org/2001/XMLSchema-instance");
             if (apiDocument.DocumentElement != null)
             {
                 var importedNode = returnDoc.ImportNode(apiDocument.DocumentElement, true);

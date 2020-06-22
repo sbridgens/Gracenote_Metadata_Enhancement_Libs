@@ -135,7 +135,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
 
                 if (Path.GetExtension(entry.FullName) == ".stl")
                 {
-                    if(!StlExtracted)
+                    if (!StlExtracted)
                     {
                         Log.Info($"Extracting Subtitle file: {entry.Name}");
                         ExtractEntry(entry, "stl");
@@ -187,7 +187,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             var outputFile = IsLegacyGoPackage
                            ? Path.Combine(OutputDirectory, archiveEntry.FullName)
                            : Path.Combine(OutputDirectory, archiveEntry.Name);
-            
+
             if (IsLegacyGoPackage & !Directory.Exists(Path.GetDirectoryName(outputFile)))
             {
                 var dir = Path.GetDirectoryName(outputFile);
@@ -271,7 +271,7 @@ namespace SchTech.File.Manager.Concrete.ZipArchive
             }
         }
 
-       
+
         public bool CreateLegacyGoPackage(string sourceArchive, string sourceDirectory)
         {
             try

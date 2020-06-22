@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
@@ -10,7 +7,9 @@ using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.Business.Manager.Concrete.EntityFramework;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
-using SchTech.File.Manager.Concrete.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace GracenoteUpdateManager
@@ -22,7 +21,7 @@ namespace GracenoteUpdateManager
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(GracenoteUpdateController));
 
-        private static readonly  IAdiEnrichmentService AdiEnrichmentService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
+        private static readonly IAdiEnrichmentService AdiEnrichmentService = new AdiEnrichmentManager(new EfAdiEnrichmentDal());
         public List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping> MappingsRequiringUpdate { get; private set; }
         public List<GnApiProgramsSchema.programsProgram> ProgramDataUpdatesRequiredList { get; private set; }
 
@@ -53,9 +52,9 @@ namespace GracenoteUpdateManager
             _gnMappingDataService = new GnMappingDataManager(new EfGnMappingDataDal());
 
             ApiManager = new GraceNoteApiManager();
-            if(WorkflowEntities==null)
+            if (WorkflowEntities == null)
                 WorkflowEntities = new EnrichmentWorkflowEntities();
-            
+
         }
 
         private static void LogError(string functionName, string message, Exception ex)
@@ -73,9 +72,9 @@ namespace GracenoteUpdateManager
                 //Get from tracking table but fallback to mapping if there is no entry
                 var updateId = _mappingsTrackerService.GetLastUpdateIdFromLatestUpdateIds();
 
-                if(updateId == 0)
-                       updateId = Convert.ToInt64(_mappingsTrackerService.GetLowestUpdateIdFromMappingTrackingTable() ??
-                                                  _mappingsTrackerService.GetLowestUpdateIdFromMappingTable());
+                if (updateId == 0)
+                    updateId = Convert.ToInt64(_mappingsTrackerService.GetLowestUpdateIdFromMappingTrackingTable() ??
+                                               _mappingsTrackerService.GetLowestUpdateIdFromMappingTable());
 
                 return updateId;
             }
@@ -132,18 +131,18 @@ namespace GracenoteUpdateManager
         {
             ApiManager.UpdateProgramData =
                 (from programs in ApiManager.CoreProgramData?.programs
-                    let tmsId = programs.TMSId
-                    where tmsId != null
-                    select programs).ToList();
+                 let tmsId = programs.TMSId
+                 where tmsId != null
+                 select programs).ToList();
         }
 
         private void BuildLayer2UpdatesList()
         {
             ApiManager.UpdateProgramData =
                 (from programs in ApiManager.CoreProgramData?.programs
-                    let connectorId = programs.connectorId
-                    where connectorId != null
-                    select programs).ToList();
+                 let connectorId = programs.connectorId
+                 where connectorId != null
+                 select programs).ToList();
         }
 
         private void ValidateMappingExistsInDb(
@@ -151,14 +150,15 @@ namespace GracenoteUpdateManager
         {
             var existsInMappingTable = _gnMappingDataService.Get(m => m.GN_ProviderId == providerId);
 
-            if (existsInMappingTable == null) 
+
+            if (existsInMappingTable == null)
                 return;
 
             var apiXmlData =
                 UpdateTrackerSerializationHelper<GnOnApiProgramMappingSchema.@on>.SerializedObjectToString(programMapping, true);
 
             var apiData = _apiLookupService.Get(a => a.IngestUUID == existsInMappingTable.IngestUUID);
-            
+
             if (apiData == null)
             {
                 apiData = new GN_Api_Lookup
@@ -183,10 +183,10 @@ namespace GracenoteUpdateManager
             {
                 //Create a new List
                 MappingsRequiringUpdate = new List<GnOnApiProgramMappingSchema.onProgramMappingsProgramMapping>();
-                
+
 
                 //Call the Gn api with a limit of 1000 for mapping updates
-                if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "ProgramMappings",apiLimit))
+                if (!WorkflowEntities.GetGraceNoteUpdates(dbUpdateId, "ProgramMappings", apiLimit))
                 {
                     Log.Info($"No Mapping Updates for UpdateId: {dbUpdateId}");
                     return false;
@@ -212,14 +212,14 @@ namespace GracenoteUpdateManager
 
                 //Parse the mapping results and keep only the items that relate to the current ingest platform
                 //only valid pid paid values starting with TITL belong to the current platform.
-                ApiManager.UpdateMappingsData = 
+                ApiManager.UpdateMappingsData =
                     (from mapping in ApiManager.CoreGnMappingData?.programMappings.programMapping
-                        where mapping.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped
-                        let paid = mapping.link.FirstOrDefault(t => t.idType.ToLower().Equals("paid"))
-                        where paid != null
-                        where paid.Value.ToLower().StartsWith("titl")
-                        select mapping).ToList();
-                
+                     where mapping.status == GnOnApiProgramMappingSchema.onProgramMappingsProgramMappingStatus.Mapped
+                     let paid = mapping.link.FirstOrDefault(t => t.idType.ToLower().Equals("paid"))
+                     where paid != null
+                     where paid.Value.ToLower().StartsWith("titl")
+                     select mapping).ToList();
+
                 //nullify the api results to cleanup resources
                 ApiManager.CoreGnMappingData = null;
 
@@ -246,13 +246,13 @@ namespace GracenoteUpdateManager
                     MappingsRequiringUpdate.Add(programMapping);
 
                     Log.Info($"Updating MappingsUpdateTracking Table with new mapping data for IngestUUID: {existsInTracker.IngestUUID} and PIDPAID: {existsInTracker.GN_ProviderId}");
-                    
+
                     //set the tracker service to flag the related asset as requiring an update.
                     //this flag will be used to trigger the adi creation service to generate a valid update against the correct ingestuuid.
                     //Sets the update ids too
                     _mappingsTrackerService.UpdateMappingData(existsInTracker.IngestUUID, programMapping, NextMappingUpdateId.ToString(), MaxMappingUpdateId.ToString());
                 }
-                
+
                 //mappings requiring updates finished being calculated and can now be used to generate adi updates
                 return true;
             }
@@ -265,7 +265,7 @@ namespace GracenoteUpdateManager
             }
         }
 
-        public bool GetGracenoteProgramUpdates(string dbUpdateId, string limit,  int layer)
+        public bool GetGracenoteProgramUpdates(string dbUpdateId, string limit, int layer)
         {
             try
             {
@@ -290,7 +290,7 @@ namespace GracenoteUpdateManager
                 //store nextid as local variable in order to set correct layer data
                 var nextId = ApiManager.CoreProgramData?.header.streamData.nextUpdateId ?? 0;
                 Log.Info($"Next Update ID for Layer{layer}: {nextId}");
-                
+
 
                 switch (layer)
                 {
@@ -349,7 +349,7 @@ namespace GracenoteUpdateManager
         {
             var mappings = _gnMappingDataService.GetList(m => m.GN_TMSID == programData.TMSId & m.GN_RootID == programData.rootId);
 
-            if (!mappings.Any()) 
+            if (!mappings.Any())
                 return;
 
             foreach (var mapping in mappings)
@@ -385,8 +385,8 @@ namespace GracenoteUpdateManager
             ValidateLayer1ExistsInDb(programData);
             var programExistsInDb =
                 _layer1TrackingService.GetTrackingItemByTmsIdAndRootId(programData.TMSId, programData.rootId);
-            
-            if(programExistsInDb == null)
+
+            if (programExistsInDb == null)
                 return;
 
             Log.Info($"Layer1 TMSID: {programData.TMSId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
@@ -404,7 +404,7 @@ namespace GracenoteUpdateManager
         {
             var mappings = _gnMappingDataService.GetList(m => m.GN_connectorId == programData.connectorId & m.GN_RootID == programData.rootId);
 
-            if (!mappings.Any()) 
+            if (!mappings.Any())
                 return;
 
             foreach (var mapping in mappings)
@@ -441,7 +441,7 @@ namespace GracenoteUpdateManager
                 _layer2TrackingService.GetTrackingItemByConnectorIdAndRootId(programData.connectorId,
                     programData.rootId);
 
-            if(programExistsInDb == null)
+            if (programExistsInDb == null)
                 return;
 
             Log.Info($"Layer2 ConnectorId: {programData.connectorId} with RootId: {programData.rootId} EXISTS IN THE DB Requires Update, Update id: {programData.updateId}");
@@ -481,7 +481,7 @@ namespace GracenoteUpdateManager
         {
             var versionMinor = AdiEnrichmentService.Get(i => i.IngestUUID == ingestGuid).VersionMinor;
             if (versionMinor != null)
-                return (int) versionMinor;
+                return (int)versionMinor;
 
             return 0;
         }

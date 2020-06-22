@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Core.DataAccess.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
 using SchTech.Entities.ConcreteTypes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework
 {
@@ -43,8 +43,8 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
         {
             using (var mapContext = new ADI_EnrichmentContext())
             {
-                var rowData = GetList(t => t.GN_connectorId == connectorId & 
-                                            t.Layer2_RootId == rootId & 
+                var rowData = GetList(t => t.GN_connectorId == connectorId &
+                                            t.Layer2_RootId == rootId &
                                             t.RequiresEnrichment == false);
 
                 if (rowData.Count == 0)
@@ -53,7 +53,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 //check if any l1 data with the same uid requires enrichment
                 var hasL1Update = rowData.Select(row => mapContext.Layer1UpdateTracking.
                                           FirstOrDefault(l => l.IngestUUID == row.IngestUUID)).
-                                          Any(layer1Data => layer1Data != null && 
+                                          Any(layer1Data => layer1Data != null &&
                                                             layer1Data.RequiresEnrichment);
 
 
@@ -120,7 +120,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
                 return minVal.Mapping_UpdateId;
             }
         }
-        
+
         public void UpdateLayer2Data(Guid uuid, GnApiProgramsSchema.programsProgram programData, string nextUpdateId, string maxUpdateId)
         {
             using (var mapContext = new ADI_EnrichmentContext())

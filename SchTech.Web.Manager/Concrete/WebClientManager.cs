@@ -3,7 +3,6 @@ using SchTech.Web.Manager.Abstract;
 using System;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 
@@ -72,7 +71,7 @@ namespace SchTech.Web.Manager.Concrete
         {
             _cJar = new CookieContainer();
         }
-        
+
         public string HttpGetRequest(string url, bool followRedirect = true)
         {
             Is403Error = false;
@@ -96,7 +95,7 @@ namespace SchTech.Web.Manager.Concrete
                 if (CurrentRetryCount >= MaxWebRetries)
                     return string.Empty;
             }
-            
+
 
             if (followRedirect && (RequestStatusCode == (int)HttpStatusCode.Moved ||
                                    RequestStatusCode == (int)HttpStatusCode.Found))
@@ -220,7 +219,7 @@ namespace SchTech.Web.Manager.Concrete
 
             return SuccessfulWebRequest;
         }
-        
+
 
     }
 }

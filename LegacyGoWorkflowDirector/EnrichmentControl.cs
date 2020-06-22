@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNMappingSchema;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
@@ -19,6 +16,9 @@ using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.File.Manager.Concrete.Serialization;
 using SchTech.File.Manager.Concrete.ZipArchive;
 using SchTech.Queue.Manager.Concrete;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace LegacyGoWorkflowDirector
 {
@@ -70,7 +70,7 @@ namespace LegacyGoWorkflowDirector
                 Log.Error($"[{functionName}] Inner Exception:" +
                           $" {ex.InnerException.Message}");
         }
-        
+
         public bool AvailableDriveSpace()
         {
             using (var hardwareInformation = new HardwareInformationManager())

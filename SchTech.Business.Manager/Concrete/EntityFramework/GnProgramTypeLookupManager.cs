@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using SchTech.Business.Manager.Abstract.EntityFramework;
+﻿using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.Entities.ConcreteTypes;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {
     public sealed class GnProgramTypeLookupManager : IGnProgramTypeLookupService
     {
         private readonly IGnProgramTypeLookupDal _gnProgramTypeLookupDal;
-        
+
         public GnProgramTypeLookupManager(IGnProgramTypeLookupDal programTypeLookupDal)
         {
             _gnProgramTypeLookupDal = programTypeLookupDal;

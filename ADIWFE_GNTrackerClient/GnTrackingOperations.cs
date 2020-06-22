@@ -1,5 +1,4 @@
-﻿using System;
-using ADIWFE_GNTrackerClient.Properties;
+﻿using ADIWFE_GNTrackerClient.Properties;
 using GracenoteUpdateManager;
 using log4net;
 using SchTech.Configuration.Manager.Concrete;
@@ -7,12 +6,13 @@ using SchTech.Configuration.Manager.Parameters;
 using SchTech.Configuration.Manager.Schema.GNUpdateTracker;
 using SchTech.DataAccess.Concrete.EntityFramework;
 using SchTech.Entities.ConcreteTypes;
+using System;
 
 
 namespace ADIWFE_GNTrackerClient
 {
     public class GnTrackingOperations
-    { 
+    {
         /// <summary>
         ///     Initialize Log4net
         /// </summary>
@@ -108,7 +108,7 @@ namespace ADIWFE_GNTrackerClient
                     //Get lowest updateId checks tracking first then fallsback to mapping if null
                     lowestUpdateId = UpdateController.GetLowestMappingUpdateId();
 
-                    if(lowestUpdateId < 1)
+                    if (lowestUpdateId < 1)
                     {
                         //Log the entry being created
                         Log.Info(
@@ -166,7 +166,7 @@ namespace ADIWFE_GNTrackerClient
                 updateTracker.LastLayer2UpdateIdChecked = GracenoteUpdateController.NextLayer2UpdateId;
                 updated = true;
             }
-            if(updated)
+            if (updated)
                 UpdateIdsDal.Update(updateTracker);
         }
 
@@ -181,7 +181,7 @@ namespace ADIWFE_GNTrackerClient
 
                 if (lowestUpdateId == 0)
                 {
-                    lowestUpdateId = layerId == 1 ? UpdateController.GetLowestLayer1UpdateId() : 
+                    lowestUpdateId = layerId == 1 ? UpdateController.GetLowestLayer1UpdateId() :
                                                     UpdateController.GetLowestLayer2UpdateId();
                 }
 

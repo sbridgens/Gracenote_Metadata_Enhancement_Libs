@@ -1,6 +1,6 @@
-﻿using System;
-using log4net;
+﻿using log4net;
 using SchTech.DataAccess.Concrete.EntityFramework.Contexts;
+using System;
 using System.Linq;
 
 namespace SchTech.DataAccess.Concrete.EntityFramework

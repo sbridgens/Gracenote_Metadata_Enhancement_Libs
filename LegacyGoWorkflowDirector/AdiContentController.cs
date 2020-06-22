@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using log4net;
+﻿using log4net;
 using SchTech.Api.Manager.GracenoteOnApi.Concrete.EqualityComparers;
 using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Concrete.ImageLogic;
@@ -10,6 +6,10 @@ using SchTech.Business.Manager.Concrete.Validation;
 using SchTech.Configuration.Manager.Schema.ADIWFE;
 using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace LegacyGoWorkflowDirector
 {
@@ -788,7 +788,7 @@ namespace LegacyGoWorkflowDirector
                        AddTitleMetadataApp_DataNode("Show_Name", showName) &&
                        AddTitleMetadataApp_DataNode(
                            "Show_Summary_Short",
-                           EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions,true));
+                           EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions, true));
             }
             catch (Exception shDEx)
             {

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SchTech.Core.Entities;
+﻿using SchTech.Core.Entities;
+using System;
 
 namespace SchTech.Entities.ConcreteTypes
 {
@@ -21,7 +17,7 @@ namespace SchTech.Entities.ConcreteTypes
         public string Mapping_NextUpdateId { get; set; }
         public string Mapping_MaxUpdateId { get; set; }
         public string Mapping_RootId { get; set; }
-        
+
         public DateTime UpdatesChecked { get; set; }
 
         public bool RequiresEnrichment { get; set; }

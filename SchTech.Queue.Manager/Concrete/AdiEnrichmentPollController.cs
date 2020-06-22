@@ -50,7 +50,7 @@ namespace SchTech.Queue.Manager.Concrete
                     SetFailedMappingPollTime();
                     ProcessMappingFailures = true;
                 }
-                
+
                 if (WorkflowFileList().Count < 1)
                     return true;
 

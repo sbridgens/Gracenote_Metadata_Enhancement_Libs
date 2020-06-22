@@ -1,11 +1,9 @@
-﻿using System;
+﻿using SchTech.Business.Manager.Abstract.EntityFramework;
+using SchTech.DataAccess.Abstract;
+using SchTech.Entities.ConcreteTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
-using SchTech.Business.Manager.Abstract.EntityFramework;
-using SchTech.DataAccess.Abstract;
-using SchTech.DataAccess.Concrete.EntityFramework;
-using SchTech.Entities.ConcreteTypes;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
+﻿using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Business.Manager.Abstract.EntityFramework;
 using SchTech.DataAccess.Abstract;
 using SchTech.Entities.ConcreteTypes;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace SchTech.Business.Manager.Concrete.EntityFramework
 {
@@ -71,7 +71,7 @@ namespace SchTech.Business.Manager.Concrete.EntityFramework
         {
             return _layer2TrackingDal.GetLowestUpdateIdFromLayer2UpdateTrackingTable();
         }
-        
+
         public string GetLowestUpdateIdFromMappingTrackingTable()
         {
             return _layer2TrackingDal.GetLowestUpdateIdFromMappingTrackingTable();
