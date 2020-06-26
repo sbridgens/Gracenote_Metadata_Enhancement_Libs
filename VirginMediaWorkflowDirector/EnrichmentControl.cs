@@ -916,6 +916,7 @@ namespace VirginMediaWorkflowDirector
                 if (!isl.DownloadImageRequired)
                     continue;
 
+                //start download and adi update operations
                 var localImage = GetImageName(imageUri, configLookup.Image_Mapping);
                 isl.DownloadImage(imageUri, localImage);
                 var imagepaid = $"{isl.ImageQualifier}{WorkflowEntities.TitlPaidValue.Replace("TITL", "")}";

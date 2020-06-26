@@ -417,7 +417,8 @@ namespace GracenoteUpdateManager
                     apiData = new GN_Api_Lookup
                     {
                         IngestUUID = mapping.IngestUUID,
-                        GN_connectorId = programData.connectorId,
+                        GN_TMSID = programData.TMSId,
+                        GN_connectorId = mapping.GN_connectorId,
                         GnLayer2Data = apiXmlData
                     };
 
@@ -426,17 +427,21 @@ namespace GracenoteUpdateManager
                 else
                 {
                     apiData.GnLayer2Data = apiXmlData;
-                    apiData.GN_connectorId = programData.connectorId;
+                    apiData.GN_TMSID = programData.TMSId;
+                    apiData.GN_connectorId = mapping.GN_connectorId;
                     _apiLookupService.Update(apiData);
                 }
-
             }
 
         }
 
         private void ParseLayer2Updates(GnApiProgramsSchema.programsProgram programData)
         {
+            if (programData.TMSId != programData.connectorId)
+                return;
+
             ValidateLayer2ExistsInDb(programData);
+            
             var programExistsInDb =
                 _layer2TrackingService.GetTrackingItemByConnectorIdAndRootId(programData.connectorId,
                     programData.rootId);

@@ -7,9 +7,10 @@ namespace SchTech.Configuration.Manager.Schema.GNUpdateTracker
     {
         [XmlElement(ElementName = "OnApi")]
         public static string OnApi { get; set; }
+
         [XmlElement(ElementName = "ApiKey")]
         public static string ApiKey { get; set; }
-        [XmlElement(ElementName = "MediaCloud")]
+
         public static string MediaCloud { get; set; }
         [XmlElement(ElementName = "Database_Host")]
         public static string Database_Host { get; set; }

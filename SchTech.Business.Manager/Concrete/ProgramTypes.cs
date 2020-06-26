@@ -15,11 +15,12 @@ namespace SchTech.Business.Manager.Concrete
         /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(typeof(ProgramTypes));
 
-        public static void SetProgramType(string progType, string progSubType)
+        public static void SetProgramType(string progType, string progSubType, bool isTrackerService = false)
         {
             try
             {
-                Log.Info("Setting Program Types for Package.");
+                if(!isTrackerService)
+                    Log.Info("Setting Program Types for Package.");
                 IGnProgramTypeLookupService programTypeLookupService =
                     new GnProgramTypeLookupManager(new EfGnProgramTypeLookupDal());
 
@@ -38,19 +39,22 @@ namespace SchTech.Business.Manager.Concrete
                 switch (lookupValue)
                 {
                     case 0:
-                        Log.Info("Program is of type Movie");
+                        if (!isTrackerService)
+                            Log.Info("Program is of type Movie");
                         EnrichmentWorkflowEntities.IsMoviePackage = true;
                         break;
                     case 1:
                     case 2:
-                        Log.Info(lookupValue == 1
+                        if (!isTrackerService) 
+                            Log.Info(lookupValue == 1
                             ? "Program is of type Episode"
                             : "Movie is a Series/Show asset.");
                         EnrichmentWorkflowEntities.IsEpisodeSeries = true;
                         break;
                     case 99:
                         EnrichmentWorkflowEntities.PackageIsAOneOffSpecial = true;
-                        Log.Info("Program is of type Special.");
+                        if (!isTrackerService) 
+                            Log.Info("Program is of type Special.");
                         break;
                 }
             }

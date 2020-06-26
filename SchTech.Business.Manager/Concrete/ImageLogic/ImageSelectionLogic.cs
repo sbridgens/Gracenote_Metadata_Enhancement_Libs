@@ -277,7 +277,7 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                 {
                                     logged = 1;
                                     //Check the identifiers match the config.
-                                    if (!MatchIdentifier(image.identifiers, image.assetId))
+                                    if (!MatchIdentifier(image.identifiers, image.assetId, isTrackerService))
                                     {
                                         continue;
                                     }
@@ -342,7 +342,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
                                         //New image required so update the db and set the uri ready for download.
                                         string newUri = $"{imageTypeRequired}: {image.URI}";
 
-                                        _log.Debug($"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
+                                        if (!isTrackerService)
+                                            _log.Debug($"Update package detected a new image, updating db for {imageTypeRequired} with {image.URI}");
                                         //Added this check in to ensure images are updated if missing or changed.
                                         CurrentMappingData.GN_Images = match.Value == ""
                                             ? (CurrentMappingData.GN_Images != string.Empty
@@ -353,8 +354,8 @@ namespace SchTech.Business.Manager.Concrete.ImageLogic
 
                                         //update DbImages list, this will be saved by calling class.
                                         DbImages = CurrentMappingData.GN_Images;
-
-                                        _log.Info($"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
+                                        if (!isTrackerService)
+                                            _log.Info($"Image URI: {image.URI} for: {imageTypeRequired} and Image Priority: {category.PriorityOrder}");
                                     }
                                 }
                                 else

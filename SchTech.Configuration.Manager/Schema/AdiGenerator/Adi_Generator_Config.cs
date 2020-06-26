@@ -9,6 +9,13 @@ namespace SchTech.Configuration.Manager.Schema.AdiGenerator
         public static string Database_Host { get; set; }
 
         [XmlElement(ElementName = "Database_Name")]
+
+        [XmlElement(ElementName = "OnApi")] 
+        public static string OnApi { get; set; }
+
+        [XmlElement(ElementName = "ApiKey")] 
+        public static string ApiKey { get; set; }
+
         public static string Database_Name { get; set; }
 
         [XmlElement(ElementName = "Integrated_Security")]

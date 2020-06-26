@@ -60,13 +60,13 @@ namespace SchTech.Entities.ConcreteTypes
 
         public string OnapiProviderid { get; set; }
 
-        public string GracenoteMappingData { get; private set; }
+        public string GracenoteMappingData { get; set; }
 
-        public string GracenoteProgramData { get; private set; }
+        public string GracenoteProgramData { get; set; }
 
-        public string GraceNoteUpdateData { get; private set; }
+        public string GraceNoteUpdateData { get; set; }
 
-        public string GraceNoteSeriesSeasonSpecialsData { get; private set; }
+        public string GraceNoteSeriesSeasonSpecialsData { get; set; }
 
         public string GraceNoteTmsId { get; set; }
 
