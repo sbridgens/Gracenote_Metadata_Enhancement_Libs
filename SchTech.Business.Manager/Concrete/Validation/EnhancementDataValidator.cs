@@ -114,36 +114,25 @@ namespace SchTech.Business.Manager.Concrete.Validation
             return programData.progType.ToLower().Contains("special") || programData.holiday != null;
         }
 
-        public static string CheckAndReturnDescriptionData(List<GnApiProgramsSchema.titleDescType> programDescriptions, bool isSeason = false)
+        public static string CheckAndReturnDescriptionData(
+            GnApiProgramsSchema.programsProgramDescriptions programDescriptions, bool isSeason = false)
         {
-            if (!programDescriptions.Any())
+            if (!programDescriptions.desc.Any())
                 return string.Empty;
 
             if (!isSeason)
-            {
-                foreach (var desc in programDescriptions.OrderByDescending(d => d.size).ThenBy(d => d.type))
-                {
-                    if (desc.type == "plot")
-                    {
-                        switch (desc.size)
-                        {
-                            case "250":
-                                return desc.Value;
-                            case "100":
-                                return desc.Value;
-                        }
-                    }
+                return programDescriptions.desc
+                    .Where(
+                        d => d.type == "plot" & d.size == "250" ||
+                             d.type == "plot" & d.size == "100" ||
+                             d.type == "generic" & d.size == "100" ||
+                             d.size == "250" ||
+                             d.size == "100")
+                    .Select(t => t.Value)
+                    .FirstOrDefault();
 
-                    if (desc.type == "generic" & desc.size == "100")
-                    {
-                        return desc.Value;
-                    }
-
-                }
-            }
-            // season or default fallback if above are not found
-            return programDescriptions.OrderByDescending(d => d.size)
-                .Where(d => d.size == "250" || d.size == "100")
+            return programDescriptions.desc
+                .Where(d => d.size == "250")
                 .Select(t => t.Value)
                 .FirstOrDefault()
                 ?.ToString();

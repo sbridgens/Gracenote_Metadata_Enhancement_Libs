@@ -599,11 +599,11 @@ namespace LegacyGoWorkflowDirector
             }
         }
 
-        public bool InsertDescriptionData()
+        public bool InsertDescriptionData(GnApiProgramsSchema.programsProgramDescriptions descriptions)
         {
             try
             {
-                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions);
+                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions);
 
                 if (!string.IsNullOrEmpty(desc))
                 {
@@ -777,18 +777,32 @@ namespace LegacyGoWorkflowDirector
             }
         }
 
-        public bool InsertShowData(string showId, string showName, int totalSeasons)
+        public bool InsertShowData(string showId, string showName, int totalSeasons, GnApiProgramsSchema.programsProgramDescriptions descriptions)
         {
             try
             {
-                if (SeasonInfo != null) AddTitleMetadataApp_DataNode("Show_NumberOfItems", totalSeasons.ToString());
+                if (SeasonInfo != null)
+                    AddTitleMetadataApp_DataNode("Show_NumberOfItems", totalSeasons.ToString());
 
 
-                return AddTitleMetadataApp_DataNode("Show_ID", showId) &&
-                       AddTitleMetadataApp_DataNode("Show_Name", showName) &&
-                       AddTitleMetadataApp_DataNode(
-                           "Show_Summary_Short",
-                           EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions, true));
+                if (AddTitleMetadataApp_DataNode("Show_ID", showId) &&
+                    AddTitleMetadataApp_DataNode("Show_Name", showName))
+                {
+                    if (!string.IsNullOrEmpty(EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions, true)))
+                    {
+                        AddTitleMetadataApp_DataNode(
+                            "Show_Summary_Short",
+                            EnhancementDataValidator.CheckAndReturnDescriptionData(
+                                descriptions,
+                                true));
+                    }
+                    else
+                    {
+                        Log.Warn("No description data found at Layer2 for Show_Summary_Short, enrichment will continue without Show_Summary_Short data.");
+                    }
+                }
+
+                return true;
             }
             catch (Exception shDEx)
             {

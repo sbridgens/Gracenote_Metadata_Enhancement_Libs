@@ -86,28 +86,23 @@ namespace VirginMediaWorkflowDirector
         public void UpdateListData(GnApiProgramsSchema.programsProgram apiData, string seasonId)
         {
             //Build Data Lists
-            //titles
-            EnrichmentDataLists.AddProgramTitlesToList(apiData?.titles, "Layer1");
-            //descriptions
-            EnrichmentDataLists.AddProgramDescriptionsToList(apiData?.descriptions, "Layer1");
+            //Asset List
+            EnrichmentDataLists.AddProgramAssetsToList(apiData?.assets, "Layer1");
             //Cast List
             EnrichmentDataLists.AddCastMembersToList(apiData?.cast, "Layer1");
             //Crew List
             EnrichmentDataLists.AddCrewMembersToList(apiData?.crew, "Layer1");
+            //titles
+            EnrichmentDataLists.AddProgramTitlesToList(apiData?.titles, "Layer1");
             //genres
-            EnrichmentDataLists.AddGenresToList(apiData?.genres, "Layer1");
-            //Asset List
-            EnrichmentDataLists.AddProgramAssetsToList(apiData?.assets, "Layer1");
+            EnrichmentDataLists.AddGenresToList(apiData?.genres, "Layer1)");
             //external Links
             EnrichmentDataLists.AddExternalLinksToList(apiData?.externalLinks);
-            //Check for layer2 Availability
+            //
             var seasonData = apiData?.seasons?.FirstOrDefault(s => s.seasonId == seasonId);
 
             if (seasonData == null)
-            {
-                Log.Info("No Layer2 Data available for current Deliverable.");
                 return;
-            }
             //Season Asset List
             EnrichmentDataLists.AddProgramAssetsToList(seasonData.assets, "Layer2");
             //Season Cast List
@@ -115,6 +110,7 @@ namespace VirginMediaWorkflowDirector
             //Season Crew List
             EnrichmentDataLists.AddCrewMembersToList(seasonData.crew, "Layer2");
         }
+
 
         public List<GnApiProgramsSchema.assetType> ReturnAssetList()
         {
@@ -736,11 +732,11 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
-        public bool InsertDescriptionData()
+        public bool InsertDescriptionData(GnApiProgramsSchema.programsProgramDescriptions descriptions)
         {
             try
             {
-                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions);
+                var desc = EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions);
 
                 if (!string.IsNullOrEmpty(desc))
                 {
@@ -915,7 +911,7 @@ namespace VirginMediaWorkflowDirector
             }
         }
 
-        public bool InsertShowData(string showId, string showName, int totalSeasons)
+        public bool InsertShowData(string showId, string showName, int totalSeasons, GnApiProgramsSchema.programsProgramDescriptions descriptions)
         {
             try
             {
@@ -924,13 +920,15 @@ namespace VirginMediaWorkflowDirector
 
 
                 if (AddTitleMetadataApp_DataNode("Show_ID", showId) &&
-                       AddTitleMetadataApp_DataNode("Show_Name", showName))
+                    AddTitleMetadataApp_DataNode("Show_Name", showName))
                 {
-                    if (!string.IsNullOrEmpty(EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions, true)))
+                    if (!string.IsNullOrEmpty(EnhancementDataValidator.CheckAndReturnDescriptionData(descriptions, true)))
                     {
                         AddTitleMetadataApp_DataNode(
                             "Show_Summary_Short",
-                            EnhancementDataValidator.CheckAndReturnDescriptionData(EnrichmentDataLists.ProgramDescriptions, true));
+                            EnhancementDataValidator.CheckAndReturnDescriptionData(
+                                descriptions,
+                                true));
                     }
                     else
                     {
