@@ -3,7 +3,6 @@ using SchTech.Api.Manager.GracenoteOnApi.Schema.GNProgramSchema;
 using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.ZipArchive;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SchTech.Business.Manager.Concrete.Validation
@@ -121,18 +120,30 @@ namespace SchTech.Business.Manager.Concrete.Validation
                 return string.Empty;
 
             if (!isSeason)
-                return programDescriptions.desc
-                    .Where(
-                        d => d.type == "plot" & d.size == "250" ||
-                             d.type == "plot" & d.size == "100" ||
-                             d.type == "generic" & d.size == "100" ||
-                             d.size == "250" ||
-                             d.size == "100")
-                    .Select(t => t.Value)
-                    .FirstOrDefault();
+            {
+                foreach (var desc in programDescriptions.desc.OrderByDescending(d => d.size).ThenBy(d => d.type))
+                {
+                    if (desc.type == "plot")
+                    {
+                        switch (desc.size)
+                        {
+                            case "250":
+                                return desc.Value;
+                            case "100":
+                                return desc.Value;
+                        }
+                    }
 
-            return programDescriptions.desc
-                .Where(d => d.size == "250")
+                    if (desc.type == "generic" & desc.size == "100")
+                    {
+                        return desc.Value;
+                    }
+
+                }
+            }
+            // season or default fallback if above are not found
+            return programDescriptions.desc.OrderByDescending(d => d.size)
+                .Where(d => d.size == "250" || d.size == "100")
                 .Select(t => t.Value)
                 .FirstOrDefault()
                 ?.ToString();

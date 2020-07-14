@@ -89,7 +89,7 @@ namespace SchTech.DataAccess.Concrete.EntityFramework
             {
                 using (var db = new ADI_EnrichmentContext())
                 {
-                    var imgList = db.GN_Mapping_Data.Where(i => i.Id == rowId)
+                    var imgList = db.GN_Mapping_Data.Where(i => i.Id == rowId & !string.IsNullOrEmpty(i.GN_Images))
                         .Select(i => i.GN_Images)
                         .FirstOrDefault()
                         ?.Split(',')
