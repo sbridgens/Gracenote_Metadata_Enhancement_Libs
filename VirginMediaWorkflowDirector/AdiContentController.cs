@@ -289,6 +289,22 @@ namespace VirginMediaWorkflowDirector
 
                         if (movieData != null)
                         {
+
+                            /*
+                             * Added function 20-07-2020 as the cp now controls add and remove of block platform
+                             * this function will check the incoming update against the stored db version for existence of the block platform flag
+                             * and persist or remove the flag based on the incoming file as the clone movie section maybe incorrect.
+                             */
+                            var hasBlockPlatformPreviously =
+                                assetData.Metadata.App_Data.FirstOrDefault(b => b.Name == "Block_Platform");
+                            var updateHasBlockPlatform = 
+                                movieData.Metadata.App_Data.FirstOrDefault(b => b.Name == "Block_Platform");
+
+                            if (hasBlockPlatformPreviously != null)
+                                assetData.Metadata.App_Data.Remove(hasBlockPlatformPreviously);
+                            if(updateHasBlockPlatform != null)
+                                assetData.Metadata.App_Data.Add(updateHasBlockPlatform);
+
                             //add without content node
                             var assetSection = new ADIAssetAsset
                             {
@@ -559,6 +575,7 @@ namespace VirginMediaWorkflowDirector
                               $"{caabpdEx.InnerException.Message}");
             }
         }
+
 
         public static void InsertProgramLayerData(string tmsid, string programRootId, string shoDataRootId)
         {
