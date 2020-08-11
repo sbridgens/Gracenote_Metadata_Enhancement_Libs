@@ -80,7 +80,7 @@ namespace ADIWFE_TestClient
             serializeData = new XmlApiSerializationHelper<GnOnApiProgramMappingSchema.@on>();
 
             GnOnApiProgramMappingSchema.@on programData;
-            programData = serializeData.Read(webData) ?? throw new ArgumentNullException("serializeData.Read(webData)");
+            programData = serializeData.Read(webData) ?? throw new ArgumentNullException($"serializeData.Read(webData)");
             gnMappingData.GraceNoteMappingData = programData.programMappings
                 .programMapping
                 .FirstOrDefault(p => p.link.Any
@@ -93,13 +93,13 @@ namespace ADIWFE_TestClient
 
             if (gnMappingData.GraceNoteMappingData != null)
             {
-                var TMSID = gnMappingData.GraceNoteMappingData.id.Where(t => t.type.Equals("TMSId"))
+                var tmsid = gnMappingData.GraceNoteMappingData.id.Where(t => t.type.Equals("TMSId"))
                     .Select(r => r.Value).FirstOrDefault();
-                var ROOTID = gnMappingData.GraceNoteMappingData.id.Where(t => t.type.Equals("rootId"))
+                var rootid = gnMappingData.GraceNoteMappingData.id.Where(t => t.type.Equals("rootId"))
                     .Select(r => r.Value).FirstOrDefault();
 
-                Console.WriteLine($"\r\n{TMSID}" +
-                                  $"\r\n{ROOTID}");
+                Console.WriteLine($"\r\n{tmsid}" +
+                                  $"\r\n{rootid}");
             }
         }
 
