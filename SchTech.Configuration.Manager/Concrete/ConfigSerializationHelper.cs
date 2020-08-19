@@ -40,6 +40,9 @@ namespace SchTech.Configuration.Manager.Concrete
                                 LegacyGoAllowedProviders.MoveNonLegacyToDirectory =
                                     ele.Attribute("MoveNonLegacyToDirectory")?.Value;
                                 break;
+                            case "AllowAdultContentIngest":
+                                ADIWF_Config.AllowAdultContentIngest = Convert.ToBoolean(ele.Value);
+                                break;
                             default:
                                 pinf.SetValue(pinf.Name, ele.Value);
 

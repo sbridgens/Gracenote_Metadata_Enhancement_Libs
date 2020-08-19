@@ -8,6 +8,7 @@ using SchTech.Entities.ConcreteTypes;
 using SchTech.File.Manager.Concrete.FileSystem;
 using SchTech.Queue.Manager.Concrete;
 using System;
+using System.IO;
 using VirginMediaWorkflowDirector;
 
 namespace ADIWFE_TestClient
@@ -27,6 +28,8 @@ namespace ADIWFE_TestClient
         private bool HasGnMapping { get; set; }
 
         private bool Success { get; set; }
+
+        private bool PassThroughIngest { get; set; }
 
         public static void LogError(string functionName, string message, Exception ex)
         {
@@ -111,31 +114,40 @@ namespace ADIWFE_TestClient
                 {
                     IngestFile = (WorkQueueItem)AdiEnrichmentQueueController.QueuedPackages[package];
 
-
                     Log.Info(
                         $"############### Processing STARTED For Queued item {package + 1} of {AdiEnrichmentQueueController.QueuedPackages.Count}: {IngestFile.AdiPackage.FullName} ###############\r\n");
                     WorkflowManager = new EnrichmentControl();
 
                     Success = GetMappingAndExtractPackage();
-                    if (!Success)
-                        throw new Exception(
-                            "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
-                    if (!EnrichmentWorkflowEntities.IsMoviePackage)
+
+                    if(!PassThroughIngest)
                     {
-                        if (!ProcessSeriesEpisodePackage())
-                            throw new Exception("Error Processing Series/Episode data.");
-                    }
-                    if (AllPackageTasks())
-                    {
-                        WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
-                        AdiEnrichmentQueueController.QueuedPackages.Remove(package);
-                        Log.Info(
-                            $"############### Processing FINISHED For Queued file: {IngestFile.AdiPackage.Name} ###############\r\n");
+                        if (!Success)
+                            throw new Exception(
+                                "Error encountered during GetMappingAndExtractPackage process, check logs and package.");
+                        if (!EnrichmentWorkflowEntities.IsMoviePackage)
+                        {
+                            if (!ProcessSeriesEpisodePackage())
+                                throw new Exception("Error Processing Series/Episode data.");
+                        }
+
+                        if (AllPackageTasks())
+                        {
+                            WorkflowManager.PackageCleanup(IngestFile.AdiPackage);
+                            AdiEnrichmentQueueController.QueuedPackages.Remove(package);
+                        }
+                        else
+                        {
+                            throw new Exception("Workflow Processing failed.");
+                        }
                     }
                     else
                     {
-                        throw new Exception("Workflow Processing failed.");
+                        WorkflowManager.StartPassthroughTasks(IngestFile.AdiPackage, Path.Combine(ADIWF_Config.TVOD_Delivery_Directory, IngestFile.AdiPackage.Name));
                     }
+
+                    Log.Info(
+                        $"############### Processing FINISHED For Queued file: {IngestFile.AdiPackage.Name} ###############\r\n");
                 }
                 catch (Exception pqiEx)
                 {
@@ -169,9 +181,19 @@ namespace ADIWFE_TestClient
         {
             try
             {
+
+                PassThroughIngest = false;
+
                 if (WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
                        WorkflowManager.ValidatePackageIsUnique())
                 {
+                    if (EnrichmentWorkflowEntities.IsAdultPackage & !ADIWF_Config.AllowAdultContentIngest)
+                    {
+                        PassThroughIngest = true;
+                        Log.Warn("Adult package detected, config disallows enrichment of adult content; passing through to ingest without enrichment.");
+                        return true;
+                    }
+
                     HasGnMapping = WorkflowManager.CallAndParseGnMappingData();
                     if (HasGnMapping)
                         return WorkflowManager.SeedGnMappingData() &&
@@ -230,6 +252,19 @@ namespace ADIWFE_TestClient
             {
                 LogError("AllPackageTasks", "Error Carrying out all common package tasks", aptex);
                 return false;
+            }
+        }
+
+        private void ProcessPassThrough()
+        {
+            try
+            {
+
+            }
+            catch (Exception pptException)
+            {
+
+                LogError("pptException", "Error Allowing Pass through of Package", pptException);
             }
         }
     }

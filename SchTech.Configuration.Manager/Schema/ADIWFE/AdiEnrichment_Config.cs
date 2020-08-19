@@ -103,5 +103,9 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
 
         [XmlElement(ElementName = "Prefix_Series_ID_Value")]
         public static string Prefix_Series_ID_Value { get; set; }
+
+
+        [XmlElement(ElementName = "AllowAdultContentIngest")]
+        public static bool AllowAdultContentIngest { get; set; }
     }
 }

@@ -42,6 +42,8 @@ namespace SchTech.Entities.ConcreteTypes
 
         public static bool IsEpisodeSeries { get; set; }
 
+        public static bool IsAdultPackage { get; set; }
+
         public static bool PackageHasPreviewMetadata { get; set; }
 
         public static bool IsDuplicateIngest { get; set; }
@@ -332,5 +334,7 @@ namespace SchTech.Entities.ConcreteTypes
             XmlSerializer = new XmlSerializationManager<ADI>();
             XmlSerializer.Save(filePath, adiFileContent);
         }
+
+        
     }
 }

@@ -93,6 +93,27 @@ namespace VirginMediaWorkflowDirector
             WorkflowEntities.HasPackagesToProcess = pollController.HasFilesToProcess;
         }
 
+        private bool IsAdultPackage()
+        {
+            try
+            {
+               var audience =
+                   EnrichmentWorkflowEntities.AdiFile.Asset.Metadata.App_Data.FirstOrDefault(a => a.Name == "Audience")?.Value;
+
+               return audience?.ToLower() == "adult"
+                   ? EnrichmentWorkflowEntities.IsAdultPackage = true
+                   : EnrichmentWorkflowEntities.IsAdultPackage = false;
+
+            }
+            catch (Exception iapEx)
+            {
+                LogError(
+                    "IsAdultPackage",
+                    "Error During Detection of Audience Type", iapEx);
+                return false;
+            }
+        }
+
         public bool ObtainAndParseAdiFile(FileInfo adiPackageInfo)
         {
             try
@@ -141,6 +162,9 @@ namespace VirginMediaWorkflowDirector
 
 
                 HasPoster = AdiContentManager.CheckAndRemovePosterSection();
+
+                if(IsAdultPackage())
+                    Log.Info("Package Audience is of type: Adult.");
 
                 return true;
 
@@ -1642,6 +1666,23 @@ namespace VirginMediaWorkflowDirector
                 {
                     //do nothing
                 }
+            }
+        }
+
+        public void StartPassthroughTasks(FileInfo packageFile, string destination)
+        {
+            try
+            {
+                Log.Info($"Moving Package: {packageFile.FullName} to delivery directory: {destination}");
+                File.Move(packageFile.FullName, destination);
+                Log.Info("Successfully moved package");
+                RemoveWorkingDirectory();
+            }
+            catch (Exception sptException)
+            {
+                LogError(
+                    "StartPassthroughTasks",
+                    "Error Carrying out passthrough tasks", sptException);
             }
         }
     }
