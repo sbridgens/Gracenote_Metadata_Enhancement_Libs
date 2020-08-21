@@ -58,7 +58,7 @@ namespace SchTech.Api.Manager.GracenoteOnApi.Concrete
                 ? MovieEpisodeProgramData.episodeInfo?.title.Value
                 : MovieEpisodeProgramData.episodeInfo?.number != null
                     ? $"Episode {MovieEpisodeProgramData.episodeInfo?.number}"
-                    : $"Episode {GetSeriesTitle() ?? MovieEpisodeProgramData.partNumber}";
+                    : $"{GetSeriesTitle() ?? MovieEpisodeProgramData.partNumber}";
         }
 
         public string GetSeriesTitle()
