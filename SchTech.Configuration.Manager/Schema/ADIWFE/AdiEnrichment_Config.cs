@@ -32,6 +32,17 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
         public static string BlockPlatformValue { get; set; }
     }
 
+    [XmlRoot(ElementName = "AllowAdultContentIngest")]
+    public class AllowAdultContentIngest
+    {
+        [XmlAttribute(AttributeName = "deliveryDirectory")]
+        public static string DeliveryDirectory { get; set; }
+        [XmlText]
+        public static bool AllowAdultEnrichment { get; set; }
+    }
+
+
+
     [XmlRoot(ElementName = "ADIWF_Config")]
     public class ADIWF_Config
     {
@@ -106,6 +117,8 @@ namespace SchTech.Configuration.Manager.Schema.ADIWFE
 
 
         [XmlElement(ElementName = "AllowAdultContentIngest")]
-        public static bool AllowAdultContentIngest { get; set; }
+        public static AllowAdultContentIngest AllowAdultContentIngest { get; set; }
+
     }
 }
+ 

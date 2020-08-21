@@ -41,7 +41,8 @@ namespace SchTech.Configuration.Manager.Concrete
                                     ele.Attribute("MoveNonLegacyToDirectory")?.Value;
                                 break;
                             case "AllowAdultContentIngest":
-                                ADIWF_Config.AllowAdultContentIngest = Convert.ToBoolean(ele.Value);
+                                AllowAdultContentIngest.AllowAdultEnrichment = Convert.ToBoolean(ele.Value);
+                                AllowAdultContentIngest.DeliveryDirectory = ele.Attribute("deliveryDirectory")?.Value;
                                 break;
                             default:
                                 pinf.SetValue(pinf.Name, ele.Value);

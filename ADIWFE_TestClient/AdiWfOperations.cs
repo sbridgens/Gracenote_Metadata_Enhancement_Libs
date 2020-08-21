@@ -143,7 +143,7 @@ namespace ADIWFE_TestClient
                     }
                     else
                     {
-                        WorkflowManager.StartPassthroughTasks(IngestFile.AdiPackage, Path.Combine(ADIWF_Config.TVOD_Delivery_Directory, IngestFile.AdiPackage.Name));
+                        WorkflowManager.StartPassthroughTasks(IngestFile.AdiPackage, Path.Combine(AllowAdultContentIngest.DeliveryDirectory, IngestFile.AdiPackage.Name));
                     }
 
                     Log.Info(
@@ -187,7 +187,8 @@ namespace ADIWFE_TestClient
                 if (WorkflowManager.ObtainAndParseAdiFile(IngestFile.AdiPackage) &&
                        WorkflowManager.ValidatePackageIsUnique())
                 {
-                    if (EnrichmentWorkflowEntities.IsAdultPackage & !ADIWF_Config.AllowAdultContentIngest)
+
+                    if (EnrichmentWorkflowEntities.IsAdultPackage & !AllowAdultContentIngest.AllowAdultEnrichment)
                     {
                         PassThroughIngest = true;
                         Log.Warn("Adult package detected, config disallows enrichment of adult content; passing through to ingest without enrichment.");
