@@ -1,4 +1,4 @@
-# Gracenote_Metadata_Enhancement_Libs
+# Gracenote Metadata Enhancement Libs
 Libs for creating a Gracenote Metadata enrichment service
 
 
